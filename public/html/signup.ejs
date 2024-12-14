@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup Form</title>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- MDB -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
+    <style>
+      body {
+        background-image: url('http://localhost:3000/images/signup.svg'); /* Update URL as needed */
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        height: 100vh;
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 40%;
+        padding: 30px;
+        border-radius: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+      }
+
+      .card-header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        font-size: 16px;
+      }
+
+      .btn-custom {
+        background-color: #06ff86;
+        color: #000;
+        font-size: 16px;
+      }
+
+      .btn-custom:hover {
+        background-color: #06ff86;
+        border-radius: 30px;
+        border: 1px solid #000000;
+      }
+
+      .text-muted {
+        font-size: 14px;
+      }
+
+      .form-outline {
+        margin-bottom: 20px;
+      }
+
+      .form-control {
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      console.log('Page loaded');
+    </script>
+    <div class="card">
+      <div class="card-header">
+        <h3>Sign up</h3>
+        <p class="text-muted">See what Can Tutor-Hub Do</p>
+      </div>
+      <form
+        action="/signup"
+        method="POST"
+        onsubmit="console.log('Form submitted');"
+      >
+        <!-- Google Sign Up Button -->
+        <div class="text-center mb-4">
+          <button
+            type="button"
+            class="btn btn-outline-primary btn-block"
+            onclick="console.log('Google signup clicked');"
+          >
+            Sign up with Google
+          </button>
+        </div>
+
+        <!-- First Name & Last Name -->
+        <div class="row mb-4">
+          <div class="col">
+            <div class="form-outline">
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                class="form-control"
+                required
+                oninput="console.log('First Name:', this.value);"
+              />
+              <label class="form-label" for="firstName">First Name*</label>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-outline">
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                class="form-control"
+                required
+                oninput="console.log('Last Name:', this.value);"
+              />
+              <label class="form-label" for="lastName">Last Name*</label>
+            </div>
+          </div>
+        </div>
+        <!-- Account Type -->
+        <div class="form-outline mb-4">
+          <select
+            id="accountType"
+            name="accountType"
+            class="form-control"
+            onchange="console.log('Account Type:', this.value);"
+          >
+            <option value="">Select Account Type*</option>
+            <option value="user">User</option>
+            <option value="teacher">Teacher</option>
+          </select>
+        </div>
+
+        <!-- Email -->
+        <div class="form-outline mb-4">
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="form-control"
+            required
+            oninput="console.log('Email:', this.value);"
+          />
+          <label class="form-label" for="email">Email*</label>
+        </div>
+
+        <!-- Password -->
+        <div class="form-outline mb-4">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-control"
+            required
+            oninput="console.log('Password entered');"
+          />
+          <label class="form-label" for="password">Password*</label>
+        </div>
+
+        <div class="form-outline mb-4">
+          <input
+            type="password"
+            id="confirmPassword"
+            name="ConfirmPassword"
+            class="form-control"
+            required
+            oninput="console.log('Confirm Password entered');"
+          />
+          <label class="form-label" for="confirmPassword"
+            >Confirm Password*</label
+          >
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="form-check mb-4">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            value=""
+            id="terms"
+            required
+            onchange="console.log('Terms accepted:', this.checked);"
+          />
+          <label class="form-check-label" for="terms">
+            I agree to the <a href="#">Terms of Service</a> and
+            <a href="#">Privacy Policy</a>.
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center">
+          <button type="submit" class="btn btn-custom btn-lg btn-block">
+            Create your Tutor-hub account
+          </button>
+        </div>
+
+        <!-- Sign In Link -->
+        <p class="text-muted text-center mt-3">
+          Already have an account?
+          <a href="/signin" class="text-primary">Sign in</a>
+        </p>
+      </form>
+    </div>
+  </body>
+</html>

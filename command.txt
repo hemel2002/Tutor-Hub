@@ -4,3 +4,4 @@ npm install nodemailer
 npm install connect-flash    
 npm install express-session  
 npm install method-override  
+npm install dotenv

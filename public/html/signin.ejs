@@ -25,49 +25,59 @@
 
     <style>
       /* These are the KEY styles - you can add them directly to any object you want in your project */
-      .fancy-border-radius {
-        border-radius: 100% 0% 100% 0% / 100% 100% 0% 0%;
+      .btn {
+        background-color: rgb(3, 151, 97);
+      }
+      .btn:hover {
+        background-color: rgb(3, 151, 97);
+        border-radius: 30px;
+        border: 1px solid #000000;
+      }
+      .svg-background {
+        background-image: url('http://localhost:3000/images/signup.svg'); /* Correct the path */
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-        /* These are ADDITIONAL styles - add them if you want an object exactly like in the demo above */
-        width: 400px;
-        height: 400px;
-        background: #ad5389;
-        background: -webkit-linear-gradient(to right, #3c1053, #ad5389);
-        background: linear-gradient(to right, #3c1053, #ad5389);
+        height: 100vh;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-7">
-          <div class="card text-center">
-            <div class="card-header bg-success text-light">Welcome!</div>
-            <div class="card-body">
-              <h5 class="card-title">Sign in</h5>
+    <div class="svg-background">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-7">
+            <div class="card text-center">
+              <div class="card-header bg-success text-light">Welcome!</div>
+              <div class="card-body">
+                <h5 class="card-title">Sign in</h5>
 
-              <div class="form-outline" data-mdb-input-init>
-                <div class="row">
-                  <div class="col-7">
-                    <input type="email" id="typeEmail" class="form-control" />
-                    <label class="form-label" for="typeEmail"
-                      >Enter Email
-                    </label>
-                  </div>
-                  <div class="col-5">
-                    <a href="#" class="btn btn-primary" data-mdb-ripple-init
-                      >Next
-                      <i class="fas fa-arrow-right"></i>
-                    </a>
+                <div class="form-outline" data-mdb-input-init>
+                  <div class="row">
+                    <div class="col-7">
+                      <input type="email" id="typeEmail" class="form-control" />
+                      <label class="form-label" for="typeEmail"
+                        >Enter Email
+                      </label>
+                    </div>
+                    <div class="col-5">
+                      <a href="#" class="btn btn-primary" data-mdb-ripple-init
+                        >Next
+                        <i class="fas fa-arrow-right"></i>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
+              <div class="card-footer text-muted">2 days ago</div>
             </div>
-            <div class="card-footer text-muted">2 days ago</div>
           </div>
-        </div>
 
-        <!-- <div class="fancy-border-radius"></div> -->
+          <!-- <div class="fancy-border-radius"></div> -->
+        </div>
       </div>
     </div>
   </body>
