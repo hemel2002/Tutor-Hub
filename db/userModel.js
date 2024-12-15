@@ -45,10 +45,7 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Account Type is required'],
     },
   },
-
-  {
-    _id: false, // Disable the default _id field
-  }
+  { timestamps: true }
 );
 //   'phone number': {
 //     type: Number,

@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const mongoURI = process.env.MONGO_URI;
 
-const MongooseConnection = () => {
-  mongoose
+const MongooseConnection = async () => {
+  await mongoose
     .connect(mongoURI)
     .then(() => {
       console.log('Database Connected');
@@ -11,4 +11,6 @@ const MongooseConnection = () => {
       console.log('Database Connection Failed', err);
     });
 };
+module.exports = MongooseConnection;
+
 module.exports = MongooseConnection;

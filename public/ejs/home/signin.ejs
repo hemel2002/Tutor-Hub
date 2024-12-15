@@ -26,27 +26,33 @@
     <style>
       /* These are the KEY styles - you can add them directly to any object you want in your project */
       .btn {
-        background-color: rgb(3, 151, 97);
+        background-color: #00ed64;
+        color: #000000;
       }
       .btn:hover {
-        background-color: rgb(3, 151, 97);
+        background-color: #00ed64;
         border-radius: 30px;
         border: 1px solid #000000;
+        color: #000000;
       }
       .svg-background {
-        background-image: url('http://localhost:3000/images/signup.svg'); /* Correct the path */
+        background-image: url('http://localhost:3000/images/signin.svg'); /* Correct the path */
         background-size: cover;
         background-position: center;
+        background-attachment: fixed;
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
         display: flex;
-        align-items: center;
         justify-content: center;
-
+        align-items: center;
         height: 100vh;
+        overflow: hidden;
       }
     </style>
   </head>
   <body>
     <div class="svg-background">
+      <%- include('../flash/homeFlash') %>
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-md-7">
@@ -54,23 +60,29 @@
               <div class="card-header bg-success text-light">Welcome!</div>
               <div class="card-body">
                 <h5 class="card-title">Sign in</h5>
-
-                <div class="form-outline" data-mdb-input-init>
-                  <div class="row">
-                    <div class="col-7">
-                      <input type="email" id="typeEmail" class="form-control" />
-                      <label class="form-label" for="typeEmail"
-                        >Enter Email
-                      </label>
-                    </div>
-                    <div class="col-5">
-                      <a href="#" class="btn btn-primary" data-mdb-ripple-init
-                        >Next
-                        <i class="fas fa-arrow-right"></i>
-                      </a>
+                <form action="/signin" method="POST">
+                  <div class="form-outline">
+                    <div class="row">
+                      <div class="col-7">
+                        <input
+                          type="email"
+                          id="typeEmail"
+                          class="form-control"
+                          name="email"
+                        />
+                        <label class="form-label" for="typeEmail"
+                          >Enter Email
+                        </label>
+                      </div>
+                      <div class="col-5">
+                        <button type="submit" class="btn" data-mdb-ripple-init>
+                          Next
+                          <i class="fas fa-arrow-right"></i>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </form>
               </div>
               <div class="card-footer text-muted">2 days ago</div>
             </div>

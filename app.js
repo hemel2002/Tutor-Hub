@@ -31,26 +31,108 @@ app.use(
 app.use(flash());
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.set('views', path.join(__dirname, 'public', 'html'));
+app.set('views', path.join(__dirname, 'public', 'ejs'));
 
 app.set('view engine', 'ejs');
+app.use((req, res, next) => {
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
+  next();
+});
 
 //////////////////////////Mongoose Connection//////////////////////////
 
 const PORT = process.env.PORT;
 
-/////////////////////home///////////////////
-app.get('/', (req, res) => {
-  res.render('signin');
+/////////////////////sign in///////////////////
+app.get('/signin', (req, res) => {
+  res.render('home/signin');
 });
+app.post('/signin', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    await MongooseConnection();
+    const user = await CreateNewUser.findOne({ email: email });
+    if (user) {
+      req.flash('success', `Welcome, ${user['full name']}.`);
+      res.redirect(`/validuser?email=${email}`);
+    } else {
+      req.flash('error', 'user not found, please sign up');
+      res.redirect('/signin');
+    }
+  } catch (error) {
+    req.flash('error', 'Internal server error');
+    res.redirect('/signin');
+  } finally {
+    mongoose.connection.close();
+  }
+
+  console.log(req.body);
+});
+/////////valid user signin/////////////
+app.get('/validuser', async (req, res) => {
+  const email = req.query.email;
+  try {
+    await MongooseConnection();
+
+    const user = await CreateNewUser.findOne({ email: email });
+    res.render('home/SignUpAfterValidation', {
+      fullname: user['full name'],
+      pic: user['profile picture'],
+      email: user.email,
+    });
+  } catch (error) {
+    console.log(error);
+  } finally {
+    mongoose.connection.close();
+  }
+});
+app.post('/validuser', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    await MongooseConnection();
+    const user = await CreateNewUser.findOne({ email: email });
+    console.log(user);
+    if (user.password === password) {
+      req.flash('success', 'Successfully signed in');
+      res.redirect('/dashboard');
+    } else {
+      req.flash('error', 'Invalid email or password');
+      res.redirect('/signin');
+    }
+  } catch (error) {
+    req.flash('error', 'Internal server error');
+    res.redirect('/signin');
+  } finally {
+    mongoose.connection.close();
+  }
+});
+
 /////////////////////signup////////////////////////
 
 app.get('/signup', (req, res) => {
-  res.render('signup');
+  // await CreateNewUser.collection.drop();
+
+  res.render('home/signup');
 });
 
 app.post('/signup', async (req, res) => {
-  const { first_name, last_name, email, password, account_type } = req.body;
+  const {
+    first_name,
+    last_name,
+    email,
+    password,
+    account_type,
+    confirmPassword,
+  } = req.body;
+  console.log(req.body);
+  if (password !== confirmPassword) {
+    req.flash('error', 'Passwords do not match');
+    res.redirect('/signup');
+    return;
+  }
   try {
     // Ensure the mongoose connection is established
     await MongooseConnection();
@@ -66,23 +148,27 @@ app.post('/signup', async (req, res) => {
       nextUser = parseInt(userId.replace(/[^\d]/g, '')) + 1; // Extract digits and increment
     }
 
-    const user_id = `U${nextUser}`;
+    const user_id = `U000000${nextUser}`;
     console.log(user_id);
 
     // Create the new user
-    await CreateNewUser.create({
+    const newUser = new CreateNewUser({
       'user id': user_id,
       'first name': first_name,
       'last name': last_name,
       email: email,
       password: password,
       'account type': account_type,
+      _id: new mongoose.Types.ObjectId(),
     });
+    await newUser.save();
+    req.flash('success', 'User created successfully');
 
-    res.redirect('/signin');
+    return res.redirect('/signin');
   } catch (error) {
     console.log(error);
-    res.status(500).send('Internal Server Error');
+    req.flash('error', error.message);
+    res.redirect('/signup');
   } finally {
     mongoose.connection.close();
   }
@@ -96,5 +182,5 @@ app.get('/signin', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log(`http://localhost:${PORT}/`);
+  console.log(`http://localhost:${PORT}/signin`);
 });
