@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Time Series Data Design</title>
+    <!-- Include MDB Bootstrap -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* Custom CSS */
+      .hero-section {
+        background-color: #f8f9fa; /* Light background */
+        padding: 80px 0;
+      }
+
+      .hero-title {
+        font-size: 3rem;
+        font-weight: bold;
+      }
+
+      .highlight-text {
+        background: rgba(0, 255, 128, 0.1);
+        border: 1px solid #4caf50;
+        border-radius: 5px;
+        padding: 5px 10px;
+        color: #4caf50;
+      }
+
+      .cta-buttons a {
+        margin-right: 10px;
+      }
+
+      .stats-section {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 30px;
+      }
+
+      .stat-card {
+        text-align: center;
+      }
+
+      .image-section {
+        position: relative;
+        background-color: #111;
+        padding: 40px 0;
+      }
+
+      .image-section img {
+        max-width: 100%;
+        border-radius: 10px;
+      }
+
+      /* Dark overlay effect */
+      .dark-overlay {
+        position: absolute;
+        top: -60px;
+        right: 0;
+        max-width: 60%;
+      }
+      .svg-background {
+        background-image: url('/public/images/hero.svg'); /* Correct the path */
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Hero Section -->
+    <div class="svg-background">
+      <section class="hero-section text-center">
+        <div class="container">
+          <h1 class="hero-title">
+            Loved by developers. <br />
+            Built for <span class="highlight-text">Time Series Data</span>
+          </h1>
+          <p class="lead mt-4">
+            You don't need a separate database to support transactions, rich
+            search, or gen AI. The world's most popular document database is now
+            the world's most versatile developer data platform.
+          </p>
+          <div class="cta-buttons mt-4">
+            <a href="#" class="btn btn-success">Try Atlas Free</a>
+            <a href="#" class="btn btn-outline-dark">Learn More →</a>
+          </div>
+
+          <!-- Stats Section -->
+          <div class="stats-section mt-5">
+            <div class="stat-card">
+              <h3>52K+</h3>
+              <p>Customers →</p>
+            </div>
+            <div class="stat-card">
+              <h3>115+</h3>
+              <p>Regions across AWS, Azure, and Google Cloud →</p>
+            </div>
+            <div class="stat-card">
+              <h3>175K+</h3>
+              <p>Developers join every month →</p>
+            </div>
+            <div class="stat-card">
+              <h3>#1</h3>
+              <p>Most used modern database →</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Image Section -->
+      <section class="image-section">
+        <div class="container">
+          <!-- Overlay Image -->
+          <img
+            src="your-placeholder-image.jpg"
+            alt="Overlay Design"
+            class="dark-overlay"
+          />
+        </div>
+      </section>
+    </div>
+
+    <!-- MDB JS -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"
+    ></script>
+  </body>
+</html>
