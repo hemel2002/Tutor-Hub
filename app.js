@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const methodOverride = require('method-override');
-const CreateNewUser = require('./db/userModel');
+const bcrypt = require('bcrypt');
 const session = require('express-session');
 const flash = require('connect-flash');
 const nodemailer = require('nodemailer');
@@ -14,7 +14,22 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
 const { Cloudinary } = require('cloudinary');
 const MongooseConnection = require('./db/MongooseConnection');
+const CreateNewUser = require('./db/userModel');
+const hashPass = require('./function/hashing');
 const app = express();
+const OpenAI = require('openai');
+const axios = require('axios');
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const completion = openai.chat.completions.create({
+  model: 'gpt-4o-mini',
+  messages: [{ role: 'user', content: 'write a haiku about ai' }],
+});
+
+completion.then((result) => console.log(result.choices[0].message));
 ///connect .env file
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -45,9 +60,31 @@ app.use((req, res, next) => {
 const PORT = process.env.PORT;
 
 /////////////////////sign in///////////////////
-app.get('/signin', (req, res) => {
-  res.render('home/signin');
+// Ensure you have this dependency installedconst axios = require('axios');
+
+const options = {
+  method: 'GET',
+  url: 'https://famous-quotes4.p.rapidapi.com/random',
+  params: {
+    category: 'education',
+    count: '1',
+  },
+  headers: {
+    'x-rapidapi-key': process.env.RAPID_API_KEY,
+    'x-rapidapi-host': 'famous-quotes4.p.rapidapi.com',
+  },
+};
+
+app.get('/signin', async (req, res) => {
+  try {
+    const response = await axios.request(options);
+    console.log(response.data[0]);
+    res.render('home/signin', { quotes: response.data[0] });
+  } catch (error) {
+    console.error(error);
+  }
 });
+
 app.post('/signin', async (req, res) => {
   const { email } = req.body;
 
@@ -94,8 +131,9 @@ app.post('/validuser', async (req, res) => {
   try {
     await MongooseConnection();
     const user = await CreateNewUser.findOne({ email: email });
-    console.log(user);
-    if (user.password === password) {
+    const validUser = await bcrypt.compare(password, user.password);
+
+    if (validUser) {
       req.flash('success', 'Successfully signed in');
       res.redirect('/dashboard');
     } else {
@@ -113,6 +151,7 @@ app.post('/validuser', async (req, res) => {
 /////////////////////signup////////////////////////
 
 app.get('/signup', (req, res) => {
+  // MongooseConnection();
   // await CreateNewUser.collection.drop();
 
   res.render('home/signup');
@@ -149,7 +188,7 @@ app.post('/signup', async (req, res) => {
     }
 
     const user_id = `U000000${nextUser}`;
-    console.log(user_id);
+    const hashPasswoord = await hashPass(password);
 
     // Create the new user
     const newUser = new CreateNewUser({
@@ -157,7 +196,7 @@ app.post('/signup', async (req, res) => {
       'first name': first_name,
       'last name': last_name,
       email: email,
-      password: password,
+      password: hashPasswoord,
       'account type': account_type,
       _id: new mongoose.Types.ObjectId(),
     });
