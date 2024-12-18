@@ -20,16 +20,6 @@ const app = express();
 const OpenAI = require('openai');
 const axios = require('axios');
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const completion = openai.chat.completions.create({
-  model: 'gpt-4o-mini',
-  messages: [{ role: 'user', content: 'write a haiku about ai' }],
-});
-
-completion.then((result) => console.log(result.choices[0].message));
 ///connect .env file
 
 app.use(express.static(path.join(__dirname, 'public')));
