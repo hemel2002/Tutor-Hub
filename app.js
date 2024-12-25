@@ -17,7 +17,11 @@ const MongooseConnection = require('./db/MongooseConnection');
 const CreateNewUser = require('./db/userModel');
 const hashPass = require('./function/hashing');
 const app = express();
-const OpenAI = require('openai');
+const TokenModel = require('./db/ForgetModel');
+const sendOtpEmail = require('./routes/email');
+const { PASSWORD_RESET_REQUEST_TEMPLATE } = require('./routes/EmailTemp');
+const getWirelessIP = require('./routes/GetWirelessIp');
+
 const axios = require('axios');
 
 ///connect .env file
@@ -42,6 +46,7 @@ app.set('view engine', 'ejs');
 app.use((req, res, next) => {
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
+  res.locals.localhost = `http://${getWirelessIP()}:${PORT}`;
   next();
 });
 
@@ -203,10 +208,89 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-/////////////////////signin////////////////////////
+/////////////////////Verify Valid Email////////////////////////
+app.get('/emailVerification', (req, res) => {
+  res.render('home/verifyEmail');
+});
+/////////////////////Forget password////////////////////////
+app.get('/forgetpassword', (req, res) => {
+  res.render('home/forget');
+});
+app.post('/forgetpassword', async (req, res) => {
+  const { email } = req.body;
 
-app.get('/signin', (req, res) => {
-  res.render('signin');
+  const Token = uuidv4();
+  const subject = 'Password Reset Request';
+  const resetLink = `http://${getWirelessIP()}:${PORT}/resetpassword?token=${Token}&email=${email}`;
+  console.log(resetLink);
+  const message = PASSWORD_RESET_REQUEST_TEMPLATE.replace(
+    `{resetURL}`,
+    resetLink
+  );
+  console.log(message);
+  try {
+    await MongooseConnection();
+    const user = await CreateNewUser.findOne({ email: email });
+    if (!user) {
+      req.flash('error', 'User not found');
+      return res.redirect('/forgetpassword');
+    }
+    const SetToken = new TokenModel({
+      email: email,
+      token: Token,
+      expiryTime: Date.now() + 36000000,
+    });
+
+    await SetToken.save();
+    await sendOtpEmail(email, subject, message);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    mongoose.connection.close();
+  }
+});
+//////////////////////////Reset Password//////////////////////////
+app.get('/resetpassword', async (req, res) => {
+  const { token, email } = req.query;
+  try {
+    await MongooseConnection();
+    const user = await TokenModel.findOne({ email: email, token: token });
+    if (!user || user.expiryTime < Date.now()) {
+      req.flash('error', 'Invalid token or token expired');
+      return res.redirect('/forgetpassword');
+    }
+    return res.render('home/ResetPassword', { email: email });
+  } catch (error) {
+    console.log(error);
+  } finally {
+    mongoose.connection.close();
+  }
+});
+app.post('/resetpassword', async (req, res) => {
+  const { password, confirmpassword, email } = req.body;
+  console.log(req.body);
+  if (password !== confirmpassword) {
+    req.flash('error', 'Passwords do not match');
+    return res.redirect(`/resetpassword?email=${email}`);
+  }
+  try {
+    await MongooseConnection();
+    const user = await CreateNewUser.findOne({ email: email });
+    const hashPassword = await hashPass(password);
+    user.password = hashPassword;
+    console.log(user);
+    await user.save();
+    req.flash('success', 'Password reset successfully');
+    return res.redirect('/signin');
+  } catch (error) {
+    console.log(error);
+  } finally {
+    mongoose.connection.close();
+  }
+});
+//////////////////////////Nearby Teachers//////////////////////////
+app.get('/nearby', (req, res) => {
+  res.render('home/NearByTeachers');
 });
 
 app.listen(PORT, () => {
