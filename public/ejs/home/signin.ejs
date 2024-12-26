@@ -47,6 +47,14 @@
         backdrop-filter: blur(3px);
       }
 
+      .flash-message {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 3;
+      }
+
       .quote-container {
         position: absolute;
         top: 20px;
@@ -185,7 +193,8 @@
     </style>
   </head>
   <body>
-    <%- include('../flash/homeFlash') %> <%- include('../NavBar/NavBar') %>
+    <div class="flash-message"><%- include('../flash/homeFlash') %></div>
+    <%- include('../NavBar/NavBar') %>
     <div class="svg-background">
       <!-- Quotes Section -->
       <div class="quote-container">

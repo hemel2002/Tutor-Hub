@@ -109,7 +109,7 @@ app.get('/validuser', async (req, res) => {
     await MongooseConnection();
 
     const user = await CreateNewUser.findOne({ email: email });
-    res.render('home/SignUpAfterValidation', {
+    res.render('home/SigninAfterValidation', {
       fullname: user['full name'],
       pic: user['profile picture'],
       email: user.email,
@@ -243,6 +243,8 @@ app.post('/forgetpassword', async (req, res) => {
 
     await SetToken.save();
     await sendOtpEmail(email, subject, message);
+    req.flash('success', 'Password reset link sent to your email');
+    return res.redirect('/SuccessResetLink');
   } catch (error) {
     console.log(error);
   } finally {
@@ -291,6 +293,11 @@ app.post('/resetpassword', async (req, res) => {
 //////////////////////////Nearby Teachers//////////////////////////
 app.get('/nearby', (req, res) => {
   res.render('home/NearByTeachers');
+});
+//////////////////////////seccess ResetLink//////////////////////////
+app.get('/SuccessResetLink', (req, res) => {
+  req.flash('success', 'Password reset link sent to your email');
+  res.render('home/SuccessResetLink');
 });
 
 app.listen(PORT, () => {

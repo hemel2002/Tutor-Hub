@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Profile</title>
+    <!-- MDB CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.3.0/mdb.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    />
+    <!-- Custom CSS -->
+    <style>
+      body {
+        background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+        font-family: 'Roboto', sans-serif;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 600px;
+        margin: 70px auto;
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+      }
+      .edit-profile-header h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #333333;
+      }
+      .profile-picture {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #ff9a9e;
+      }
+      .form-outline {
+        margin-bottom: 20px;
+      }
+      .btn-update {
+        background: #ff6f61;
+        color: #ffffff;
+        font-weight: bold;
+        border: none;
+        width: 100%;
+      }
+      .btn-update:hover {
+        background: #e65a50;
+      }
+      .btn-link {
+        color: #ff6f61;
+        font-weight: bold;
+      }
+      .btn-link:hover {
+        text-decoration: underline;
+      }
+      hr {
+        border: 0;
+        border-top: 1px solid #ddd;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include ('../NavBar/NavBar') %> <%- include('../flash/homeFlash') %>
+
+    <div class="container" style="padding: 40px; margin-top: 100px">
+      <!-- Edit Profile Header -->
+      <div class="edit-profile-header text-center mb-4">
+        <h1>Hello, <%= fullname %>!</h1>
+      </div>
+
+      <!-- Edit Profile Form -->
+      <div class="edit-profile-form" style="padding: 40px">
+        <form
+          id="profileForm"
+          class="needs-validation"
+          action="/validuser"
+          method="post"
+          novalidate
+        >
+          <!-- Profile Picture -->
+          <div class="text-center mb-4">
+            <img
+              src="<%= pic %>"
+              alt="Profile Picture"
+              class="profile-picture mb-3"
+              id="profile-picture"
+            />
+          </div>
+
+          <!-- Email Field -->
+          <div class="form-outline">
+            <input
+              type="email"
+              name="email"
+              id="email"
+              class="form-control"
+              value="<%= email %>"
+              readonly
+              required
+            />
+            <label class="form-label" for="email">Email</label>
+          </div>
+
+          <!-- Password Field -->
+          <div class="form-outline">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-control"
+              placeholder="Enter new password"
+              required
+            />
+            <label class="form-label" for="password">New Password</label>
+          </div>
+
+          <!-- Update Button -->
+          <button type="submit" class="btn btn-update mt-3">
+            Update Profile
+          </button>
+
+          <!-- Divider -->
+          <p class="text-center mt-4 mb-0">or</p>
+          <a href="/signup" class="btn btn-link">Create New Account</a>
+          <hr />
+
+          <!-- Forgot Password -->
+          <a
+            href="/forgetpassword"
+            class="text-decoration-none d-block text-center"
+          >
+            Forgot Password?
+          </a>
+        </form>
+      </div>
+    </div>
+
+    <!-- MDB JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.3.0/mdb.min.js"></script>
+  </body>
+</html>
