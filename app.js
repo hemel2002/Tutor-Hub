@@ -299,6 +299,10 @@ app.get('/SuccessResetLink', (req, res) => {
   req.flash('success', 'Password reset link sent to your email');
   res.render('home/SuccessResetLink');
 });
+//////////////////////////LANDING/////////////////////////
+app.get('/home', (req, res) => {
+  res.render('home/home');
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- MDB -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
+      rel="stylesheet"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
+    ></script>
+    <title>Home</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        font-family: 'Poppins', sans-serif;
+      }
+
+      .section1 {
+        background: url('/images/landing/landing.svg') no-repeat center center;
+        background-size: cover;
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+      }
+
+      .btn-custom {
+        padding: 10px 20px;
+        border-radius: 5px;
+      }
+
+      .footer {
+        background-color: #012738;
+        color: white;
+        padding: 20px 0;
+      }
+
+      .footer a {
+        color: #0dcaf0;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="fixed-top"><%- include ('../NavBar/NavBar') %></nav>
+
+    <!-- Hero Section -->
+    <div class="section1">
+      <!-- Title Section -->
+      <div class="row mt-10">
+        <div class="col-12 mb-5 text-center">
+          <h3>Find the Perfect Tutor for Your Child Today!</h3>
+        </div>
+        <div class="col-md-8 col-12 mb-3 text-center">
+          <h1><b>Tutor-Hub</b></h1>
+        </div>
+      </div>
+
+      <!-- Description Section -->
+      <div class="row m-2">
+        <div class="col-md-8 col-12 mb-3 text-center">
+          <p>
+            At Tutor-Hub, we connect passionate educators with eager learners to
+            unlock every child’s potential. Whether your child needs help with
+            math, science, languages, or exam preparation, our platform offers a
+            diverse pool of verified, skilled tutors.
+          </p>
+        </div>
+      </div>
+
+      <!-- Why Tutor-Hub Section -->
+      <div class="row my-5">
+        <div class="col-8 text-center">
+          <h2 class="mb-4"><b>Why Tutor-Hub?</b></h2>
+        </div>
+        <div class="col-md-6 col-8 mb-6">
+          <div class="card shadow">
+            <div class="card-body">
+              <i class="fas fa-user-check fa-3x text-primary mb-3"></i>
+              <h5 class="card-title">Verified Tutors</h5>
+              <p class="card-text">
+                Every tutor undergoes a strict verification process to ensure
+                quality and reliability.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-7 col-8 mb-4">
+          <div class="card shadow">
+            <div class="card-body">
+              <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+              <h5 class="card-title">Customizable Learning</h5>
+              <p class="card-text">
+                Tailored learning experiences designed to meet your child's
+                unique needs and goals.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-8 mb-4">
+          <div class="card shadow">
+            <div class="card-body">
+              <i class="fas fa-handshake fa-3x text-warning mb-3"></i>
+              <h5 class="card-title">Affordable Pricing</h5>
+              <p class="card-text">
+                High-quality education at a price that fits your budget.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons Section -->
+      <div class="row m-4 p-4">
+        <div class="col-md-3 col-6 text-center">
+          <a href="/signup" class="btn btn-success w-100">Join Us</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Tutors Section -->
+    <section class="top-tutors" style="background-color: #012738">
+      <div class="container text-center">
+        <h2 class="mb-4 text-success pt-4">Top Tutors</h2>
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <div class="card">
+              <img
+                src="/images/tutors/tutor1.jpg"
+                class="card-img-top"
+                alt="Tutor 1"
+              />
+              <div class="card-body">
+                <h5 class="card-title">John Doe</h5>
+                <p class="card-text">
+                  Math Specialist with 5 years experience.
+                </p>
+                <a href="#" class="btn btn-primary">View Profile</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="card">
+              <img
+                src="/images/tutors/tutor2.jpg"
+                class="card-img-top"
+                alt="Tutor 2"
+              />
+              <div class="card-body">
+                <h5 class="card-title">Jane Smith</h5>
+                <p class="card-text">Expert in Science and Biology.</p>
+                <a href="#" class="btn btn-primary">View Profile</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="card">
+              <img
+                src="/images/tutors/tutor3.jpg"
+                class="card-img-top"
+                alt="Tutor 3"
+              />
+              <div class="card-body">
+                <h5 class="card-title">Michael Lee</h5>
+                <p class="card-text">Language Tutor specializing in French.</p>
+                <a href="#" class="btn btn-primary">View Profile</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <div class="testimonials">
+      <h2 class="text-center pt-4">What Our Users Say</h2>
+      <div class="row justify-content-center">
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <p>
+                "Tutor-Hub connected us with an amazing math tutor. My child
+                loves learning now!"
+              </p>
+              <h6>- Parent</h6>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <p>
+                "A wonderful platform that makes learning easy and accessible."
+              </p>
+              <h6>- Student</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Reviews and Ratings Section -->
+    <section class="reviews pb-4">
+      <div class="container text-center">
+        <h2 class="mb-4 pt-4">Reviews and Ratings</h2>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card p-3">
+              <h5>"Excellent platform!"</h5>
+              <p>
+                My child improved in math significantly thanks to Tutor-Hub!
+              </p>
+              <p class="text-warning">★★★★★</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card p-3">
+              <h5>"Highly recommended!"</h5>
+              <p>Great tutors and easy to use. Love the experience!</p>
+              <p class="text-warning">★★★★★</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card p-3">
+              <h5>"Professional Tutors!"</h5>
+              <p>Very satisfied with the quality of education provided.</p>
+              <p class="text-warning">★★★★★</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <h5>Contact Us</h5>
+            <p>Email: support@tutorhub.com</p>
+            <p>Phone: +1 234 567 890</p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <h5>Quick Links</h5>
+            <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+          </div>
+        </div>
+        <hr />
+        <p class="text-center">&copy; 2024 Tutor-Hub. All Rights Reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>
