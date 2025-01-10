@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Teachers</title>
+    <!-- MDBootstrap CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.3.1/mdb.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .card:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease-in-out;
+      }
+      .hidden {
+        display: none;
+      }
+      .teacher-card {
+        margin-bottom: 5%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <!-- Search Bar -->
+      <div class="row mb-4">
+        <div class="col-md-12">
+          <div class="form-outline">
+            <input
+              type="text"
+              id="searchInput"
+              class="form-control"
+              placeholder="Search teachers by name..."
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Teachers Cards -->
+      <div class="row" id="teachersContainer">
+        <!-- Example Teacher Cards -->
+        <div class="col-md-4 teacher-card" data-name="John Doe">
+          <div class="card">
+            <div class="bg-image hover-overlay">
+              <img
+                src="<%= localhost %>/images/teacher.svg"
+                class="card-img-top"
+                alt="John Doe"
+              />
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">John Doe</h5>
+              <p class="card-text">Math Teacher with 5 years of experience.</p>
+              <a href="/profile/ShahriarHemal" class="btn btn-success"
+                >View Profile</a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 teacher-card" data-name="Jane Smith">
+          <div class="card">
+            <div class="bg-image hover-overlay">
+              <img
+                src="<%= localhost %>/images/teacher.svg"
+                class="card-img-top"
+                alt="Jane Smith"
+              />
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Jane Smith</h5>
+              <p class="card-text">English Teacher specializing in grammar.</p>
+              <a href="/profile/ShahriarHemal" class="btn btn-success"
+                >View Profile</a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 teacher-card" data-name="Michael Brown">
+          <div class="card">
+            <div class="bg-image hover-overlay">
+              <img
+                src="<%= localhost %>/images/teacher.svg"
+                class="card-img-top"
+                alt="Michael Brown"
+              />
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Michael Brown</h5>
+              <p class="card-text">
+                Science Teacher passionate about experiments.
+              </p>
+              <a href="/profile/ShahriarHemal" class="btn btn-success"
+                >View Profile</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 teacher-card" data-name="Shahriar Hemal">
+          <div class="card">
+            <div class="bg-image hover-overlay">
+              <img
+                src="<%= localhost %>/images/teacher.svg"
+                class="card-img-top"
+                alt="Michael Brown"
+              />
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Shahriar Hemal</h5>
+              <p class="card-text">
+                Science Teacher passionate about experiments.
+              </p>
+              <a href="/profile/ShahriarHemal" class="btn btn-success"
+                >View Profile</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MDBootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.3.1/mdb.min.js"></script>
+    <script>
+      // Search Functionality
+      document
+        .getElementById('searchInput')
+        .addEventListener('input', function () {
+          const searchValue = this.value.toLowerCase();
+          const cards = document.querySelectorAll('.teacher-card');
+
+          cards.forEach((card) => {
+            const name = card.getAttribute('data-name').toLowerCase();
+            if (name.includes(searchValue)) {
+              card.classList.remove('hidden');
+            } else {
+              card.classList.add('hidden');
+            }
+          });
+        });
+    </script>
+  </body>
+</html>

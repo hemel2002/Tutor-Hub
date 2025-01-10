@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="Your Name" />
+    <title>Verification Form</title>
+
+    <!-- MDB CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- WOW.js Animation Library -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+
+    <!-- Custom Styles -->
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to right, #ece9e6, #ffffff);
+        padding: 50px;
+      }
+
+      form {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        padding: 30px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .form-label {
+        font-weight: 500;
+      }
+
+      .btn-primary {
+        background: linear-gradient(to right, #4facfe, #00f2fe);
+        border: none;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(to right, #00f2fe, #4facfe);
+        box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4);
+      }
+
+      .img-thumbnail {
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+
+      .img-thumbnail:hover {
+        transform: scale(1.1);
+      }
+
+      .wow {
+        visibility: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Form Container -->
+    <form class="wow fadeIn">
+      <h2 class="text-center mb-4">Verification Form</h2>
+
+      <div class="mb-4 text-center">
+        <label for="uploadImage" class="form-label">Upload your image</label>
+        <a href="#">
+          <img
+            src="picasset/uploadimage.svg"
+            class="img-thumbnail"
+            alt="Upload"
+            width="150"
+          />
+        </a>
+      </div>
+
+      <div class="form-outline mb-4">
+        <input type="text" id="username" class="form-control" required />
+        <label class="form-label" for="username">Username</label>
+      </div>
+
+      <div class="form-outline mb-4">
+        <input type="email" id="email" class="form-control" required />
+        <label class="form-label" for="email">Email Address</label>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-6 form-outline">
+          <input type="text" id="firstName" class="form-control" required />
+          <label class="form-label" for="firstName">First Name</label>
+        </div>
+        <div class="col-md-6 form-outline">
+          <input type="text" id="lastName" class="form-control" required />
+          <label class="form-label" for="lastName">Last Name</label>
+        </div>
+      </div>
+
+      <div class="form-outline mb-4">
+        <input type="tel" id="phone" class="form-control" required />
+        <label class="form-label" for="phone">Phone Number</label>
+      </div>
+
+      <div class="form-check mb-4">
+        <input class="form-check-input" type="checkbox" id="terms" required />
+        <label class="form-check-label" for="terms">
+          Agree to terms and conditions
+        </label>
+      </div>
+
+      <button class="btn btn-primary btn-block" type="submit">Submit</button>
+    </form>
+
+    <!-- MDB Scripts -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"
+    ></script>
+    <script>
+      // Initialize WOW.js
+      new WOW().init();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,212 @@
+.b-example-vr {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 100vh;
+  }
+  
+  .bi {
+    vertical-align: -.125em;
+    fill: currentColor;
+  }
+  
+  .bd-mode-toggle {
+    z-index: 1500;
+  }
+  
+  .bd-mode-toggle .dropdown-menu .active .bi {
+    display: block !important;
+  }
+  
+  .bi {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+  }
+
+/* General styling for the search bar container */
+.input-group {
+    max-width: 600px; /* Limit the width of the search bar */
+    width: 90%; /* Allow responsiveness */
+    margin: 20px auto; /* Center horizontally with spacing on top */
+    position: relative;
+    top: 10px; /* Slightly adjust from the top */
+    display: flex;
+   justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    border-radius: 8px; /* Rounded corners */
+    background: #f9f9f9; /* Light background color */
+    padding: 10px; /* Inner padding for better spacing */
+  }
+  
+  /* Input field styling */
+  .form-control {
+    flex: 1 1 auto; /* Allow input to grow and shrink as needed */
+    min-width: 150px; /* Prevent it from becoming too small */
+    border: 1px solid #ccc; /* Subtle border */
+    border-radius: 4px; /* Rounded corners */
+    padding: 8px; /* Add padding */
+    font-size: 16px; /* Slightly larger font size */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition effects */
+  }
+  
+  .form-control:focus {
+    border-color: #fefffe; /* Highlighted border color on focus */
+    box-shadow: 0 0 5px rgba(0, 255, 38, 0.5); /* Glow effect on focus */
+  }
+  
+  /* Button styling */
+  .btn {
+    flex: 0 1 auto; /* Allow buttons to resize proportionally */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 16px; /* Uniform font size */
+    padding: 8px 12px; /* Adjust padding */
+    background-color: #04AA6D; /* Match the color of the "next" button */
+    color: white; /* White text for contrast */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Smooth hover effects */
+  }
+  
+  .btn:hover {
+    background-color: #046c4e; /* Slightly darker green on hover */
+    color: white; /* Maintain white text on hover */
+    box-shadow: 0 4px 6px rgba(0, 170, 109, 0.4); /* Add hover shadow with matching green tint */
+  }
+  /* Dropdown menu styling */
+  .dropdown-menu {
+    max-width: 300px; /* Ensure dropdown menu doesn't stretch unnecessarily */
+    width: auto;
+    text-align: center;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow */
+    background: #fff; /* White background */
+    padding: 5px 0; /* Add vertical padding */
+  }
+  
+  .dropdown-item {
+    padding: 10px 15px; /* Add padding to dropdown items */
+    font-size: 16px; /* Adjust font size */
+    transition: background-color 0.3s; /* Smooth hover effect */
+  }
+  
+  .dropdown-item:hover {
+    background-color: #f1f1f1; /* Light gray hover effect */
+  }
+  
+  /* Responsive card styles */
+  .row-cols-1 {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between cards */
+    align-items: center;
+    padding: 20px;
+    margin: 20px auto
+  }
+  
+  .row-cols-md-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Adjust based on screen size */
+    gap: 30px; /* Space between cards */
+    justify-content: center; /* Center the grid content */
+    padding: 20px;
+  }
+  
+  .card {
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    overflow: hidden; /* Ensure no overflow */
+    transition: transform 0.3s, box-shadow 0.3s; /* Smooth hover effect */
+    width: 100%; /* Ensure cards fill the column space */
+    max-width: 400px; /* Prevent cards from becoming too wide */
+    min-width: 300px;
+    margin: auto; /* Center individual cards */
+  }
+  
+  .card:hover {
+    transform: scale(1.05); /* Slightly enlarge on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Deeper shadow on hover */
+  }
+  
+  .card-img-top {
+    object-fit: cover; /* Ensure proper image fit */
+    height: 400px; /* Fixed height for consistency */
+  }
+  
+  .card-body {
+    padding: 15px;
+    background: #fff; /* White background */
+    text-align: center; /* Center-align text */
+  }
+  
+  .card-title {
+    font-size: 18px; /* Adjust title size */
+    font-weight: bold;
+    margin-bottom: 10px; /* Spacing below title */
+  }
+  
+  .card-text {
+    font-size: 14px; /* Adjust text size */
+    color: #555; /* Subtle text color */
+  }
+  
+  .card-footer {
+    background: #f9f9f9; /* Light footer background */
+    border-top: 1px solid #eee; /* Subtle border */
+    text-align: center;
+    padding: 10px;
+    font-size: 12px; /* Smaller font size */
+    color: #888; /* Secondary text color */
+  }
+  
+  /* Small screens adjustments */
+  @media (max-width: 768px) {
+    .input-group {
+      max-width: 100%; /* Full width for small screens */
+      flex-wrap: wrap; /* Wrap elements to fit smaller screen sizes */
+      padding: 15px; /* Adjust padding for smaller screens */
+    }
+  
+    .dropdown-menu {
+      text-align: left; /* Align dropdown items to the left on small screens */
+    }
+  
+    .card {
+      width: 100%; /* Full width for small screens */
+    }
+  }
+  .button-container {
+    display: flex; /* Arrange buttons in a row */
+    justify-content: space-between; /* Space them evenly within the container */
+    align-items: center; /* Align buttons vertically */
+    width: 100%; /* Ensure buttons span the card width */
+    margin-top: 1rem; /* Add spacing above the buttons */
+  }
+  a {
+    text-decoration: none;
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  .next {
+    background-color: #04AA6D; /* Green */
+    color: white;
+  }
+  
+  .next:hover {
+    background-color: #046c4e; /* Slightly darker green on hover */
+    box-shadow: 0 4px 6px rgba(0, 170, 109, 0.4); /* Green tint shadow */
+  }
+  
+  /* Ensure the container is properly positioned */
+  .container {
+    position: relative; /* Establish a containing block for absolute positioning */
+    min-height: 100vh; /* Ensure the container spans the full viewport height */
+  }
+  

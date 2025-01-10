@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Edit Profile</title>
+    <title>Update Profile</title>
     <!-- MDB CSS -->
     <link
       rel="stylesheet"
@@ -18,33 +18,26 @@
     <style>
       body {
         font-family: 'Arial', sans-serif;
-        background-color: #f8f9fa;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
       }
 
-      .edit-profile-header {
-        background: linear-gradient(45deg, #ff5722, #e64a19);
-        color: white;
-        padding: 50px 20px;
-        text-align: center;
-        border-radius: 0 0 50% 50%;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      }
-
-      .edit-profile-form {
-        margin-top: -40px;
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 20px;
+      .edit-profile-container {
+        max-width: 800px;
         background: white;
         border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.8s ease-in-out;
       }
 
       .profile-picture-container {
         text-align: center;
-        margin-top: -60px;
         position: relative;
+        margin-bottom: 2rem;
       }
 
       .profile-picture {
@@ -58,25 +51,46 @@
 
       .upload-btn {
         position: absolute;
-        bottom: 0;
-        right: 50%;
-        transform: translate(50%, 20%);
-        background: #ff5722;
+        bottom: 10px;
+        right: 45%;
+        transform: translateX(50%);
+        background: #51f69b;
         color: white;
         border-radius: 50%;
         padding: 10px;
-        font-size: 16px;
+        font-size: 1.2em;
         cursor: pointer;
+        border: none;
+      }
+
+      .edit-profile-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #444;
+      }
+
+      .edit-profile-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .edit-profile-header p {
+        font-size: 1rem;
+        color: #666;
+      }
+
+      .form-outline {
+        margin-bottom: 1.5rem;
       }
 
       .btn-update {
         width: 100%;
-        background: linear-gradient(45deg, #ff5722, #e64a19);
+        background: linear-gradient(135deg, #ff5722, #e64a19);
         color: white;
-        padding: 12px 0;
+        padding: 12px;
         border: none;
         border-radius: 50px;
-        font-size: 18px;
+        font-size: 1.2em;
         transition: background-color 0.3s ease;
       }
 
@@ -84,109 +98,73 @@
         background: #e64a19;
       }
 
-      .form-outline {
-        margin-bottom: 20px;
+      .suggestions-container {
+        position: absolute;
+        background: #ffffff;
+        border: 1px solid #ddd;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        width: 100%;
       }
 
-      .form-select {
+      .suggestion {
+        padding: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .suggestion:hover {
+        background-color: #f2f2f2;
+      }
+
+      .btn {
+        background: rgba(0, 230, 118, 0.8);
+        color: #000;
+        border-radius: 10px;
         padding: 10px 15px;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease-in-out;
       }
 
-      @media (max-width: 768px) {
-        .edit-profile-header {
-          padding: 30px 10px;
-        }
+      .btn:hover {
+        background: rgba(0, 200, 100, 1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transform: translateY(-2px);
+        border-radius: 30px;
+        border-radius: 1px solid #000;
+      }
 
-        .edit-profile-form {
-          margin-top: -30px;
-          padding: 15px;
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-        .profile-picture {
-          width: 100px;
-          height: 100px;
-        }
+      .svg-container {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      .profile-svg {
+        width: 150px;
+        height: auto;
       }
     </style>
   </head>
   <body>
-    <nav class="navbar">
-      <div class="container-fluid">
-        <button
-          class="navbar-toggler danger"
-          type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasNavbarLight"
-          aria-controls="offcanvasNavbarLight"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-      </div>
-    </nav>
+    <div class="svg-container"></div>
+    <div class="edit-profile-container">
+      <!-- Profile Picture -->
 
-    <div
-      class="offcanvas offcanvas-end"
-      tabindex="-1"
-      id="offcanvasNavbarLight"
-      aria-labelledby="offcanvasNavbarLightLabel"
-    >
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasNavbarLightLabel">
-          Street Food Management
-        </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="offcanvas"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="offcanvas-body">
-        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/home">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/profile">Profile</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/dashboard">Dashboard</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Settings
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <a class="dropdown-item" href="/edit_profile">Edit Profile</a>
-              </li>
-              <li>
-                <hr class="dropdown-divider" />
-              </li>
-            </ul>
-          </li>
-        </ul>
-        <button type="button" class="btn btn-primary btn-lg w-100 mt-3">
-          Logout
-        </button>
-      </div>
-    </div>
-
-    <!-- Edit Profile Header -->
-    <header class="edit-profile-header">
-      <h1>Edit Your Profile</h1>
-      <p class="mb-0">Keep your profile information up to date</p>
-    </header>
-
-    <!-- Edit Profile Form -->
-    <div class="container edit-profile-form">
       <div class="profile-picture-container">
         <img
           src="https://via.placeholder.com/120"
@@ -210,9 +188,16 @@
         />
       </div>
 
+      <!-- Header -->
+      <div class="edit-profile-header">
+        <h1>Update Profile</h1>
+        <p>Update your details to keep your profile up-to-date</p>
+      </div>
+
+      <!-- Form -->
       <form
         id="profileForm"
-        class="needs-validation mt-4"
+        class="needs-validation"
         action="/edit_profile"
         method="post"
         enctype="multipart/form-data"
@@ -269,11 +254,29 @@
         </div>
 
         <div class="form-outline">
-          <textarea id="subjects" class="form-control" rows="3"></textarea>
-          <label class="form-label" for="subjects">Subjects of Interest</label>
+          <textarea
+            id="subjects"
+            class="form-control"
+            rows="3"
+            name="PREFERRED_SUBJECT"
+          ></textarea>
+          <label class="form-label" for="subjects">Preferred Subjects</label>
         </div>
 
-        <div class="mb-4">
+        <label class="form-label" for="id-card">Upload ID Card</label>
+
+        <div class="form-outline" data-mdb-input-init>
+          <input
+            type="file"
+            class="form-control"
+            name="ID_CARD_IMAGE"
+            id="id-card"
+            accept="image/*"
+            required
+          />
+        </div>
+
+        <div class="mb-4 position-relative">
           <label for="locationInput" class="form-label">Address</label>
           <input
             type="text"
@@ -281,25 +284,19 @@
             class="form-control validate"
             placeholder="Enter your shop address"
             name="AREA"
-            value="<%= vendordata && vendordata.SHOP_DATA && vendordata.SHOP_DATA.AREA || '' %>"
             required
           />
           <div class="invalid-feedback">Address is required.</div>
           <div id="suggestions" class="suggestions-container"></div>
         </div>
 
-        <button type="submit" class="btn btn-update">Save Changes</button>
+        <button type="submit" class="btn btn-update">Update Profile</button>
       </form>
     </div>
 
-    <!-- MDB JS -->
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.3.0/mdb.min.js"></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      crossorigin="anonymous"
-    ></script>
-
-    <!-- Image preview script -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
       function previewImage(event) {
         const reader = new FileReader();
@@ -309,16 +306,13 @@
         };
         reader.readAsDataURL(event.target.files[0]);
       }
-    </script>
-    <script>
-      var apiKey = '7fa23b5a9b194102a9be9a11ce64a57c'; // Replace with your Geoapify API key
 
-      var locationInput = document.getElementById('locationInput');
-      var suggestionsContainer = document.getElementById('suggestions');
+      const apiKey = '7fa23b5a9b194102a9be9a11ce64a57c';
+      const locationInput = document.getElementById('locationInput');
+      const suggestionsContainer = document.getElementById('suggestions');
 
       locationInput.addEventListener('input', function () {
-        var input = this.value;
-        console.log('Input event fired:', input); // Debugging log
+        const input = this.value;
         if (input.trim() === '') {
           clearSuggestions();
           return;
@@ -327,35 +321,27 @@
       });
 
       function fetchSuggestions(input) {
-        var url =
-          'https://api.geoapify.com/v1/geocode/autocomplete?text=' +
-          encodeURIComponent(input) +
-          '&apiKey=' +
-          apiKey;
-
-        console.log('Fetching suggestions for:', input); // Debugging log
-
+        const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
+          input
+        )}&apiKey=${apiKey}`;
         axios
           .get(url)
-          .then(function (response) {
-            console.log('Suggestions fetched:', response.data.features); // Debugging log
+          .then((response) => {
             displaySuggestions(response.data.features);
           })
-          .catch(function (error) {
+          .catch((error) => {
             console.error('Error fetching suggestions:', error);
           });
       }
 
       function displaySuggestions(suggestions) {
         suggestionsContainer.innerHTML = '';
-
-        suggestions.forEach(function (suggestion) {
-          var suggestionText = suggestion.properties.formatted;
-          var suggestionItem = document.createElement('div');
-          suggestionItem.textContent = suggestionText;
+        suggestions.forEach((suggestion) => {
+          const suggestionItem = document.createElement('div');
+          suggestionItem.textContent = suggestion.properties.formatted;
           suggestionItem.classList.add('suggestion');
-          suggestionItem.addEventListener('click', function () {
-            locationInput.value = suggestionText;
+          suggestionItem.addEventListener('click', () => {
+            locationInput.value = suggestion.properties.formatted;
             clearSuggestions();
           });
           suggestionsContainer.appendChild(suggestionItem);

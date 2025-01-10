@@ -22,6 +22,8 @@ const sendOtpEmail = require('./routes/email');
 const { PASSWORD_RESET_REQUEST_TEMPLATE } = require('./routes/EmailTemp');
 const getWirelessIP = require('./routes/GetWirelessIp');
 const admin = require('./routes/admin');
+const teacher = require('./routes/teacher');
+const student = require('./routes/student');
 const axios = require('axios');
 
 ///connect .env file
@@ -43,13 +45,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'public', 'ejs'));
 
 app.set('view engine', 'ejs');
-app.use('/admin', admin);
+
 app.use((req, res, next) => {
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
   res.locals.localhost = `http://${getWirelessIP()}:${PORT}`;
   next();
 });
+app.use('/admin', admin);
+app.use('/teacher', teacher);
+app.use('/student', student);
 
 //////////////////////////Mongoose Connection//////////////////////////
 
@@ -306,6 +311,9 @@ app.get('/SuccessResetLink', (req, res) => {
 //////////////////////////LANDING/////////////////////////
 app.get('/home', (req, res) => {
   res.render('home/home');
+});
+app.get('/test', (req, res) => {
+  res.render('home/edit_profile');
 });
 
 app.listen(PORT, () => {

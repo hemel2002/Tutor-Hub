@@ -4,7 +4,7 @@
 >
   <div class="container-fluid">
     <!-- Navbar brand -->
-    <a class="navbar-brand" href="/home">Tutor-Hub</a>
+    <a class="navbar-brand text-white fw-bold" href="/home">Tutor-Hub</a>
 
     <!-- Toggle button -->
     <button
@@ -16,45 +16,81 @@
       aria-expanded="false"
       aria-label="Toggle navigation"
     >
-      <i class="fas fa-bars"></i>
+      <i class="fas fa-bars text-white"></i>
     </button>
 
     <!-- Collapsible wrapper -->
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <!-- Left links -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link" href="/home">Home</a>
+          <a class="nav-link text-white" href="/home">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/nearby">Nearby Teachers</a>
+          <a class="nav-link text-white" href="/nearby">Nearby Teachers</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/contact">Contact</a>
+          <a class="nav-link text-white" href="/contact">Contact</a>
         </li>
       </ul>
 
-      <!-- Icons -->
-      <ul class="navbar-nav d-flex flex-row me-1">
-        <li class="nav-item me-3 me-lg-0">
+      <!-- Right links -->
+      <ul class="navbar-nav d-flex flex-row align-items-center">
+        <!-- Notifications dropdown -->
+        <li class="nav-item dropdown me-3">
+          <a
+            class="nav-link dropdown-toggle hidden-arrow text-white"
+            href="#"
+            id="navbarDropdownMenuLink"
+            role="button"
+            data-mdb-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="fas fa-bell"></i>
+            <span class="badge rounded-pill badge-notification bg-danger"
+              >1</span
+            >
+          </a>
+          <ul
+            class="dropdown-menu dropdown-menu-start"
+            aria-labelledby="navbarDropdownMenuLink"
+          >
+            <li>
+              <a class="dropdown-item" href="#">Some news</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#">Another news</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#">Something else here</a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Sign in button -->
+        <li class="nav-item me-2">
           <a class="nav-link" href="/signin">
-            <button class="btn btn-success">Sign in</button>
+            <button class="btn btn-light text-success">Sign in</button>
           </a>
         </li>
-        <li class="nav-item me-3 me-lg-0">
+
+        <!-- Sign up button -->
+        <li class="nav-item">
           <a class="nav-link" href="/signup">
-            <button class="btn">Sign up</button>
+            <button class="btn btn-light">Sign up</button>
           </a>
         </li>
       </ul>
 
       <!-- Search -->
-      <form class="w-auto">
+      <form class="d-flex ms-3">
         <input
           type="search"
           class="form-control"
           placeholder="Type query"
           aria-label="Search"
         />
+        <button class="btn btn-light ms-2" type="submit">Search</button>
       </form>
     </div>
   </div>
