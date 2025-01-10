@@ -315,6 +315,10 @@ app.get('/home', (req, res) => {
 app.get('/test', (req, res) => {
   res.render('home/edit_profile');
 });
+//////////////////////////contact/////////////////////////
+app.get('/contact', (req, res) => {
+  res.render('home/contact');
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
