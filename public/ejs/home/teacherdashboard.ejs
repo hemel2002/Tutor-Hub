@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <title>Dashboard</title>
+    <style>
+        /* Add your existing styles here */
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <%- include('header') %>
+        <img src="<%= profilePicUrl %>" alt="Profile Pic" class="rounded-circle" width="80" height="80">
+        <ul>
+            <% navLinks.forEach(link => { %>
+                <li><a href="<%= link.href %>"><span class="icon"><%= link.icon %></span> <%= link.text %></a></li>
+            <% }) %>
+        </ul>
+        <div class="form-check form-switch">
+            <label class="form-check-label" for="flexSwitchCheckDefault">Dark mode</label>
+            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="add-material">
+            <h3>Add New Material</h3>
+            <form action="/materials/add" method="POST" enctype="multipart/form-data">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" placeholder="Enter material title" required>
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4" placeholder="Enter material description" required></textarea>
+                <label for="file">Upload File</label>
+                <input type="file" id="file" name="file" required>
+                <button type="submit">Add Material</button>
+            </form>
+        </div>
+        <div class="materials-list">
+            <h3>Existing Study Materials</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% materials.forEach(material => { %>
+                        <tr>
+                            <td><%= material.title %></td>
+                            <td><%= material.description %></td>
+                            <td>
+                                <form action="/materials/delete/<%= material.id %>" method="POST" style="display: inline;">
+                                    <button style="background-color: #ff6b6b; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
