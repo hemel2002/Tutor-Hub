@@ -18,4 +18,7 @@ router.get('/dashboard', (req, res) => {
 router.get('/SearchTutor', (req, res) => {
   res.render('student/searchTutor');
 });
+router.get('/rating&commnet', (req, res) => {
+  res.render('student/RatingAndCommentPage');
+});
 module.exports = router;

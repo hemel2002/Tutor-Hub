@@ -31,4 +31,7 @@ router.get('/StudentManagement', (req, res) => {
 router.get('/Complaints', (req, res) => {
   res.render('admin/Complaints_Dashboard');
 });
+router.post('/logout', (req, res) => {
+  return res.redirect('/signin');
+});
 module.exports = router;
