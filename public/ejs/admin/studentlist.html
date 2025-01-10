@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Available Students</title>
+
+    <!-- MDB CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.1/mdb.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Custom Styles -->
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f8f9fa;
+      }
+
+      .table-container {
+        margin-top: 40px;
+      }
+
+      .table {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      thead {
+        background-color: #343a40;
+        color: #fff;
+      }
+
+      tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.1);
+      }
+
+      .filter-bar {
+        margin: 20px 0;
+      }
+
+      .pagination {
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Admin Dashboard</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-mdb-toggle="collapse"
+          data-mdb-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="#">Available Students</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+      <h2 class="text-center mt-4">Available Students</h2>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar d-flex justify-content-between align-items-center">
+        <input
+          type="text"
+          id="filterInput"
+          class="form-control w-50"
+          placeholder="Search by name or class..."
+        />
+      </div>
+
+      <!-- Table -->
+      <div class="table-container">
+        <table
+          class="table table-hover align-middle text-center shadow-sm"
+          id="studentTable"
+        >
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Class</th>
+              <th>Guardian</th>
+              <th>Joined In</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Example Rows -->
+            <tr>
+              <td>1</td>
+              <td>John Doe</td>
+              <td>10</td>
+              <td>Jane Doe</td>
+              <td>01 Jan 2023</td>
+              <td>
+                <button class="btn btn-primary btn-sm view-details" data-id="1">
+                  View Profile
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Emily Smith</td>
+              <td>8</td>
+              <td>Michael Smith</td>
+              <td>15 Mar 2023</td>
+              <td>
+                <button class="btn btn-primary btn-sm view-details" data-id="2">
+                  View Profile
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <nav aria-label="Pagination" class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+          <li class="page-item disabled">
+            <a class="page-link">Previous</a>
+          </li>
+          <li class="page-item active">
+            <a class="page-link">1</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#">2</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#">3</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- MDB JavaScript -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.1/mdb.min.js"
+    ></script>
+    <!-- GSAP Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+      // GSAP Animation for Table
+      gsap.from('#studentTable tbody tr', {
+        duration: 1,
+        opacity: 0,
+        y: 50,
+        stagger: 0.1,
+      });
+
+      // Filter Functionality
+      document
+        .getElementById('filterInput')
+        .addEventListener('input', function () {
+          const filterValue = this.value.toLowerCase();
+          const rows = document.querySelectorAll('#studentTable tbody tr');
+
+          rows.forEach((row) => {
+            const name = row.cells[1].textContent.toLowerCase();
+            const studentClass = row.cells[2].textContent.toLowerCase();
+
+            if (
+              name.includes(filterValue) ||
+              studentClass.includes(filterValue)
+            ) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+        });
+
+      // View Profile Button
+      document.querySelectorAll('.view-details').forEach((button) => {
+        button.addEventListener('click', function () {
+          const studentId = this.getAttribute('data-id');
+          window.location.href = `/student-profile/${studentId}`;
+        });
+      });
+    </script>
+  </body>
+</html>

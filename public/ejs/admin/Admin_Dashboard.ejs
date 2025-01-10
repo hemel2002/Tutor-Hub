@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Analytics</title>
+
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- MDB -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
+      rel="stylesheet"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
+    ></script>
+    <!-- Custom CSS -->
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+      }
+    </style>
+  </head>
+
+  <body>
+    <%- include('header') %>
+
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar -->
+        <%- include('side_navbar') %>
+
+        <!-- Main Content -->
+        <main class="col-md-10 mx-auto">
+          <div class="container">
+            <!-- Dashboard Cards -->
+            <div class="row my-4">
+              <div class="col-lg-4 col-sm-6 mb-4">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title">Total Students</h5>
+                    <h1>1200</h1>
+                    <div class="progress my-3" style="height: 8px">
+                      <div
+                        class="progress-bar bg-success"
+                        role="progressbar"
+                        style="--value: 81%"
+                      ></div>
+                    </div>
+                    <p class="text-success">+81%</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4 col-sm-6 mb-4">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title">Total Teachers</h5>
+                    <h1>50</h1>
+                    <div class="progress my-3" style="height: 8px">
+                      <div
+                        class="progress-bar bg-info"
+                        role="progressbar"
+                        style="--value: 31%"
+                      ></div>
+                    </div>
+                    <p class="text-info">+31%</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4 col-sm-6 mb-4">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title">Active Teachers</h5>
+                    <h1>20</h1>
+                    <div class="progress my-3" style="height: 8px">
+                      <div
+                        class="progress-bar bg-primary"
+                        role="progressbar"
+                        style="--value: 21%"
+                      ></div>
+                    </div>
+                    <p class="text-primary">+21%</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- New Customers Section -->
+            <div class="mb-4">
+              <h2>New Customers</h2>
+
+              <div class="row">
+                <div class="col-sm-6 col-md-3 mb-4">
+                  <div class="card">
+                    <img
+                      class="card-img-top"
+                      src="http://localhost:3000/images/profile.jpeg"
+                      alt="User"
+                    />
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Tutor ABC</h5>
+                      <p class="card-text">5 days ago</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-3 mb-4">
+                  <div class="card">
+                    <img
+                      class="card-img-top"
+                      src="http://localhost:3000/images/profile.jpeg"
+                      alt="User"
+                    />
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Tutor ABC</h5>
+                      <p class="card-text">5 days ago</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-3 mb-4">
+                  <div class="card">
+                    <img
+                      class="card-img-top"
+                      src="http://localhost:3000/images/profile.jpeg"
+                      alt="User"
+                    />
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Tutor ABC</h5>
+                      <p class="card-text">5 days ago</p>
+                    </div>
+                  </div>
+                </div>
+                <!-- Add similar cards dynamically -->
+              </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="mb-4">
+              <h2>Recent Activities</h2>
+              <div class="card">
+                <div class="card-body">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Activity</th>
+                        <th>User</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>New Vendor Registered</td>
+                        <td>Jack</td>
+                        <td>Aug 2, 2024</td>
+                      </tr>
+                      <!-- Add more rows dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="mb-4">
+              <h2>Vendor Categories Chart</h2>
+              <canvas id="vendorCategoriesChart"></canvas>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      // Vendor Categories Chart
+      const ctx = document
+        .getElementById('vendorCategoriesChart')
+        .getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Engineering', 'Medical', 'Others'],
+          datasets: [
+            {
+              label: 'Tutors',
+              data: [10, 2, 60],
+              backgroundColor: ['#007bff', '#28a745', '#ffc107'],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

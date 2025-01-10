@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head data-mdb-theme="dark">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Complaints Dashboard</title>
+
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Material Design Bootstrap -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css"
+      rel="stylesheet"
+    />
+    <!-- MDB Scripts -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.umd.min.js"
+      defer
+    ></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f9f9f9;
+      }
+
+      header {
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar {
+        background-color: #ffffff;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        width: 250px; /* Increase the width of the sidebar */
+      }
+
+      .sidebar .nav-link {
+        color: #333;
+        font-weight: 500;
+        padding: 10px 15px;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar .nav-link:hover,
+      .sidebar .nav-link.active {
+        background-color: #007bff;
+        color: #ffffff;
+        border-radius: 5px;
+      }
+
+      .profile-photo img {
+        border: 3px solid #007bff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .table {
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .table thead {
+        background-color: #007bff;
+        color: #ffffff;
+      }
+
+      .table tbody tr:hover {
+        background-color: #f1f5ff;
+      }
+
+      .btn {
+        transition: all 0.3s ease;
+      }
+
+      .btn:hover {
+        transform: scale(1.05);
+      }
+
+      .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 30%;
+          z-index: 1050;
+          display: none;
+        }
+
+        .sidebar.show {
+          display: block;
+          width: 100%;
+        }
+
+        .main-content {
+          margin-top: 60%;
+          margin-left: 10%;
+
+          width: 60%;
+          padding: 20%;
+        }
+      }
+      .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+      }
+
+      .card .chart-container {
+        height: 400px; /* Adjust the height as needed */
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Include Header -->
+    <%- include('header') %>
+
+    <div class="d-flex flex-column flex-md-row">
+      <!-- Include Sidebar -->
+      <%- include('side_navbar') %>
+      <div class="container-fluid p-2">
+        <div class="row">
+          <!-- Main Content -->
+          <div class="col-12">
+            <!-- Filter and Search Controls -->
+            <div class="mb-4">
+              <div
+                class="filter-controls d-flex flex-column flex-md-row justify-content-between align-items-center"
+              >
+                <input
+                  type="text"
+                  class="form-control mb-2 mb-md-0"
+                  id="searchInput"
+                  placeholder="Search Complaints"
+                />
+                <select
+                  class="form-select w-auto ms-md-2 mb-2 mb-md-0"
+                  id="statusFilter"
+                >
+                  <option value="">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="dismissed">Dismissed</option>
+                </select>
+                <input
+                  type="date"
+                  class="form-control ms-md-2 mb-2 mb-md-0"
+                  id="startDate"
+                />
+                <input
+                  type="date"
+                  class="form-control ms-md-2 mb-2 mb-md-0"
+                  id="endDate"
+                />
+              </div>
+            </div>
+
+            <!-- Complaints Overview -->
+            <div class="card dashboard-card">
+              <div class="card-header">
+                <h5>Complaints Overview</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped w-100" id="complaintsTable">
+                    <thead>
+                      <tr>
+                        <th>Teacher ID</th>
+                        <th>Teacher Name</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>1</td>
+                        <td>John Doe</td>
+                        <td>2025-01-01</td>
+                        <td>
+                          <span class="badge bg-warning text-dark"
+                            >Pending</span
+                          >
+                        </td>
+                        <td>
+                          <a
+                            href="/admin/1/complain_details?V_ID=1&C_ID=1"
+                            class="btn btn-info btn-sm"
+                            >View</a
+                          >
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>2</td>
+                        <td>Jane Smith</td>
+                        <td>2025-01-02</td>
+                        <td><span class="badge bg-success">Resolved</span></td>
+                        <td>
+                          <a
+                            href="/admin/1/complain_details?V_ID=2&C_ID=2"
+                            class="btn btn-info btn-sm"
+                            >View</a
+                          >
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>3</td>
+                        <td>Michael Brown</td>
+                        <td>2025-01-03</td>
+                        <td><span class="badge bg-danger">Dismissed</span></td>
+                        <td>
+                          <a
+                            href="/admin/1/complain_details?V_ID=3&C_ID=3"
+                            class="btn btn-info btn-sm"
+                            >View</a
+                          >
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Pagination Controls -->
+                <nav aria-label="Pagination example">
+                  <ul
+                    class="pagination pagination-sm flex-wrap justify-content-center"
+                    id="complaints-pagination"
+                  >
+                    <li class="page-item disabled">
+                      <a
+                        class="page-link ripple-surface"
+                        href="#"
+                        aria-label="Previous"
+                      >
+                        <i class="fas fa-chevron-left"></i>
+                      </a>
+                    </li>
+                    <li class="page-item active">
+                      <a class="page-link ripple-surface" href="#">1</a>
+                    </li>
+                    <li class="page-item">
+                      <a class="page-link ripple-surface" href="#">2</a>
+                    </li>
+                    <li class="page-item">
+                      <a class="page-link ripple-surface" href="#">3</a>
+                    </li>
+                    <li class="page-item">
+                      <a
+                        class="page-link ripple-surface"
+                        href="#"
+                        aria-label="Next"
+                      >
+                        <i class="fas fa-chevron-right"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+
+                <!-- Charts -->
+                <div class="row">
+                  <div class="col-md-12 align-items-center">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5>Complaints by Status</h5>
+                        <div class="chart-container">
+                          <canvas id="statusChart"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Status Chart
+        const ctxStatus = document
+          .getElementById('statusChart')
+          .getContext('2d');
+        new Chart(ctxStatus, {
+          type: 'pie',
+          data: {
+            labels: ['Pending', 'Resolved', 'Dismissed'],
+            datasets: [
+              {
+                label: 'Complaints Status',
+                data: [5, 10, 3],
+                backgroundColor: ['#ffc107', '#28a745', '#dc3545'],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: true },
+              tooltip: { enabled: true },
+            },
+          },
+        });
+
+        // Search Functionality
+        document
+          .getElementById('searchInput')
+          .addEventListener('input', function () {
+            // Add search logic here
+          });
+
+        // Status Filter
+        document
+          .getElementById('statusFilter')
+          .addEventListener('change', function () {
+            // Add filter logic here
+          });
+      });
+    </script>
+  </body>
+</html>

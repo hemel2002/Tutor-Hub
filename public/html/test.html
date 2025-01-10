@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Page</title>
+    <!-- MDB CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.1/mdb.min.css"
+      rel="stylesheet"
+    />
+    <!-- GSAP Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  </head>
+  <body>
+    <div class="container py-5">
+      <!-- Page Header -->
+      <div class="text-center mb-4">
+        <h1 class="fw-bold" id="payment-header">Complete Your Payment</h1>
+        <p class="text-muted">Choose a payment method and proceed securely</p>
+      </div>
+
+      <!-- Payment Options Section -->
+      <div class="row">
+        <!-- QR Code Payment -->
+        <div class="col-md-6 mb-4" id="qr-payment">
+          <div class="card shadow">
+            <div class="card-body text-center">
+              <h5 class="fw-bold">Pay with QR Code</h5>
+              <p class="text-muted">
+                Scan the QR code to complete your payment
+              </p>
+              <img
+                src="https://via.placeholder.com/200"
+                alt="QR Code"
+                class="img-fluid mx-auto d-block mb-3"
+              />
+              <button class="btn btn-primary">Download QR Code</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Payment -->
+        <div class="col-md-6 mb-4" id="card-payment">
+          <div class="card shadow">
+            <div class="card-body">
+              <h5 class="fw-bold text-center">Pay with Card</h5>
+              <form>
+                <!-- Card Number -->
+                <div class="form-outline mb-3">
+                  <input
+                    type="text"
+                    id="cardNumber"
+                    class="form-control"
+                    placeholder="Card Number"
+                  />
+                  <label class="form-label" for="cardNumber">Card Number</label>
+                </div>
+                <!-- Expiry Date -->
+                <div class="form-outline mb-3">
+                  <input
+                    type="text"
+                    id="expiryDate"
+                    class="form-control"
+                    placeholder="MM/YY"
+                  />
+                  <label class="form-label" for="expiryDate">Expiry Date</label>
+                </div>
+                <!-- CVV -->
+                <div class="form-outline mb-4">
+                  <input
+                    type="password"
+                    id="cvv"
+                    class="form-control"
+                    placeholder="CVV"
+                  />
+                  <label class="form-label" for="cvv">CVV</label>
+                </div>
+                <!-- Pay Now Button -->
+                <button type="submit" class="btn btn-success btn-block w-100">
+                  Pay Now
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MDB JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.1/mdb.min.js"></script>
+    <!-- GSAP Animations -->
+    <script>
+      // Animation for Page Header
+      gsap.from('#payment-header', {
+        duration: 1.2,
+        y: -50,
+        opacity: 0,
+        ease: 'bounce.out',
+      });
+
+      // Animation for QR Payment Card
+      gsap.from('#qr-payment', {
+        duration: 1,
+        x: -100,
+        opacity: 0,
+        delay: 0.5,
+      });
+
+      // Animation for Card Payment Card
+      gsap.from('#card-payment', {
+        duration: 1,
+        x: 100,
+        opacity: 0,
+        delay: 0.5,
+      });
+    </script>
+  </body>
+</html>
