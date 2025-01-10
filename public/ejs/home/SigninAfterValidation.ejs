@@ -16,7 +16,6 @@
     <!-- Custom CSS -->
     <style>
       body {
-        background: linear-gradient(135deg, #ff9a9e, #fad0c4);
         font-family: 'Roboto', sans-serif;
         min-height: 100vh;
       }
@@ -38,25 +37,12 @@
         height: 120px;
         border-radius: 50%;
         object-fit: cover;
-        border: 4px solid #ff9a9e;
+        border: 4px solid #61ca79;
       }
       .form-outline {
         margin-bottom: 20px;
       }
-      .btn-update {
-        background: #ff6f61;
-        color: #ffffff;
-        font-weight: bold;
-        border: none;
-        width: 100%;
-      }
-      .btn-update:hover {
-        background: #e65a50;
-      }
-      .btn-link {
-        color: #ff6f61;
-        font-weight: bold;
-      }
+
       .btn-link:hover {
         text-decoration: underline;
       }
@@ -116,20 +102,23 @@
               id="password"
               name="password"
               class="form-control"
-              placeholder="Enter new password"
+              placeholder="Enter password"
               required
             />
-            <label class="form-label" for="password">New Password</label>
+            <label class="form-label" for="password">Password</label>
           </div>
 
           <!-- Update Button -->
-          <button type="submit" class="btn btn-update mt-3">
-            Update Profile
-          </button>
+          <center>
+            <button type="submit" class="btn btn-success mt-3">Log in</button>
+          </center>
 
           <!-- Divider -->
           <p class="text-center mt-4 mb-0">or</p>
-          <a href="/signup" class="btn btn-link">Create New Account</a>
+          <center>
+            <a href="/signup" class="btn btn-link">Create New Account</a>
+          </center>
+
           <hr />
 
           <!-- Forgot Password -->

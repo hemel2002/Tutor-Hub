@@ -21,7 +21,7 @@ const TokenModel = require('./db/ForgetModel');
 const sendOtpEmail = require('./routes/email');
 const { PASSWORD_RESET_REQUEST_TEMPLATE } = require('./routes/EmailTemp');
 const getWirelessIP = require('./routes/GetWirelessIp');
-
+const admin = require('./routes/admin');
 const axios = require('axios');
 
 ///connect .env file
@@ -43,6 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'public', 'ejs'));
 
 app.set('view engine', 'ejs');
+app.use('/admin', admin);
 app.use((req, res, next) => {
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
@@ -122,15 +123,18 @@ app.get('/validuser', async (req, res) => {
 });
 app.post('/validuser', async (req, res) => {
   const { email, password } = req.body;
+  console.log(req.body);
+  console.log(email, password);
 
   try {
     await MongooseConnection();
     const user = await CreateNewUser.findOne({ email: email });
+    const account_type = user['account type'];
     const validUser = await bcrypt.compare(password, user.password);
 
     if (validUser) {
       req.flash('success', 'Successfully signed in');
-      res.redirect('/dashboard');
+      res.redirect(`${account_type}/dashboard`);
     } else {
       req.flash('error', 'Invalid email or password');
       res.redirect('/signin');
@@ -306,5 +310,5 @@ app.get('/home', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log(`http://localhost:${PORT}/signin`);
+  console.log(`http://localhost:${PORT}/home`);
 });
