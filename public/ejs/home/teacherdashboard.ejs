@@ -4,41 +4,345 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href=
+"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" 
+          rel="stylesheet" />
     <title>Dashboard</title>
     <style>
-        /* Add your existing styles here */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar h2 {
+            font-size: 28px;
+            color: #ff6b6b;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-family: 'Trebuchet MS', sans-serif;
+            text-align: center;
+        }
+
+        .sidebar img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .sidebar p {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background-color: #007bff;
+            color: #ffffff;
+            border-radius: 5px;
+        }
+
+        .sidebar ul li .icon {
+            margin-right: 10px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .header input {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .notifications {
+            background-color: #f8af37;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .notifications h3 {
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .notifications p {
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .add-material {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .add-material h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .add-material form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .add-material form label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .add-material form input, .add-material form textarea, .add-material form button {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .add-material form button {
+            background-color: #ff6b6b;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            width: 10%;
+        }
+
+        .add-material form button:hover {
+            background-color: #e55b5b;
+        }
+
+        .materials-list {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .materials-list h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .materials-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .materials-list table th, .materials-list table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .materials-list table th {
+            background-color: #f4f4f4;
+        }
+
+        .materials-list table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .form-check {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.form-check-input {
+  width: 42px;
+  height: 22px;
+  background-color: #ccc;
+  border-radius: 11px;
+  position: relative;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form-check-input:checked {
+  background-color: #007bff;
+}
+
+.form-check-input::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s ease;
+}
+
+.form-check-input:checked::before {
+  transform: translateX(20px);
+}
+
+.form-check-label {
+  margin-left: 10px;
+  font-size: 16px;
+  color: #333;
+}
+.today-sessions {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.today-sessions h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.sessions-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sessions-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s ease;
+}
+
+.sessions-list li:hover {
+    background-color: #f1f1f1;
+}
+
+.session-time {
+    font-weight: bold;
+    color: #ff6b6b;
+    margin-right: 15px;
+}
+
+.session-details {
+    flex-grow: 1;
+    color: #333;
+}
+
+.session-delete {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.session-delete:hover {
+    background-color: #e55b5b;
+}
+
     </style>
 </head>
 <body>
+    
     <div class="sidebar">
-        <%- include('header') %>
-        <img src="<%= profilePicUrl %>" alt="Profile Pic" class="rounded-circle" width="80" height="80">
+       
+        <img src="http://localhost:3000/images/profile.jpeg" alt="Profile Pic"
+        class="rounded-circle"
+            width="80"
+            height="80">
         <ul>
-            <% navLinks.forEach(link => { %>
-                <li><a href="<%= link.href %>"><span class="icon"><%= link.icon %></span> <%= link.text %></a></li>
-            <% }) %>
+            <li><a href="#"><span class="icon">🏠</span> Dashboard</a></li>
+            <li><a href="#"><span class="icon"><i class="fa fa-calendar"></i></span> Availability Calendar</a></li>
+            <li><a href="#"><span class="icon">💳</span> Payment <span style="color: red;">(1)</span></a></li>
+            <li><a href="#"><span class="icon">📜</span> Transaction History</a></li>
+            <li><a href="#"><span class="icon">⭐</span> Rate us</a></li>
+            <li><a href="#"><span class="icon">🔒</span> Change Password</a></li>
+            <li><a href="#"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Logout</a></li>
         </ul>
         <div class="form-check form-switch">
-            <label class="form-check-label" for="flexSwitchCheckDefault">Dark mode</label>
+            <label class="form-check-label" for="flexSwitchCheckDefault">Dark mode  </label>
             <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-        </div>
+          </div>
     </div>
     <div class="main-content">
         <div class="add-material">
             <h3>Add New Material</h3>
-            <form action="/materials/add" method="POST" enctype="multipart/form-data">
+            <form>
                 <label for="title">Title</label>
                 <input type="text" id="title" name="title" placeholder="Enter material title" required>
+
                 <label for="description">Description</label>
                 <textarea id="description" name="description" rows="4" placeholder="Enter material description" required></textarea>
+
                 <label for="file">Upload File</label>
                 <input type="file" id="file" name="file" required>
+
                 <button type="submit">Add Material</button>
             </form>
         </div>
+
         <div class="materials-list">
-            <h3>Existing Study Materials</h3>
+            <h3>Resent Updated Materials</h3>
             <table>
                 <thead>
                     <tr>
@@ -48,20 +352,40 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% materials.forEach(material => { %>
-                        <tr>
-                            <td><%= material.title %></td>
-                            <td><%= material.description %></td>
-                            <td>
-                                <form action="/materials/delete/<%= material.id %>" method="POST" style="display: inline;">
-                                    <button style="background-color: #ff6b6b; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    <% }) %>
+                    <tr>
+                        <td>Physics Basics</td>
+                        <td>An introduction to physics concepts</td>
+                        <td><button style="background-color: #ff6b6b; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">Delete</button></td>
+                    </tr>
+                    <tr>
+                        <td>Mathematics for Beginners</td>
+                        <td>Basic concepts of algebra and geometry</td>
+                        <td><button style="background-color: #ff6b6b; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">Delete</button></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
+        <div class="today-sessions">
+            <h3>Today's Sessions</h3>
+            <ul class="sessions-list">
+                <li>
+                    <span class="session-time">10:00 AM - 11:00 AM</span>
+                    <span class="session-details">Physics with Dr. John Doe</span>
+                    <button class="session-delete">&times;</button>
+                </li>
+                <li>
+                    <span class="session-time">12:00 PM - 1:00 PM</span>
+                    <span class="session-details">Math with Prof. Jane Smith</span>
+                    <button class="session-delete">&times;</button>
+                </li>
+                <li>
+                    <span class="session-time">3:00 PM - 4:00 PM</span>
+                    <span class="session-details">Chemistry with Dr. Emily Clark</span>
+                    <button class="session-delete">&times;</button>
+                </li>
+            </ul>
+        </div>
+        
     </div>
 </body>
 </html>
