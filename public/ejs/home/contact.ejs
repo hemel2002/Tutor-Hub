@@ -3,15 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Time Series Data Design</title>
+    <title>Contact Us - Tutor Hub</title>
     <!-- Include MDB Bootstrap -->
     <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-      rel="stylesheet"
-    />
-    <!-- Google Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
       rel="stylesheet"
     />
     <!-- MDB -->
@@ -21,130 +16,256 @@
     />
     <script
       type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"
-    ></script>
-    <script
-      type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
     <style>
       /* Custom CSS */
-      .hero-section {
-        background-color: #f8f9fa; /* Light background */
-        padding: 80px 0;
+      body {
+        font-family: 'Poppins', sans-serif;
       }
 
-      .hero-title {
-        font-size: 3rem;
-        font-weight: bold;
-      }
-
-      .highlight-text {
-        background: rgba(0, 255, 128, 0.1);
-        border: 1px solid #4caf50;
-        border-radius: 5px;
-        padding: 5px 10px;
-        color: #4caf50;
-      }
-
-      .cta-buttons a {
-        margin-right: 10px;
-      }
-
-      .stats-section {
-        display: flex;
-        justify-content: space-around;
-        margin-top: 30px;
-      }
-
-      .stat-card {
+      .contact-header {
+        background-color: #4caf50;
+        color: white;
+        padding: 60px 0;
         text-align: center;
       }
 
-      .image-section {
-        position: relative;
-        background-color: #111;
-        padding: 40px 0;
+      .contact-header h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
       }
 
-      .image-section img {
-        max-width: 100%;
-        border-radius: 10px;
+      .contact-header p {
+        font-size: 1.2rem;
       }
 
-      /* Dark overlay effect */
-      .dark-overlay {
-        position: absolute;
-        top: -60px;
-        right: 0;
-        max-width: 60%;
+      .contact-form {
+        background: #f8f9fa;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
-      .svg-background {
-        background-image: url(' <%= localhost %>/images/hero.svg'); /* Correct the path */
-        background-size: cover;
-        background-position: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
 
-        height: 100vh;
+      .contact-info {
+        background: #111;
+        color: white;
+        padding: 40px;
+        border-radius: 8px;
+      }
+
+      .contact-info h3 {
+        margin-bottom: 20px;
+      }
+
+      .contact-info .icon {
+        font-size: 1.5rem;
+        margin-right: 10px;
+        color: #4caf50;
+      }
+
+      .map-section {
+        margin-top: 40px;
+      }
+      body {
+        padding-top: 1%; /* Adjust percentage to match navbar height */
+      }
+
+      /* Specific adjustment for Contact Header */
+      .contact-header {
+        margin-top: 2%;
       }
     </style>
   </head>
 
   <body>
-    <!-- Hero Section -->
-    <%- include('../NavBar/NavBar') %>
-    <div class="svg-background">
-      <section class="hero-section text-center">
-        <div class="container">
-          <h1 class="hero-title">
-            Loved by developers. <br />
-            Built for <span class="highlight-text">Time Series Data</span>
-          </h1>
-          <p class="lead mt-4">
-            You don't need a separate database to support transactions, rich
-            search, or gen AI. The world's most popular document database is now
-            the world's most versatile developer data platform.
-          </p>
-          <div class="cta-buttons mt-4">
-            <a href="#" class="btn btn-success">Try Atlas Free</a>
-            <a href="#" class="btn btn-outline-dark">Learn More →</a>
-          </div>
+    <!-- Navbar -->
+    <nav
+      class="navbar navbar-expand-lg navbar-light fixed-top"
+      style="background-color: #36c114"
+    >
+      <div class="container-fluid">
+        <!-- Navbar brand -->
+        <a class="navbar-brand text-white fw-bold" href="/home">Tutor-Hub</a>
 
-          <!-- Stats Section -->
-          <div class="stats-section mt-5">
-            <div class="stat-card">
-              <h3>52K+</h3>
-              <p>Customers →</p>
-            </div>
-            <div class="stat-card">
-              <h3>115+</h3>
-              <p>Regions across AWS, Azure, and Google Cloud →</p>
-            </div>
-            <div class="stat-card">
-              <h3>175K+</h3>
-              <p>Developers join every month →</p>
-            </div>
-            <div class="stat-card">
-              <h3>#1</h3>
-              <p>Most used modern database →</p>
-            </div>
+        <!-- Toggle button -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-mdb-toggle="collapse"
+          data-mdb-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i class="fas fa-bars text-white"></i>
+        </button>
+
+        <!-- Collapsible wrapper -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <!-- Left links -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link text-white" href="/home">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="/nearby">Nearby Teachers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="/contact">Contact</a>
+            </li>
+          </ul>
+
+          <!-- Right links -->
+          <ul class="navbar-nav d-flex flex-row align-items-center">
+            <!-- Notifications dropdown -->
+            <li class="nav-item dropdown me-3">
+              <a
+                class="nav-link dropdown-toggle hidden-arrow text-white"
+                href="#"
+                id="navbarDropdownMenuLink"
+                role="button"
+                data-mdb-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-bell"></i>
+                <span class="badge rounded-pill badge-notification bg-danger"
+                  >1</span
+                >
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-start"
+                aria-labelledby="navbarDropdownMenuLink"
+              >
+                <li>
+                  <a class="dropdown-item" href="#">Some news</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#">Another news</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#">Something else here</a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- Sign in button -->
+            <li class="nav-item me-2">
+              <a class="nav-link" href="/signin">
+                <button class="btn btn-light text-success">Sign in</button>
+              </a>
+            </li>
+
+            <!-- Sign up button -->
+            <li class="nav-item">
+              <a class="nav-link" href="/signup">
+                <button class="btn btn-light">Sign up</button>
+              </a>
+            </li>
+          </ul>
+
+          <!-- Search -->
+          <form class="d-flex ms-3">
+            <input
+              type="search"
+              class="form-control"
+              placeholder="Type query"
+              aria-label="Search"
+            />
+            <button class="btn btn-light ms-2" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Contact Header -->
+    <div class="contact-header mt">
+      <div class="container">
+        <h1>Contact Us</h1>
+        <p>We’re here to help. Get in touch with us today!</p>
+      </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="container my-5">
+      <div class="row">
+        <!-- Contact Form -->
+        <div class="col-md-6">
+          <div class="contact-form">
+            <h3 class="mb-4">Send Us a Message</h3>
+            <form action="/submit-contact" method="POST">
+              <div class="form-outline mb-4">
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  class="form-control"
+                  required
+                />
+                <label class="form-label" for="name">Your Name</label>
+              </div>
+              <div class="form-outline mb-4">
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="form-control"
+                  required
+                />
+                <label class="form-label" for="email">Your Email</label>
+              </div>
+              <div class="form-outline mb-4">
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="4"
+                  class="form-control"
+                  required
+                ></textarea>
+                <label class="form-label" for="message">Your Message</label>
+              </div>
+              <button type="submit" class="btn btn-success btn-block">
+                Send Message
+              </button>
+            </form>
           </div>
         </div>
-      </section>
 
-      <!-- Image Section -->
-      <section class="image-section">
-        <div class="container">
-          <!-- Overlay Image -->
-          <img
-            src="your-placeholder-image.jpg"
-            alt="Overlay Design"
-            class="dark-overlay"
-          />
+        <!-- Contact Info -->
+        <div class="col-md-6">
+          <div class="contact-info">
+            <h3>Contact Information</h3>
+            <p><i class="fas fa-phone icon"></i> +1 234 567 890</p>
+            <p><i class="fas fa-envelope icon"></i> support@tutorhub.com</p>
+            <p>
+              <i class="fas fa-map-marker-alt icon"></i> 123 Tutor Hub Street,
+              City, Country
+            </p>
+            <p>
+              <i class="fas fa-clock icon"></i> Monday - Friday: 9 AM - 5 PM
+            </p>
+          </div>
         </div>
-      </section>
+      </div>
+
+      <!-- Map Section -->
+      <div class="map-section">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.8354345095776!2d144.9537363153168!3d-37.81627974202145!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0xf57700e4f71e3a10!2sFederation%20Square!5e0!3m2!1sen!2sau!4v1618392813893!5m2!1sen!2sau"
+          width="100%"
+          height="350"
+          style="border: 0"
+          allowfullscreen=""
+          loading="lazy"
+        ></iframe>
+      </div>
     </div>
   </body>
 </html>

@@ -21,25 +21,22 @@
     <script
       type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"
-    ></script>
-    <script
-      type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
+      defer
     ></script>
     <style>
       body {
         margin: 0;
         font-family: 'Poppins', sans-serif;
-        background: url('<%= localhost %>/images/signin.svg') no-repeat center
-          center fixed;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+          url('<%= localhost %>/images/signin.svg') no-repeat center center
+            fixed;
         background-size: cover;
-
         overflow: hidden;
       }
 
       .svg-background {
         display: flex;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
         min-height: 100vh;
         position: relative;
@@ -57,7 +54,7 @@
 
       .quote-container {
         position: absolute;
-        top: 20px;
+        top: calc(var(--navbar-height, 70px) + 20px);
         left: 50%;
         transform: translateX(-50%);
         text-align: center;
@@ -67,22 +64,28 @@
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
         margin-bottom: 20px;
         z-index: 2;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        word-wrap: break-word;
+        max-width: 90%;
       }
 
       .container {
         z-index: 2;
-        max-width: 400px;
+        max-width: 1200px;
         width: 100%;
-        margin-left: 20%;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       .card {
-        background: rgba(0, 0, 0, 0.15);
+        background: rgba(0, 0, 0, 0.6);
         border: none;
         border-radius: 15px;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         backdrop-filter: blur(60px);
-
         overflow: hidden;
         animation: fadeIn 1s ease-in-out;
       }
@@ -109,7 +112,7 @@
         color: #fff;
         border: none;
         border-radius: 8px;
-        padding: 10px;
+        padding: 15px;
         font-size: 1rem;
         box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
       }
@@ -127,7 +130,7 @@
         background: rgba(7, 242, 128, 0.8);
         color: #000;
         border-radius: 10px;
-        padding: 10px 15px;
+        padding: 15px;
         font-size: 1rem;
         font-weight: 500;
         transition: all 0.3s ease-in-out;
@@ -137,8 +140,6 @@
         background: rgba(0, 200, 100, 1);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         transform: translateY(-2px);
-        border-radius: 30px;
-        border-radius: 1px solid #000;
       }
 
       .card-footer {
@@ -148,26 +149,12 @@
         color: #ccc;
         border-top: 1px solid rgba(255, 255, 255, 0.2);
       }
-      .quote-container {
-        position: absolute;
-        top: calc(
-          var(--navbar-height, 70px) + 20px
-        ); /* Adjust based on navbar height */
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-        color: #f1f1f1;
-        font-size: 1.8rem;
-        font-weight: 500;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-        margin-bottom: 20px;
-        z-index: 2;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2; /* Display maximum 2 lines */
-        -webkit-box-orient: vertical;
-        word-wrap: break-word; /* Allow text wrapping */
-        max-width: 90%;
+
+      .signin-img {
+        width: 100%;
+        max-width: 1200px;
+        height: auto;
+        align-self: flex-start;
       }
 
       @media (max-width: 768px) {
@@ -179,15 +166,19 @@
         .card {
           margin: 10px;
         }
+
+        .signin-img {
+          max-width: 100%;
+        }
       }
 
       @keyframes fadeIn {
         from {
-          opacity: 50;
+          opacity: 0;
           transform: translateY(20px);
         }
         to {
-          opacity: 100;
+          opacity: 1;
           transform: translateY(0);
         }
       }
@@ -201,29 +192,46 @@
         "<%= quotes.text %>" — <%= quotes.author %>
       </div>
 
-      <!-- Sign-In Form -->
+      <!-- Sign-In Section -->
       <div class="container">
-        <div class="card">
-          <div class="card-header text-center">Welcome Back!</div>
-          <div class="card-body">
-            <h5 class="text-center mb-4">Sign In</h5>
-            <form action="/signin" method="POST">
-              <div class="form-outline mb-4">
-                <input
-                  type="email"
-                  id="typeEmail"
-                  class="form-control"
-                  name="email"
-                  required
-                />
-                <label class="form-label" for="typeEmail">Enter Email</label>
-              </div>
-              <button type="submit" class="btn w-100 continue">
-                Continue <i class="fas fa-arrow-right ms-2"></i>
-              </button>
-            </form>
+        <div class="row">
+          <!-- Sign-In Image -->
+          <div class="col-12 col-md-6 d-flex align-items-center">
+            <img
+              src="<%= localhost %>/images/signinPic.svg"
+              alt="Sign-In Illustration"
+              class="img-fluid signin-img"
+            />
           </div>
-          <div class="card-footer">Your journey starts here</div>
+
+          <!-- Sign-In Card -->
+          <div class="col-12 col-md-6">
+            <div class="card">
+              <div class="card-header text-center">Welcome Back!</div>
+              <div class="card-body">
+                <h5 class="text-center mb-4">Sign In</h5>
+                <form action="/signin" method="POST">
+                  <div class="form-outline mb-4">
+                    <input
+                      type="email"
+                      id="typeEmail"
+                      class="form-control"
+                      name="email"
+                      required
+                      aria-label="Email address"
+                    />
+                    <label class="form-label" for="typeEmail"
+                      >Enter Email</label
+                    >
+                  </div>
+                  <button type="submit" class="btn w-100 continue">
+                    Continue <i class="fas fa-arrow-right ms-2"></i>
+                  </button>
+                </form>
+              </div>
+              <div class="card-footer">Your journey starts here</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

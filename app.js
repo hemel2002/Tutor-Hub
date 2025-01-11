@@ -319,6 +319,48 @@ app.get('/test', (req, res) => {
 app.get('/contact', (req, res) => {
   res.render('home/contact');
 });
+app.get('/NearbyTutor', (req, res) => {
+  const teachers = [
+    {
+      name: 'Shahriar Hemal',
+      area: 'Mirpur 12, Dhaka Metropolitan, Dhaka Division, Bangladesh',
+      subject: 'Mathematics',
+      rating: '4.8🌟',
+      experience: '5 years',
+      imageUrl: 'https://via.placeholder.com/150',
+      T_ID: 1,
+    },
+    {
+      name: 'Tutor Abcd',
+      area: 'Mirpur-10, Begum Rokeya Sharani, Mirpur, Dhaka - 1216, Bangladesh',
+      subject: 'Physics',
+      rating: '4.6🌟',
+      experience: '3 years',
+      imageUrl: 'https://via.placeholder.com/150',
+      T_ID: 2,
+    },
+    {
+      name: 'Hemal',
+      area: 'West End Street',
+      subject: 'Chemistry',
+      rating: '4.9🌟',
+      experience: '7 years',
+      imageUrl: 'ECB Chottor, ECB Chattar, Matikata, Dhaka - 1206, Bangladesh',
+      T_ID: 3,
+    },
+    {
+      name: 'Tutor 001',
+      area: 'New Airport Road, Baunia, Dhaka - 1230, Bangladesh',
+      subject: 'Biology',
+      rating: '4.7🌟',
+      experience: '6 years',
+      imageUrl: 'https://via.placeholder.com/150',
+      T_ID: 4,
+    },
+  ];
+
+  return res.json(teachers);
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
