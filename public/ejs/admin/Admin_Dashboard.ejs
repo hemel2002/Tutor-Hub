@@ -5,46 +5,126 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Analytics</title>
 
-    <!-- Font Awesome -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-      rel="stylesheet"
-    />
     <!-- Google Fonts -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
+
     <!-- MDB -->
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
       rel="stylesheet"
     />
-    <script
-      type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"
-    ></script>
-    <script
-      type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
-    ></script>
+
     <!-- Custom CSS -->
     <style>
       body {
-        font-family: 'Roboto', sans-serif;
+        font-family: 'Poppins', sans-serif;
+        overflow-x: hidden;
+      }
+
+      .navbar {
+        background-color: #343a40;
+        color: white;
+      }
+
+      .navbar .navbar-brand {
+        color: #fff;
+      }
+
+      .navbar .nav-link {
+        color: #ddd;
+      }
+
+      .navbar .nav-link:hover {
+        color: #fff;
+      }
+
+      .sidebar {
+        width: 250px;
+        position: fixed;
+        top: 56px;
+        left: 0;
+        height: 100%;
+        background-color: #f8f9fa;
+        border-right: 1px solid #ddd;
+        padding-top: 20px;
+      }
+
+      .sidebar .nav-link {
+        color: #333;
+        padding: 10px 20px;
+      }
+
+      .sidebar .nav-link:hover {
+        background-color: #e9ecef;
+        color: #000;
+      }
+
+      .main-content {
+        margin-left: 250px;
+        padding: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          position: absolute;
+          left: -250px;
+          transition: left 0.3s;
+        }
+
+        .sidebar.open {
+          left: 0;
+        }
+
+        .main-content {
+          margin-left: 0;
+        }
+      }
+
+      .navbar-toggler {
+        border: none;
       }
     </style>
   </head>
 
   <body>
-    <%- include('header') %>
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Admin Dashboard</a>
+        <button class="navbar-toggler" type="button" onclick="toggleSidebar()">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+    </nav>
 
-    <div class="container-fluid">
-      <div class="row">
-        <!-- Sidebar -->
-        <%- include('side_navbar') %>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebarMenu">
+      <nav class="nav flex-column sidebar fixed-top" >
+        <a class="nav-link" href="/admin">Dashboard</a>
+        <a class="nav-link" href="/admin/admin_customers">Teachers</a>
+        <a class="nav-link" href="/admin/admin_vendors">Students</a>
+        <a class="nav-link" href="/admin/Complaints">Complaints</a>
+        <a class="nav-link" href="/admin/TeacherVerification"
+          >Account Approval</a
+        >
+        <a class="nav-link" href="/admin/PaymentMangement"
+          >Payment Management</a
+        >
+        <a class="nav-link text-danger" href="/admin/logout">Logout</a>
+      </nav>
+    </div>
 
-        <!-- Main Content -->
+    <!-- Main Content -->
+ 
+
+    <!-- Main Content -->
+    <div class="main-content mt-5" id="mainContent">
+      <div class="container">
+        <h2 class="my-4">Welcome to Admin Dashboard</h2>
+        <!-- Add your main dashboard content here -->
         <main class="col-md-10 mx-auto">
           <div class="container">
             <!-- Dashboard Cards -->
@@ -58,7 +138,7 @@
                       <div
                         class="progress-bar bg-success"
                         role="progressbar"
-                        style="--value: 81%"
+                        style="width: 81%"
                       ></div>
                     </div>
                     <p class="text-success">+81%</p>
@@ -74,7 +154,7 @@
                       <div
                         class="progress-bar bg-info"
                         role="progressbar"
-                        style="--value: 31%"
+                        style="width: 31%"
                       ></div>
                     </div>
                     <p class="text-info">+31%</p>
@@ -90,7 +170,7 @@
                       <div
                         class="progress-bar bg-primary"
                         role="progressbar"
-                        style="--value: 21%"
+                        style="width: 21%"
                       ></div>
                     </div>
                     <p class="text-primary">+21%</p>
@@ -101,14 +181,14 @@
 
             <!-- New Customers Section -->
             <div class="mb-4">
-              <h2>New Customers</h2>
+              <h2>New Users</h2>
 
               <div class="row">
                 <div class="col-sm-6 col-md-3 mb-4">
                   <div class="card">
                     <img
                       class="card-img-top"
-                      src="http://localhost:3000/images/profile.jpeg"
+                      src="<%= localhost %>/images/profile2.svg"
                       alt="User"
                     />
                     <div class="card-body text-center">
@@ -121,7 +201,20 @@
                   <div class="card">
                     <img
                       class="card-img-top"
-                      src="http://localhost:3000/images/profile.jpeg"
+                      src="<%= localhost %>/images/profile1.svg"
+                      alt="User"
+                    />
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Tutor 123</h5>
+                      <p class="card-text">5 days ago</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-3 mb-4">
+                  <div class="card">
+                    <img
+                      class="card-img-top"
+                      src="<%= localhost %>/images/profile2.svg"
                       alt="User"
                     />
                     <div class="card-body text-center">
@@ -134,12 +227,12 @@
                   <div class="card">
                     <img
                       class="card-img-top"
-                      src="http://localhost:3000/images/profile.jpeg"
+                      src="<%= localhost %>/images/profile1.svg"
                       alt="User"
                     />
                     <div class="card-body text-center">
-                      <h5 class="card-title">Tutor ABC</h5>
-                      <p class="card-text">5 days ago</p>
+                      <h5 class="card-title">Student ABC</h5>
+                      <p class="card-text">8 days ago</p>
                     </div>
                   </div>
                 </div>
@@ -162,9 +255,14 @@
                     </thead>
                     <tbody>
                       <tr>
-                        <td>New Vendor Registered</td>
-                        <td>Jack</td>
-                        <td>Aug 2, 2024</td>
+                        <td>New Teacher Registered</td>
+                        <td>Hemal</td>
+                        <td>jan 2, 2025</td>
+                      </tr>
+                      <tr>
+                        <td>Payment Successfully</td>
+                        <td>Student</td>
+                        <td>feb 4, 2025</td>
                       </tr>
                       <!-- Add more rows dynamically -->
                     </tbody>
@@ -175,7 +273,7 @@
 
             <!-- Charts -->
             <div class="mb-4">
-              <h2>Vendor Categories Chart</h2>
+              <h2>Teacher Categories Chart</h2>
               <canvas id="vendorCategoriesChart"></canvas>
             </div>
           </div>
@@ -197,7 +295,7 @@
           datasets: [
             {
               label: 'Tutors',
-              data: [10, 2, 60],
+              data: [10, 4, 6],
               backgroundColor: ['#007bff', '#28a745', '#ffc107'],
             },
           ],
@@ -211,6 +309,17 @@
           },
         },
       });
+    </script>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+      function toggleSidebar() {
+        const sidebar = document.getElementById('sidebarMenu');
+        const mainContent = document.getElementById('mainContent');
+        sidebar.classList.toggle('open');
+        mainContent.classList.toggle('shifted');
+      }
     </script>
   </body>
 </html>

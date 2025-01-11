@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View Profile</title>
+    <!-- MDB CSS -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- MDB -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
+      rel="stylesheet"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f1f1f1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .navbar {
+        background: linear-gradient(90deg, #36c114, #28a745);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .navbar-brand {
+        font-weight: bold;
+        font-size: 1.8rem;
+        color: white !important;
+      }
+
+      .navbar-nav .nav-link {
+        color: white !important;
+        font-weight: 500;
+        transition: color 0.3s;
+      }
+
+      .navbar-nav .nav-link:hover {
+        color: #d4edda !important;
+      }
+
+      .profile-header {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+          url('<%= localhost %>/images/home.svg') center center no-repeat;
+        background-size: cover;
+        height: 400px;
+        color: white;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .profile-header h1 {
+        font-size: 3rem;
+        font-weight: bold;
+        animation: fadeInDown 1s;
+      }
+
+      .profile-header p {
+        font-size: 1.5rem;
+        animation: fadeInUp 1s;
+      }
+
+      .card {
+        margin-top: -50px;
+        border-radius: 15px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+
+      .card .card-body h5 {
+        color: #36c114;
+        font-weight: bold;
+      }
+
+      .skills-badge {
+        margin: 5px;
+        font-size: 0.9rem;
+      }
+
+      .skills-badge:hover {
+        background-color: #28a745;
+      }
+
+      .review-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+
+      .review-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .container {
+        flex: 1;
+      }
+
+      footer {
+        background: linear-gradient(90deg, #36c114, #28a745);
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+        font-size: 0.9rem;
+        margin-top: auto;
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <%- include('../NavBar/NavBar') %>
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <h1>Tutor Abc</h1>
+      <p>Mathematics | 10 Years of Experience</p>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="container mt-5">
+      <div class="card">
+        <div class="row g-0">
+          <div class="col-md-4 text-center">
+            <img
+              src="<%= localhost %>/images/profile2.svg"
+              class="img-fluid rounded-circle mt-4"
+              alt="Tutor Image"
+              style="width: 150px; height: 150px; border: 4px solid #36c114"
+            />
+          </div>
+          <div class="col-md-8 mt-5">
+            <div class="card-body">
+              <h5>About Tutor Abc</h5>
+              <p>
+                Tutor Abc is an experienced Mathematics tutor with a passion for
+                teaching.
+              </p>
+              <p>
+                <i class="fas fa-map-marker-alt me-2"></i>Dhaka, Bangladesh<br />
+                <i class="fas fa-envelope me-2"></i>TutorAbc@example.com
+              </p>
+              <% if (UserId[0]==='S') { %>
+              <a
+                href="mailto:john.doe@example.com"
+                class="btn btn-success btn-rounded"
+                >Contact</a
+              >
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills Section -->
+      <div class="mt-4">
+        <h3>Skills</h3>
+        <span class="badge bg-success skills-badge">Algebra</span>
+        <span class="badge bg-success skills-badge">Calculus</span>
+        <span class="badge bg-success skills-badge">Geometry</span>
+      </div>
+
+      <!-- Reviews Section -->
+      <div class="mt-4">
+        <h3>Reviews</h3>
+        <div class="review-card">
+          <p>
+            "Tutor Abc is an excellent tutor who makes complex topics easy to
+            understand."
+          </p>
+          <p><strong>- Student 1</strong>, 5 ★</p>
+        </div>
+        <div class="review-card">
+          <p>
+            "Highly recommend John for anyone looking to improve their math
+            skills."
+          </p>
+          <p><strong>-Student 2</strong>, 4 ★</p>
+        </div>
+      </div>
+
+      <!-- Map Section -->
+      <div class="map-section mt-4">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.8354345095776!2d144.9537363153168!3d-37.81627974202145!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0xf57700e4f71e3a10!2sFederation%20Square!5e0!3m2!1sen!2sau!4v1618392813893!5m2!1sen!2sau"
+          width="100%"
+          height="350"
+          style="border: 0"
+          allowfullscreen=""
+          loading="lazy"
+        ></iframe>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2025 Tutor-Hub. All Rights Reserved.</p>
+    </footer>
+
+    <!-- MDB Scripts -->
+  </body>
+</html>

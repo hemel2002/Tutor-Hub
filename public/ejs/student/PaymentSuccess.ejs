@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Success</title>
+    <!-- MDB CSS -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- MDB -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
+      rel="stylesheet"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f3f3f3;
+      }
+
+      .container {
+        text-align: center;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        width: 500px;
+      }
+
+      .image-container img {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+        display: block;
+      }
+
+      .message {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #4caf50;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .message .check-icon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .footer {
+        margin-top: 20px;
+      }
+
+      .footer a {
+        text-decoration: none;
+        color: #007bff;
+        font-size: 14px;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="image-container">
+        <img
+          src="<%= localhost %>/images/PaymentSuccess.svg"
+          alt="Payment Success"
+          class="img-fluid"
+        />
+      </div>
+      <div class="message">
+        <img
+          class="check-icon"
+          src="<%= localhost %>/images/check-icon.png"
+          alt="Check Icon"
+        />
+        Successfully paid
+      </div>
+      <div class="footer">
+        <a href="/student">Go back to Account</a>
+      </div>
+    </div>
+    <!-- MDB JS -->
+  </body>
+</html>

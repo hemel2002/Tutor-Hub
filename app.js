@@ -50,6 +50,7 @@ app.use((req, res, next) => {
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
   res.locals.localhost = `http://${getWirelessIP()}:${PORT}`;
+  res.locals.UserId = req.session.UserId;
   next();
 });
 app.use('/admin', admin);
@@ -139,6 +140,7 @@ app.post('/validuser', async (req, res) => {
 
     if (validUser) {
       req.flash('success', 'Successfully signed in');
+      req.session.UserId = user['user id'];
       res.redirect(`${account_type}/dashboard`);
     } else {
       req.flash('error', 'Invalid email or password');
@@ -312,9 +314,8 @@ app.get('/SuccessResetLink', (req, res) => {
 app.get('/home', (req, res) => {
   res.render('home/home');
 });
-app.get('/test', (req, res) => {
-  res.render('home/edit_profile');
-});
+///////////////////////testing////////////////////////
+
 //////////////////////////contact/////////////////////////
 app.get('/contact', (req, res) => {
   res.render('home/contact');
@@ -360,6 +361,12 @@ app.get('/NearbyTutor', (req, res) => {
   ];
 
   return res.json(teachers);
+});
+//////////////////////////logout/////////////////////////
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+
+  return res.redirect('/signin');
 });
 
 app.listen(PORT, () => {

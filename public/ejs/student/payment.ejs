@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TutorHub - Online Payment</title>
+    <!-- MDB CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.3.0/mdb.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f7faff;
+      }
+
+      .navbar {
+        background-color: #4caf50 !important;
+      }
+
+      .navbar .nav-link {
+        color: white !important;
+      }
+
+      .navbar .nav-link:hover {
+        color: #d4f4d4 !important;
+      }
+
+      .container h1 {
+        color: #333;
+        font-weight: bold;
+        margin-bottom: 30px;
+      }
+
+      .payment-options {
+        display: flex;
+        justify-content: center;
+        gap: 50px;
+        margin-top: 40px;
+      }
+
+      .payment-card {
+        width: 300px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        border-radius: 15px;
+        overflow: hidden;
+        background-color: white;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .payment-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+      }
+
+      .payment-card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+      }
+
+      .payment-card-body {
+        text-align: center;
+        padding: 20px;
+      }
+
+      .payment-card button {
+        width: 100%;
+      }
+
+      footer {
+        margin-top: 50px;
+        background-color: #4caf50;
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">TutorHub</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-mdb-toggle="collapse"
+          data-mdb-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#">Contact</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Map</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">☰</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container text-center mt-5">
+      <h1>Online Payment</h1>
+      <div class="payment-options">
+        <!-- QR Code Payment -->
+        <div class="Qr-payment">
+          <img src="<%= localhost %>/images/qr.png" alt="Card Payment" />
+          <div class="payment-card-body">
+            <h5>Card Payment</h5>
+            <form action="/student/QrPayment" method="get">
+              <button type="submit" class="btn btn-success">
+                Pay with QR Code
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Card Payment -->
+        <div class="payment-card">
+          <img src="card-payment-icon.png" alt="Card Payment" />
+          <div class="payment-card-body">
+            <h5>Card Payment</h5>
+            <form action="/student/cardPayment" method="post">
+              <button type="submit" class="btn btn-success">
+                Pay with Card
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2025 TutorHub. All rights reserved.</p>
+    </footer>
+
+    <!-- MDB JS -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.3.0/mdb.min.js"
+    ></script>
+  </body>
+</html>

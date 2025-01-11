@@ -24,4 +24,20 @@ router.get('/Payment', (req, res) => {
 router.get('/GetVerified', (req, res) => {
   res.render('teacher/CompleteProfile');
 });
+router.get('/test', (req, res) => {
+  res.render('home/edit_profile');
+});
+router.get('/viewprofile', (req, res) => {
+  res.render('teacher/viewprofile');
+});
+router.get('/PaymentHistory', (req, res) => {
+  res.render('teacher/PaymentHistory');
+});
+router.get('/ChangePassword', (req, res) => {
+  res.render('teacher/ChangePassword');
+});
+router.get('/changecalender', (req, res) => {
+  res.render('teacher/changecalender');
+});
+
 module.exports = router;

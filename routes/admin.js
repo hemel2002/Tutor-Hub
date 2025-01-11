@@ -22,8 +22,8 @@ router.get('/TeacherVerification', (req, res) => {
 router.get('/PaymentMangement', (req, res) => {
   res.render('admin/PaymentMangement');
 });
-router.get('/TeacherManagement', (req, res) => {
-  res.render('admin/TeacherManagement');
+router.get('/teacher', (req, res) => {
+  res.render('admin/teacher');
 });
 router.get('/StudentManagement', (req, res) => {
   res.render('admin/StudentManagement');
@@ -31,7 +31,8 @@ router.get('/StudentManagement', (req, res) => {
 router.get('/Complaints', (req, res) => {
   res.render('admin/Complaints_Dashboard');
 });
-router.post('/logout', (req, res) => {
-  return res.redirect('/signin');
+router.get('/student', (req, res) => {
+  res.render('admin/student');
 });
+
 module.exports = router;
