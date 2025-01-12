@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teacher Edit Profile</title>
+    <!-- MDB CSS -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- MDB -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
+      rel="stylesheet"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f8f9fa;
+      }
+      .sidebar {
+        width: 250px;
+        background: #eaeaea; /* Sidebar background */
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 20px 15px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar .nav-link {
+        color: rgb(0, 0, 0);
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar .nav-link:hover {
+        color: #ff6262;
+        text-decoration: none;
+        transform: translateX(5px);
+      }
+
+      .sidebar .nav-link i {
+        margin-right: 10px;
+      }
+
+      .sidebar .brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 30px;
+        display: block;
+        text-align: center;
+        color: black;
+      }
+      .main-content {
+        margin-left: 250px;
+        padding: 20px;
+      }
+      .main-content h3 {
+        margin-bottom: 20px;
+      }
+      .form-outline {
+        margin-bottom: 20px;
+      }
+      .btn-block {
+        width: 100%;
+      }
+      footer {
+        text-align: center;
+        padding: 10px;
+        background-color: #33b156;
+        color: #f8f9fa;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        margin-left: 250px;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('../NavBar/NavBar') %>
+    <!-- Sidebar -->
+    <%- include('SideNavBar') %>
+
+    <!-- Main Content -->
+    <div class="main-content mt-5 pt-5">
+      <div class="payment-history">
+        <h3>Teacher Edit Profile</h3>
+        <form>
+          <!-- Name -->
+          <div class="form-outline mb-4">
+            <input
+              type="text"
+              id="teacherName"
+              class="form-control"
+              value="John Doe"
+            />
+            <label class="form-label" for="teacherName">Full Name</label>
+          </div>
+
+          <!-- Email -->
+          <div class="form-outline mb-4">
+            <input
+              type="email"
+              id="teacherEmail"
+              class="form-control"
+              value="johndoe@example.com"
+            />
+            <label class="form-label" for="teacherEmail">Email</label>
+          </div>
+
+          <!-- Subject Expertise -->
+          <div class="form-outline mb-4">
+            <input
+              type="text"
+              id="teacherSubject"
+              class="form-control"
+              value="Mathematics"
+            />
+            <label class="form-label" for="teacherSubject"
+              >Subject Expertise</label
+            >
+          </div>
+
+          <!-- Bio -->
+          <div class="form-outline mb-4">
+            <textarea id="teacherBio" class="form-control" rows="4">
+Passionate about teaching and inspiring students.</textarea
+            >
+            <label class="form-label" for="teacherBio">Bio</label>
+          </div>
+
+          <!-- Profile Picture -->
+          <div class="mb-4">
+            <label for="profilePicture" class="form-label"
+              >Profile Picture</label
+            >
+            <input type="file" class="form-control" id="profilePicture" />
+          </div>
+
+          <!-- Save Changes Button -->
+          <button type="submit" class="btn btn-success btn-block">
+            Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>&copy; 2025 Tutor Hub. All Rights Reserved.</footer>
+
+    <!-- MDB JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
+    <!-- Font Awesome -->
+    <script
+      src="https://kit.fontawesome.com/a076d05399.js"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

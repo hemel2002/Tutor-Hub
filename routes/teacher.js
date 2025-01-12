@@ -30,6 +30,9 @@ router.get('/test', (req, res) => {
 router.get('/viewprofile', (req, res) => {
   res.render('teacher/viewprofile');
 });
+router.get('/editprofile', (req, res) => {
+  res.render('teacher/editprofile');
+});
 router.get('/PaymentHistory', (req, res) => {
   res.render('teacher/PaymentHistory');
 });

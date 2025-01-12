@@ -69,4 +69,13 @@ router.get('/cancel', (req, res) => {
 router.get('/QrPayment', (req, res) => {
   res.render('student/QrPayment');
 });
+router.get('/PaymentHistory', (req, res) => {
+  res.render('student/PaymentHistory');
+});
+router.get('/ChangePassword', (req, res) => {
+  res.render('student/ChangePassword');
+});
+router.get('/Dashboard', (req, res) => {
+  res.render('student/Dashboard');
+});
 module.exports = router;

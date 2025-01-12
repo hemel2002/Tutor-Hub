@@ -45,12 +45,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'public', 'ejs'));
 
 app.set('view engine', 'ejs');
-
 app.use((req, res, next) => {
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
   res.locals.localhost = `http://${getWirelessIP()}:${PORT}`;
   res.locals.UserId = req.session.UserId;
+  res.locals.accountType = req.session.accountType;
   next();
 });
 app.use('/admin', admin);
@@ -141,6 +141,8 @@ app.post('/validuser', async (req, res) => {
     if (validUser) {
       req.flash('success', 'Successfully signed in');
       req.session.UserId = user['user id'];
+      req.session.accountType = user['account type'];
+      console.log(req.session.accountType);
       res.redirect(`${account_type}/dashboard`);
     } else {
       req.flash('error', 'Invalid email or password');
@@ -362,7 +364,11 @@ app.get('/NearbyTutor', (req, res) => {
 
   return res.json(teachers);
 });
-//////////////////////////logout/////////////////////////
+//////////Enroll////////////////////////
+app.get('/enroll', (req, res) => {
+  res.render('home/EnrollCourses');
+});
+////////////////logout/////////////////////////
 app.get('/logout', (req, res) => {
   req.session.destroy();
 
