@@ -1,52 +1,11 @@
-<aside class="sidebar bg-light p-3" id="sidebarMenu">
-  <div class="d-md-flex flex-column align-items-center h-100">
-    <div class="logo my-4 text-center">
-      <h2 class="fw-bold">Tutor<span class="text-danger">Hub</span></h2>
-    </div>
-    <nav class="nav flex-column w-100 flex-grow-1">
-      <div class="profile d-flex flex-column align-items-center mb-4">
-        <div class="profile-photo">
-          <img
-            src="http://localhost:3000/images/profile.jpeg"
-            class="rounded-circle"
-            alt="Admin"
-            width="80"
-            height="80"
-          />
-        </div>
-        <div class="info text-center mt-3">
-          <p>Hey, <b>Admin</b></p>
-          <small class="text-muted">Admin</small>
-        </div>
-      </div>
-      <a class="nav-link active text-light fw-bold" href="/admin"
-        ><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a
-      >
-      <a class="nav-link" href="/admin/admin_customers"
-        ><i class="fas fa-users me-2"></i>Teachers</a
-      >
-      <a class="nav-link" href="/admin/admin_vendors"
-        ><i class="fas fa-user-tie me-2"></i>Students</a
-      >
-      <a class="nav-link" href="/admin/Complaints"
-        ><i class="fas fa-exclamation-circle me-2"></i>Complaints
-        <span class="badge bg-danger ms-2">20</span></a
-      >
-      <a class="nav-link" href="/admin/TeacherVerification"
-        ><i class="fas fa-user-check me-2"></i>Account Approval</a
-      >
-      <a class="nav-link" href="/admin/PaymentMangement"
-        ><i class="fas fa-wallet me-2"></i>Payment Management</a
-      >
-      <div class="dark-mode mt-3">
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" id="darkModeSwitch" />
-          <label class="form-check-label" for="darkModeSwitch">Dark Mode</label>
-        </div>
-      </div>
-    </nav>
-    <form action="/admin/logout" method="post" class="w-100 mt-4">
-      <button type="submit" class="btn btn-danger w-100">Logout</button>
-    </form>
-  </div>
-</aside>
+<div class="sidebar" id="sidebarMenu">
+  <nav class="nav flex-column sidebar fixed-top">
+    <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+    <a class="nav-link" href="/admin/teacher">Teachers</a>
+    <a class="nav-link" href="/admin/student">Students</a>
+    <a class="nav-link" href="/admin/Complaints">Complaints</a>
+    <a class="nav-link" href="/admin/TeacherVerification">Account Approval</a>
+    <a class="nav-link" href="/admin/PaymentMangement">Payment Management</a>
+    <a class="nav-link text-danger" href="/logout">Logout</a>
+  </nav>
+</div>

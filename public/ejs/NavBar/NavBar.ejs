@@ -68,6 +68,7 @@
         </li>
 
         <!-- Sign in button -->
+        <% if (!UserId) { %>
         <li class="nav-item me-2">
           <a class="nav-link" href="/signin">
             <button class="btn btn-light text-success">Sign in</button>
@@ -80,6 +81,7 @@
             <button class="btn btn-light">Sign up</button>
           </a>
         </li>
+        <% } %>
       </ul>
 
       <!-- Search -->
