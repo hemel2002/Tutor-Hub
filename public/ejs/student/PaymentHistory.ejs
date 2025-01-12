@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- MDB -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
+      rel="stylesheet"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <title>Payment History</title>
+    <style>
+      .sidebar {
+        width: 250px;
+        background-color: #ffffff;
+        padding: 20px;
+        border-right: 1px solid #ffffff;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .sidebar h2 {
+        font-size: 28px;
+        color: #ff6b6b;
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-family: 'Trebuchet MS', sans-serif;
+        text-align: center;
+      }
+
+      .sidebar img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+      }
+
+      .sidebar p {
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .sidebar ul {
+        list-style-type: none;
+      }
+
+      .sidebar ul li {
+        margin: 15px 0;
+      }
+
+      .sidebar ul li a {
+        text-decoration: none;
+        color: #333;
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar ul li a:hover,
+      .sidebar ul li a.active {
+        background-color: #007bff;
+        color: #ffffff;
+        border-radius: 5px;
+      }
+
+      .sidebar ul li .icon {
+        margin-right: 10px;
+      }
+      body {
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background-color: #f4f5f7;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        width: 250px;
+        background: #ffffff; /* Sidebar background */
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 20px 15px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar .nav-link {
+        color: rgb(0, 0, 0);
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar .nav-link:hover {
+        color: #ff6262;
+        text-decoration: none;
+        transform: translateX(5px);
+      }
+
+      .sidebar .nav-link i {
+        margin-right: 10px;
+      }
+
+      .sidebar .brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 30px;
+        display: block;
+        text-align: center;
+        color: black;
+      }
+
+      /* Main Content Styles */
+      .main-content {
+        margin-left: 270px; /* Sidebar width */
+        padding: 30px;
+        flex: 1; /* Push footer to the bottom */
+        width: 100%;
+        background-color: #f4f5f7;
+      }
+
+      .payment-history {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .payment-history h3 {
+        font-weight: bold;
+        color: #000;
+        margin-bottom: 20px;
+      }
+
+      /* Table Styles */
+      table {
+        width: 100%;
+        margin-top: 15px;
+        border-collapse: collapse;
+      }
+
+      table th {
+        background-color: #47e593;
+        color: white;
+        padding: 10px;
+        text-align: left;
+      }
+
+      table td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      table tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      table tr:nth-child(odd) {
+        background-color: #ffffff;
+      }
+
+      .badge-paid {
+        background-color: #28a745;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+      }
+
+      .badge-unpaid {
+        background-color: #dc3545;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+      }
+
+      footer {
+        background: #28a745;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-size: 0.9rem;
+        margin-top: auto; /* Ensure footer sticks at the bottom */
+      }
+    </style>
+    <script>
+      function sendReminder(studentName) {
+        alert(`Reminder sent to ${studentName}!`);
+      }
+    </script>
+  </head>
+  <body>
+    <%- include('../NavBar/NavBar') %>
+    <!-- Sidebar -->
+    <%- include('NavBar') %>
+
+    <!-- Main Content -->
+    <div class="main-content mt-5">
+      <!-- Payment History -->
+      <div class="payment-history">
+        <h3>Payment History</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>John Doe</td>
+              <td>$100</td>
+              <td>2025-01-05</td>
+              <td><span class="badge-paid">Paid</span></td>
+              <td>
+                <button class="btn btn-info btn-sm">
+                  <i class="fas fa-eye"></i> View
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Jane Smith</td>
+              <td>$100</td>
+              <td>2025-01-06</td>
+              <td><span class="badge-unpaid">Unpaid</span></td>
+              <td>
+                <button
+                  class="btn btn-warning btn-sm"
+                  onclick="sendReminder('Jane Smith')"
+                >
+                  <i class="fas fa-bell"></i> Remind
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Alex Johnson</td>
+              <td>$150</td>
+              <td>2025-01-03</td>
+              <td><span class="badge-paid">Paid</span></td>
+              <td>
+                <button class="btn btn-info btn-sm">
+                  <i class="fas fa-eye"></i> View
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Emily Davis</td>
+              <td>$200</td>
+              <td>2025-01-04</td>
+              <td><span class="badge-unpaid">Unpaid</span></td>
+              <td>
+                <button
+                  class="btn btn-warning btn-sm"
+                  onclick="sendReminder('Emily Davis')"
+                >
+                  <i class="fas fa-bell"></i> Remind
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>© 2025 Tutor Hub | All Rights Reserved</footer>
+  </body>
+</html>

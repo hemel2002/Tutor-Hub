@@ -12,5 +12,3 @@ const MongooseConnection = async () => {
     });
 };
 module.exports = MongooseConnection;
-
-module.exports = MongooseConnection;

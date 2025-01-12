@@ -1,107 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Card Payment</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
 
-        body {
-            background-color: #b8e3b8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+      body {
+        background-color: #b8e3b8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
 
-        .payment-container {
-            background-color: #f3f3f3;
-            padding: 20px 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            width: 400px;
-        }
+      .payment-container {
+        background-color: #f3f3f3;
+        padding: 20px 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        width: 400px;
+      }
 
-        .payment-container h1 {
-            font-size: 24px;
-            color: #333;
-            text-align: center;
-            margin-bottom: 20px;
-        }
+      .payment-container h1 {
+        font-size: 24px;
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+      }
 
-        .payment-container label {
-            display: block;
-            font-size: 14px;
-            margin-bottom: 5px;
-            color: #555;
-        }
+      .payment-container label {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 5px;
+        color: #555;
+      }
 
-        .payment-container input[type="text"],
-        .payment-container input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+      .payment-container input[type='text'],
+      .payment-container input[type='number'] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
 
-        .payment-container .card-icons {
-            margin-bottom: 15px;
-        }
+      .payment-container .card-icons {
+        margin-bottom: 15px;
+      }
 
-        .payment-container .card-icons img {
-            height: 30px;
-            margin-right: 10px;
-        }
+      .payment-container .card-icons img {
+        height: 30px;
+        margin-right: 10px;
+      }
 
-        .payment-container input[type="checkbox"] {
-            margin-right: 5px;
-        }
+      .payment-container input[type='checkbox'] {
+        margin-right: 5px;
+      }
 
-        .payment-container .checkout-btn {
-            background-color: #4caf50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-        }
+      .payment-container .checkout-btn {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+      }
 
-        .payment-container .checkout-btn:hover {
-            background-color: #45a049;
-        }
+      .payment-container .checkout-btn:hover {
+        background-color: #45a049;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <%- include('NavBar') %>
     <div class="payment-container">
-        <h1>Payment with Card</h1>
-        <label for="card-number">Card Number</label>
-        <input type="text" id="card-number" placeholder="Card number">
-        <div class="card-icons">
-            <img src="visa-icon.png" alt="Visa">
-            <img src="mastercard-icon.png" alt="MasterCard">
-            
-        </div>
-        <label for="expiry-date">Expiry Date</label>
-        <input type="text" id="expiry-date" placeholder="YY/MM">
-        <label for="security-code">Security Code</label>
-        <input type="number" id="security-code" placeholder="3 digit">
-        <label for="name-on-card">Name on Card</label>
-        <input type="text" id="name-on-card" placeholder="Name on card">
-        <label for="billing-address">Billing Address</label>
-        <input type="text" id="billing-address" placeholder="Billing Address">
-        <label>
-            <input type="checkbox"> Save information for future payment
-        </label>
-        <button class="checkout-btn">Checkout</button>
+      <h1>Payment with Card</h1>
+      <label for="card-number">Card Number</label>
+      <input type="text" id="card-number" placeholder="Card number" />
+      <div class="card-icons">
+        <img src="visa-icon.png" alt="Visa" />
+        <img src="mastercard-icon.png" alt="MasterCard" />
+      </div>
+      <label for="expiry-date">Expiry Date</label>
+      <input type="text" id="expiry-date" placeholder="YY/MM" />
+      <label for="security-code">Security Code</label>
+      <input type="number" id="security-code" placeholder="3 digit" />
+      <label for="name-on-card">Name on Card</label>
+      <input type="text" id="name-on-card" placeholder="Name on card" />
+      <label for="billing-address">Billing Address</label>
+      <input type="text" id="billing-address" placeholder="Billing Address" />
+      <label>
+        <input type="checkbox" /> Save information for future payment
+      </label>
+      <button class="checkout-btn">Checkout</button>
     </div>
-</body>
+  </body>
 </html>
