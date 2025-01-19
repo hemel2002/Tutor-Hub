@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course Details</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.0.0/mdb.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+      body {
+        color: #333;
+        background: #f8f9fa;
+        font-family: 'Arial', sans-serif;
+      }
+
+      .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      }
+
+      #addVideoForm,
+      #addResourceForm {
+        display: none;
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-light {
+        background-color: #f8f9fa;
+        border-color: #ddd;
+      }
+
+      .form-outline {
+        margin-bottom: 15px;
+      }
+
+      .comment-section {
+        display: none;
+        margin-top: 10px;
+      }
+
+      .comment-section textarea {
+        width: 100%;
+        resize: none;
+      }
+
+      .comment-section .existing-comments {
+        margin-top: 10px;
+      }
+
+      .section-title {
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 5px;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        color: #555;
+      }
+
+      .video-card {
+        border: none;
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      video {
+        border-radius: 10px;
+      }
+
+      .fixed-buttons {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #f8f9fa;
+        padding: 10px 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container my-5">
+      <h2 class="text-center mb-4" id="courseTitle">Course Details</h2>
+
+      <!-- Fixed Buttons -->
+      <div class="fixed-buttons">
+        <button class="btn btn-success mb-3" id="addVideoBtn">
+          + Add New Video
+        </button>
+        <button class="btn btn-danger mb-3" id="addResourceBtn">
+          + Add New Resource
+        </button>
+      </div>
+
+      <!-- Add Video Form -->
+      <div id="addVideoForm" class="card p-4">
+        <h4>Add New Video</h4>
+        <form
+          id="videoForm"
+          enctype="multipart/form-data"
+          method="post"
+          action="/admin/<%= courseId %>/uploadvideo"
+        >
+          <div class="form-outline">
+            <input
+              type="text"
+              id="videoTitle"
+              name="videoTitle"
+              class="form-control"
+              required
+            />
+            <label class="form-label" for="videoTitle">Video Title</label>
+          </div>
+          <div class="form-outline">
+            <input
+              type="file"
+              id="videoFile"
+              name="videoFile"
+              class="form-control"
+              accept="video/*"
+              required
+            />
+            <label class="form-label" for="videoFile">Upload Video</label>
+          </div>
+          <button
+            type="submit"
+            name="contentType"
+            value="video"
+            class="btn btn-success"
+          >
+            Upload Video
+          </button>
+        </form>
+      </div>
+
+      <!-- Add Resource Form -->
+      <div id="addResourceForm" class="card p-4">
+        <h4>Add New Resource</h4>
+        <form
+          id="resourceForm"
+          enctype="multipart/form-data"
+          method="post"
+          action="/admin/<%= courseId %>/coursematerial"
+        >
+          <div class="form-outline">
+            <input
+              type="text"
+              id="resourceTitle"
+              class="form-control"
+              required
+            />
+            <label class="form-label" for="resourceTitle">Resource Title</label>
+          </div>
+          <div class="form-outline">
+            <input
+              type="file"
+              id="resourceFile"
+              class="form-control"
+              accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar"
+              required
+            />
+            <label class="form-label" for="resourceFile">Upload Resource</label>
+          </div>
+          <button
+            type="submit"
+            class="btn btn-danger"
+            name="contentType"
+            value="pdf"
+          >
+            Upload Resource
+          </button>
+        </form>
+      </div>
+
+      <!-- Videos Section -->
+      <h4 class="section-title mt-5">Videos</h4>
+      <div class="row mt-4" id="videoList">
+        <% courseMaterial.forEach(element => { %>
+        <div class="col-md-6 mb-4">
+          <div class="video-card">
+            <h5 class="text-danger"><%= element.title %></h5>
+            <video width="100%" controls>
+              <source src="<%= element.contentUrl %>" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            <footer class="text-muted mt-2">
+              Uploaded on: <%= element.uploadedAt %>
+            </footer>
+            <a class="btn-info mt-2 comment-btn"> Comment </a>
+            <div class="comment-section">
+              <textarea
+                class="form-control"
+                placeholder="Write a comment..."
+              ></textarea>
+              <button class="btn btn-sm btn-success mt-2">Post Comment</button>
+              <div class="existing-comments mt-2">
+                <p><strong>User1:</strong> Great video!</p>
+                <p><strong>User2:</strong> Very helpful!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+
+      <!-- Resources Section -->
+      <h4 class="section-title mt-5">Resources</h4>
+      <div class="row mt-4" id="resourceList"></div>
+    </div>
+
+    <script>
+      // Toggle Forms
+      document
+        .getElementById('addVideoBtn')
+        .addEventListener('click', function () {
+          toggleForm('addVideoForm');
+        });
+
+      document
+        .getElementById('addResourceBtn')
+        .addEventListener('click', function () {
+          toggleForm('addResourceForm');
+        });
+
+      function toggleForm(formId) {
+        const form = document.getElementById(formId);
+        if (form.style.display === 'none' || form.style.display === '') {
+          gsap.fromTo(
+            `#${formId}`,
+            { opacity: 0, y: -50 },
+            {
+              opacity: 1,
+              y: 0,
+              display: 'block',
+              duration: 0.6,
+              ease: 'power3.out',
+            }
+          );
+        } else {
+          form.style.display = 'none';
+        }
+      }
+
+      // Toggle Comments
+      document.querySelectorAll('.comment-btn').forEach((btn) => {
+        btn.addEventListener('click', function () {
+          const commentSection = this.nextElementSibling;
+          if (
+            commentSection.style.display === 'none' ||
+            commentSection.style.display === ''
+          ) {
+            gsap.fromTo(
+              commentSection,
+              { opacity: 0, height: 0 },
+              {
+                opacity: 1,
+                height: 'auto',
+                display: 'block',
+                duration: 0.6,
+                ease: 'power3.out',
+              }
+            );
+          } else {
+            gsap.to(commentSection, {
+              opacity: 0,
+              height: 0,
+              display: 'none',
+              duration: 0.6,
+              ease: 'power3.out',
+            });
+          }
+        });
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.0.0/mdb.min.js"></script>
+  </body>
+</html>

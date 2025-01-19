@@ -4,6 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Session Booking</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css"
+      rel="stylesheet"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.umd.min.js"
+    ></script>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -23,9 +39,9 @@
         z-index: -1; /* Place behind all content */
       }
       .content {
-        position: relative;
-        max-width: 60%;
-        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         height: 100vh;
       }
       .header {
@@ -42,13 +58,10 @@
         border-radius: 5px;
       }
       .card {
-        margin-top: auto;
-        position: absolute;
         align-items: center;
         background-color: #fff;
         border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.259);
-        transform: translateY(50%);
         padding: 20px;
       }
       .card h2 {
@@ -111,6 +124,7 @@
     </script>
   </head>
   <body>
+    <%- include('../NavBar/NavBar') %>
     <object
       class="svg-background"
       data="path/to/your/svgfile.svg"
@@ -119,7 +133,7 @@
     <div class="content">
       <div class="card">
         <h2>Book Sessions</h2>
-        <form action="/submit-booking" method="POST">
+        <form>
           <div class="form-group">
             <label>Select Days of the Week:</label>
             <div class="day-buttons">
@@ -137,7 +151,7 @@
             <input type="time" id="time" name="time" value="12:00" />
           </div>
           <div class="form-group">
-            <button type="submit" class="submit">Confirm</button>
+            <a href="/student/dashboard" class="btn btn-danger">Confirm</a>
           </div>
         </form>
       </div>
