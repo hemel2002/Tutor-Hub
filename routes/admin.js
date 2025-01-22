@@ -138,10 +138,11 @@ router.get('/detailsCourse/:id', async (req, res) => {
       courseId: req.params.id,
     });
     console.log('1234', courseDetails);
+    console.log('1234', courseMaterial[0].courseAsset);
     res.render('admin/detailsCourses', {
       courseId: req.params.id,
       courseDetails,
-      courseMaterial,
+      courseMaterial: courseMaterial[0].courseAsset,
     });
   } catch (error) {
     console.error(error);
@@ -156,23 +157,46 @@ router.post('/:CourseId/comments', async (req, res) => {
   console.log(findUser);
   console.log(req.body, req.params, userId);
 });
+
 router.post(
   '/:courseId/uploadvideo',
   upload2.single('videoFile'),
   async (req, res) => {
-    const { videoTitle, contentType } = req.body;
+    const { videoTitle } = req.body;
     const courseId = req.params.courseId;
-    const contentUrl = req.file.path;
+
+    // Validate if a file is uploaded
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const contentUrl = req.file.path; // Ensure this is accessible or convert it to a public URL
     console.log(req.body, req.params, req.file);
+
     try {
       await MongooseConnection();
-      const Material = new CourseMaterial({
-        courseId,
+
+      // Find existing CourseMaterial document for the courseId
+      let material = await CourseMaterial.findOne({ courseId });
+
+      if (!material) {
+        // If no document exists, create a new one
+        material = new CourseMaterial({
+          courseId,
+          courseAsset: [],
+        });
+      }
+
+      // Append new video to the `courseAsset` array
+      material.courseAsset.push({
         title: videoTitle,
-        contentType,
+        contentType: 'video',
         contentUrl,
       });
-      await Material.save();
+
+      // Save the updated document
+      await material.save();
+
       res.redirect('/admin/detailsCourse/' + courseId);
     } catch (error) {
       console.error(error);
@@ -180,4 +204,5 @@ router.post(
     }
   }
 );
+
 module.exports = router;

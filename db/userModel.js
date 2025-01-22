@@ -2,17 +2,20 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
-    'user id': {
+    userId: {
+      // Updated field name
       type: String,
-      required: [true, 'Somthing went wrong, please try again'],
+      required: [true, 'Something went wrong, please try again'],
       unique: true,
     },
-    'first name': {
+    firstName: {
+      // Updated field name
       type: String,
       required: [true, 'First name is required'],
       minlength: [3, 'First name must be at least 3 characters'],
     },
-    'last name': {
+    lastName: {
+      // Updated field name
       type: String,
       required: [true, 'Last name is required'],
       minlength: [3, 'Last name must be at least 3 characters'],
@@ -35,29 +38,30 @@ const userSchema = new mongoose.Schema(
         'Password must contain at least one uppercase letter, one lowercase letter, and one number',
       ],
     },
-    'profile picture': {
+    profilePicture: {
+      // Updated field name
       type: String,
       default:
         'https://res.cloudinary.com/da7hqzvvf/image/upload/v1724531262/profile_pic/ib0f9aexeto7vw9c3rqf.webp',
     },
-    'account type': {
+    accountType: {
+      // Updated field name
       type: String,
       required: [true, 'Account Type is required'],
     },
+    enrolledCourses: [
+      {
+        courseId: { type: String, required: true },
+        enrolledAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );
-//   'phone number': {
-//     type: Number,
-//     required: [true, 'Phone number is required'],
-//     match: [
-//       /^880\d{10}$/,
-//       'Please fill a valid phone number starting with 880',
-//     ],
-//   },
-userSchema.virtual('full name').get(function () {
-  return `${this['first name']} ${this['last name']}`;
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.virtual('fullName').get(function () {
+  // Updated field name
+  return `${this.firstName} ${this.lastName}`;
 });
-const CreateNewUser = mongoose.model('Users', userSchema);
 
-module.exports = CreateNewUser;
+module.exports = mongoose.model('User', userSchema);

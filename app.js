@@ -24,7 +24,13 @@ const getWirelessIP = require('./routes/GetWirelessIp');
 const admin = require('./routes/admin');
 const teacher = require('./routes/teacher');
 const student = require('./routes/student');
+const courses = require('./routes/functiions');
 const axios = require('axios');
+const course = require('./routes/functiions');
+const SkillDevelopmentCourses = require('./db/SkillDevelopmentCourses');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const CourseMaterial = require('./db/CourseMaterial');
+const requireLogin = require('./routes/RequireLoginMiddleware');
 
 ///connect .env file
 
@@ -95,7 +101,7 @@ app.post('/signin', async (req, res) => {
     await MongooseConnection();
     const user = await CreateNewUser.findOne({ email: email });
     if (user) {
-      req.flash('success', `Welcome, ${user['full name']}.`);
+      req.flash('success', `Welcome, ${user.fullName}.`);
       res.redirect(`/validuser?email=${email}`);
     } else {
       req.flash('error', 'user not found, please sign up');
@@ -115,11 +121,12 @@ app.get('/validuser', async (req, res) => {
   const email = req.query.email;
   try {
     await MongooseConnection();
-
     const user = await CreateNewUser.findOne({ email: email });
+    console.log(user.fullName);
+
     res.render('home/SigninAfterValidation', {
-      fullname: user['full name'],
-      pic: user['profile picture'],
+      fullname: user.fullName,
+      pic: user.profilePicture,
       email: user.email,
     });
   } catch (error) {
@@ -136,13 +143,19 @@ app.post('/validuser', async (req, res) => {
   try {
     await MongooseConnection();
     const user = await CreateNewUser.findOne({ email: email });
-    const account_type = user['account type'];
+    const account_type = user.accountType;
     const validUser = await bcrypt.compare(password, user.password);
 
     if (validUser) {
+      if (req.session.returnTo) {
+        const redirect = req.session.returnTo;
+        req.session.UserId = user.userId;
+        delete req.session.returnTo;
+        return res.redirect(redirect);
+      }
       req.flash('success', 'Successfully signed in');
-      req.session.UserId = user['user id'];
-      req.session.accountType = user['account type'];
+      req.session.UserId = user.userId;
+      req.session.accountType = user.accountType;
       console.log(req.session.accountType);
       res.redirect(`${account_type}/dashboard`);
     } else {
@@ -175,53 +188,66 @@ app.post('/signup', async (req, res) => {
     account_type,
     confirmPassword,
   } = req.body;
+
   console.log(req.body);
+
+  // Check if passwords match
   if (password !== confirmPassword) {
     req.flash('error', 'Passwords do not match');
-    res.redirect('/signup');
-    return;
+    return res.redirect('/signup');
   }
+
   try {
-    // Ensure the mongoose connection is established
+    // Ensure mongoose connection is established
     await MongooseConnection();
-
+    const userExists = await CreateNewUser.findOne({
+      email: email,
+    });
+    if (userExists) {
+      req.flash('error', 'User already exists');
+      return res.redirect('/signup');
+    }
     // Fetch the last user to determine the next user ID
-    const lastUser = await CreateNewUser.findOne()
-      .sort({ 'user id': -1 })
-      .limit(1);
 
-    let nextUser = 1;
-    if (lastUser) {
-      const userId = lastUser['user id'];
-      nextUser = parseInt(userId.replace(/[^\d]/g, '')) + 1; // Extract digits and increment
+    let user_id;
+
+    // Generate the user_id based on account type
+    if (account_type === 'teacher') {
+      user_id = `T${new mongoose.Types.ObjectId()}`;
+    } else if (account_type === 'student') {
+      user_id = `S${new mongoose.Types.ObjectId()}`;
     }
 
-    const user_id = `U000000${nextUser}`;
-    const hashPasswoord = await hashPass(password);
+    // Ensure user_id is not null
+    if (!user_id) {
+      throw new Error('Failed to generate a unique user ID');
+    }
+
+    // Hash the password
+    const hashPassword = await bcrypt.hash(password, 10);
+    console.log(user_id);
 
     // Create the new user
     const newUser = new CreateNewUser({
-      'user id': user_id,
-      'first name': first_name,
-      'last name': last_name,
+      userId: user_id, // Updated field name
+      firstName: first_name, // Updated field name
+      lastName: last_name, // Updated field name
       email: email,
-      password: hashPasswoord,
-      'account type': account_type,
-      _id: new mongoose.Types.ObjectId(),
+      password: hashPassword,
+      accountType: account_type, // Updated field name
     });
+
     await newUser.save();
     req.flash('success', 'User created successfully');
 
+    // Redirect to sign-in page
     return res.redirect('/signin');
   } catch (error) {
-    console.log(error);
+    console.error(error);
     req.flash('error', error.message);
-    res.redirect('/signup');
-  } finally {
-    mongoose.connection.close();
+    return res.redirect('/signup');
   }
 });
-
 /////////////////////Verify Valid Email////////////////////////
 app.get('/emailVerification', (req, res) => {
   res.render('home/verifyEmail');
@@ -314,8 +340,11 @@ app.get('/SuccessResetLink', (req, res) => {
   res.render('home/SuccessResetLink');
 });
 //////////////////////////LANDING/////////////////////////
-app.get('/home', (req, res) => {
-  res.render('home/home');
+app.get('/home', async (req, res) => {
+  const courses = await course();
+  console.log(courses);
+
+  res.render('home/home', { courses });
 });
 ///////////////////////testing////////////////////////
 
@@ -366,8 +395,141 @@ app.get('/NearbyTutor', (req, res) => {
   return res.json(teachers);
 });
 //////////Enroll////////////////////////
-app.get('/enroll', (req, res) => {
+app.get('/enrolled', (req, res) => {
   res.render('home/EnrollCourses');
+});
+//////////////////////////courses/////////////////////////
+app.get('/courses', async (req, res) => {
+  const courses = await course();
+  console.log(courses);
+  res.render('home/Courses', { courses });
+});
+
+//////////////course details////////////////////////
+app.get('/courseDetails', async (req, res) => {
+  const id = req.query.id;
+  try {
+    await MongooseConnection();
+    const course = await SkillDevelopmentCourses.find({ _id: id });
+    const courseMaterial = await CourseMaterial.find({ courseId: id });
+    console.log(course);
+
+    res.render('home/CourseDetails', { course, courseMaterial });
+  } catch (error) {
+    console.log(error);
+  }
+});
+//////////////////////////enroll/////////////////////////
+app.get('/enroll', requireLogin, async (req, res) => {
+  try {
+    const course = req.query.course;
+    const courseId = req.query.id;
+    const user = req.session.UserId;
+    const amount = Number(req.query.amount);
+    const image = req.query.image;
+
+    console.log(courseId); // Debugging line
+
+    if (!course || !user || !amount || isNaN(amount)) {
+      return res.status(400).send('Invalid request parameters');
+    }
+
+    await MongooseConnection();
+
+    const finduser = await CreateNewUser.findOne({ userId: user });
+
+    if (!finduser) {
+      return res.status(404).send('User not found');
+    }
+
+    console.log(finduser); // Debugging line
+
+    // Properly check if the user is already enrolled
+    if (finduser.enrolledCourses.some((c) => c.courseId === courseId)) {
+      return res.redirect(
+        `/successfullyEnrolled?id=${courseId}&userId=${req.session.UserId}`
+      );
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: course,
+              images: image ? [image] : [],
+            },
+            unit_amount: amount * 100,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `http://localhost:3000/successfullyEnrolled?id=${courseId}&userId=${req.session.UserId}`,
+      cancel_url: `http://localhost:3000/courseDetails`,
+    });
+
+    console.log(session); // Debugging line
+
+    res.redirect(session.url);
+  } catch (error) {
+    console.error('Stripe Checkout Error:', error);
+    res.status(500).send('Something went wrong');
+  }
+});
+//////////////////////////course details/////////////////////////
+app.get('/successfullyEnrolled', async (req, res) => {
+  const userId = req.session.UserId; // Ensure UserId exists in session
+  console.log('User ID:', userId);
+  const courseId = req.query.id;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'User not logged in' });
+  }
+
+  // Ensure correct field name is used
+  const updateResult = await CreateNewUser.updateOne(
+    { userId: userId }, // Use exact field name from schema
+    {
+      $addToSet: {
+        enrolledCourses: {
+          courseId, // Ensure courseId is a string if schema expects a string
+          enrolledAt: new Date(),
+        },
+      },
+    }
+  );
+
+  console.log('Update Result:', updateResult);
+  res.redirect(`CourseMaterials?id=${courseId}&userId=${req.session.UserId}`);
+});
+//////////////////////////course materials/////////////////////////
+
+app.get('/CourseMaterials', async (req, res) => {
+  console.log(req.query);
+
+  try {
+    await MongooseConnection();
+
+    const courseId = req.query.id;
+    if (!courseId) {
+      return res.status(400).json({ error: 'Course ID is required' });
+    }
+
+    // Find course material
+    const courseMaterial = await CourseMaterial.findOne({ courseId });
+
+    console.log('Course Materials:', courseMaterial);
+
+    res.render('home/CourseMaterials.ejs', {
+      CourseMaterials: courseMaterial ? courseMaterial.courseAsset : [],
+    });
+  } catch (error) {
+    console.error('Error fetching course materials:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 ////////////////logout/////////////////////////
 app.get('/logout', (req, res) => {

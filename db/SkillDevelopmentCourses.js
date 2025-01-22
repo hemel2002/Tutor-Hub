@@ -13,6 +13,7 @@ const CourseSchema = new mongoose.Schema(
     },
     courseFee: { type: Number, required: [true, 'Course Fee is required'] },
     courseImage: { type: String, default: 'https://res.cloudinary.com/da7hq' },
+    overAllRating: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

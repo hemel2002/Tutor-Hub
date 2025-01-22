@@ -45,8 +45,11 @@
       }
 
       .comment-section {
-        display: none;
+        visibility: hidden;
+        opacity: 0;
+        height: 0;
         margin-top: 10px;
+        overflow: hidden;
       }
 
       .comment-section textarea {
@@ -78,11 +81,13 @@
       video {
         border-radius: 10px;
       }
+
       input {
         border: none;
         border-bottom: 1px solid #000 !important;
         border-radius: 0;
       }
+
       .fixed-buttons {
         position: sticky;
         top: 0;
@@ -95,102 +100,12 @@
   </head>
   <body>
     <div class="container my-5">
-      <h2 class="text-center mb-4" id="courseTitle">Course Details</h2>
-
-      <!-- Fixed Buttons -->
-      <div class="fixed-buttons">
-        <button class="btn btn-success mb-3" id="addVideoBtn">
-          + Add New Video
-        </button>
-        <button class="btn btn-danger mb-3" id="addResourceBtn">
-          + Add New Resource
-        </button>
-      </div>
-
-      <!-- Add Video Form -->
-      <div id="addVideoForm" class="card p-4">
-        <h4>Add New Video</h4>
-        <form
-          id="videoForm"
-          enctype="multipart/form-data"
-          method="post"
-          action="/admin/<%= courseId %>/uploadvideo"
-        >
-          <div class="form-outline">
-            <input
-              type="text"
-              id="videoTitle"
-              name="videoTitle"
-              class="form-control"
-              required
-            />
-            <label class="form-label" for="videoTitle">Video Title</label>
-          </div>
-          <div class="form-outline">
-            <label class="form-label" for="videoFile">Upload Video</label>
-            <input
-              type="file"
-              id="videoFile"
-              name="videoFile"
-              class="form-control"
-              accept="video/*"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            name="contentType"
-            value="video"
-            class="btn btn-success"
-          >
-            Upload Video
-          </button>
-        </form>
-      </div>
-
-      <!-- Add Resource Form -->
-      <div id="addResourceForm" class="card p-4">
-        <h4>Add New Resource</h4>
-        <form
-          id="resourceForm"
-          enctype="multipart/form-data"
-          method="post"
-          action="/admin/<%= courseId %>/coursematerial"
-        >
-          <div class="form-outline">
-            <input
-              type="text"
-              id="resourceTitle"
-              class="form-control"
-              required
-            />
-            <label class="form-label" for="resourceTitle">Resource Title</label>
-          </div>
-          <div class="form-outline">
-            <label class="form-label" for="resourceFile">Upload Resource</label>
-            <input
-              type="file"
-              id="resourceFile"
-              class="form-control"
-              accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            class="btn btn-danger"
-            name="contentType"
-            value="pdf"
-          >
-            Upload Resource
-          </button>
-        </form>
-      </div>
+      <h2 class="text-center mb-4" id="courseTitle">Course Materials</h2>
 
       <!-- Videos Section -->
       <h4 class="section-title mt-5">Videos</h4>
       <div class="row mt-4" id="videoList">
-        <% courseMaterial.forEach(element => { %>
+        <% CourseMaterials.forEach(element => { %>
         <div class="col-md-6 mb-4">
           <div class="video-card">
             <h5 class="text-danger"><%= element.title %></h5>
@@ -201,7 +116,7 @@
             <footer class="text-muted mt-2">
               Uploaded on: <%= element.uploadedAt %>
             </footer>
-            <a class="btn-info mt-2 comment-btn"> Comment </a>
+            <a class="btn-info mt-2 comment-btn">Comment</a>
             <div class="comment-section">
               <textarea
                 class="form-control"
@@ -227,13 +142,13 @@
       // Toggle Forms
       document
         .getElementById('addVideoBtn')
-        .addEventListener('click', function () {
+        ?.addEventListener('click', function () {
           toggleForm('addVideoForm');
         });
 
       document
         .getElementById('addResourceBtn')
-        .addEventListener('click', function () {
+        ?.addEventListener('click', function () {
           toggleForm('addResourceForm');
         });
 
@@ -260,26 +175,21 @@
       document.querySelectorAll('.comment-btn').forEach((btn) => {
         btn.addEventListener('click', function () {
           const commentSection = this.nextElementSibling;
-          if (
-            commentSection.style.display === 'none' ||
-            commentSection.style.display === ''
-          ) {
-            gsap.fromTo(
-              commentSection,
-              { opacity: 0, height: 0 },
-              {
-                opacity: 1,
-                height: 'auto',
-                display: 'block',
-                duration: 0.6,
-                ease: 'power3.out',
-              }
-            );
+          const isVisible = commentSection.style.visibility === 'visible';
+
+          if (!isVisible) {
+            gsap.to(commentSection, {
+              visibility: 'visible',
+              opacity: 1,
+              height: 'auto',
+              duration: 0.6,
+              ease: 'power3.out',
+            });
           } else {
             gsap.to(commentSection, {
+              visibility: 'hidden',
               opacity: 0,
               height: 0,
-              display: 'none',
               duration: 0.6,
               ease: 'power3.out',
             });

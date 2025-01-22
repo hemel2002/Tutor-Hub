@@ -36,6 +36,10 @@
         text-align: center;
         color: white;
       }
+      .card {
+        border-radius: 5%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
       .hero-overlay {
         position: absolute;
         top: 0;
@@ -49,6 +53,7 @@
         z-index: 2;
         animation: fadeIn 1.5s ease-in-out;
       }
+
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -135,7 +140,10 @@
           <div class="card">
             <div class="card-body text-center">
               <i class="fas fa-calendar-alt fa-3x text-warning"></i>
+              <br />
               <h5 class="card-title mt-3">Personalized Calendar</h5>
+              <br />
+
               <p>Schedule and manage your classes effortlessly.</p>
             </div>
           </div>
@@ -148,48 +156,33 @@
     <div class="container my-5" id="skill-programs">
       <h2 class="text-center mb-4">Skill Development Programs</h2>
       <div class="row">
-        <!-- Program 1 -->
+        <% const arr = ['primary', 'danger', 'success', 'info', 'warning']; %>
+        <% courses.forEach(element => { const random = Math.floor(Math.random()
+        * arr.length); %>
         <div class="col-lg-4 mb-4">
           <div class="card">
-            <div class="card-header text-center bg-primary text-white">
-              Data Science Essentials
+            <div
+              class="card-header text-center bg-<%= arr[random] %> text-white"
+            >
+              <%= element.courseName %>
             </div>
             <div class="card-body text-center">
-              <h5 class="card-title">Duration: 3 Months</h5>
+              <h5 class="card-title">
+                Duration: <%= element.courseDuration %>
+              </h5>
               <p>Learn Python, Machine Learning, and Data Visualization.</p>
-              <a href="/enroll" class="btn btn-primary">Enroll Now</a>
+              <a href="/enroll" class="btn btn-<%= arr[random] %>"
+                >Enroll Now</a
+              >
             </div>
           </div>
         </div>
-        <!-- Program 2 -->
-        <div class="col-lg-4 mb-4">
-          <div class="card">
-            <div class="card-header text-center bg-success text-white">
-              Web Development Bootcamp
-            </div>
-            <div class="card-body text-center">
-              <h5 class="card-title">Duration: 6 Months</h5>
-              <p>Master HTML, CSS, JavaScript, and Full Stack Development.</p>
-              <a href="/enroll" class="btn btn-success">Enroll Now</a>
-            </div>
-          </div>
-        </div>
-        <!-- Program 3 -->
-        <div class="col-lg-4 mb-4">
-          <div class="card">
-            <div class="card-header text-center bg-warning text-white">
-              Business Communication
-            </div>
-            <div class="card-body text-center">
-              <h5 class="card-title">Duration: 1 Month</h5>
-              <p>Improve your communication and presentation skills.</p>
-              <a href="/enroll" class="btn btn-warning">Join Now</a>
-            </div>
-          </div>
-        </div>
+        <% }) %>
+        <a href="/courses" class="text-success mt-4 text-end"
+          >View all programe <i class="fas fa-arrow-right"></i
+        ></a>
       </div>
     </div>
-
     <div class="container my-5" id="best-teachers">
       <h2 class="text-center mb-4">Meet Our Best Teachers</h2>
       <div id="teachersCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -240,6 +233,7 @@
           <div class="carousel-item">
             <div class="row">
               <!-- Teacher 4 -->
+
               <div class="col-md-4">
                 <div class="card teacher-card text-center">
                   <img
