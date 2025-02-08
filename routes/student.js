@@ -78,4 +78,7 @@ router.get('/ChangePassword', (req, res) => {
 router.get('/Dashboard', (req, res) => {
   res.render('student/Dashboard');
 });
+router.get('/booking', (req, res) => {
+  res.render('student/booking');
+});
 module.exports = router;

@@ -8,3 +8,5 @@ npm install dotenv
 npm install bcrypt  
 npm install axios
 npm install openai
+
+4242 4242 4242 4242

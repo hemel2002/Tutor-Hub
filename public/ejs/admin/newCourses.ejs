@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Skill Development</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- MDB -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .course-card {
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
+      }
+      .course-card:hover {
+        transform: scale(1.05);
+      }
+      #addCourseForm {
+        display: none;
+      }
+      .course-img {
+        height: 200px;
+        object-fit: cover;
+      }
+      input {
+        border: none;
+        border-bottom: 1px solid #000 !important;
+        border-radius: 0;
+      }
+      .checked {
+        color: orange;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container my-5">
+      <h2 class="text-center mb-4">Admin Dashboard - Skill Development</h2>
+
+      <div class="d-flex justify-content-between mb-3">
+        <button class="btn btn-primary" id="addCourseBtn">
+          <i class="fas fa-plus"></i> Add New Course
+        </button>
+        <input
+          type="text"
+          id="searchCourse"
+          class="form-control w-50"
+          placeholder="Search courses..."
+        />
+      </div>
+
+      <div id="addCourseForm" class="card p-4">
+        <h4>Add New Course</h4>
+        <form
+          action="/admin/course"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          <div class="form-outline mb-3">
+            <input
+              type="text"
+              id="courseName"
+              class="form-control"
+              name="courseName"
+              required
+            />
+            <label class="form-label" for="courseName">Course Name</label>
+          </div>
+          <div class="form-outline mb-3">
+            <textarea
+              id="courseDescription"
+              class="form-control"
+              name="courseDescription"
+              required
+            ></textarea>
+            <label class="form-label" for="courseDescription"
+              >Course Description</label
+            >
+          </div>
+          <div class="form-outline mb-3">
+            <input
+              type="text"
+              id="courseDuration"
+              class="form-control"
+              name="courseDuration"
+              required
+            />
+            <label class="form-label" for="courseDuration"
+              >Course Duration</label
+            >
+          </div>
+          <div class="form-outline mb-3">
+            <input
+              type="number"
+              id="courseFee"
+              class="form-control"
+              name="courseFee"
+              required
+            />
+            <label class="form-label" for="courseFee">Course Fee</label>
+          </div>
+          <div class="form-outline mb-3">
+            <input
+              type="file"
+              id="courseImage"
+              class="form-control"
+              name="courseImage"
+              accept="image/*"
+              required
+            />
+            <label class="form-label" for="courseImage">Course Image</label>
+          </div>
+          <button type="submit" class="btn btn-success">Create Course</button>
+        </form>
+      </div>
+
+      <div class="row mt-4" id="courseList">
+        <% courses.forEach(element => { %>
+
+        <div class="col-md-4 mb-3">
+          <a
+            href="/admin/detailsCourse/<%= element.id %>"
+            class="text-decoration-none"
+          >
+            <div class="card course-card">
+              <img
+                src="<%=element.courseImage %>"
+                class="card-img-top course-img w-100"
+                alt="Web Dev"
+              />
+              <div class="card-body">
+                <h5 class="card-title"><%=element.courseName %></h5>
+
+                <p class="card-text"><%=element.courseDescription %></p>
+                <div class="course-rating">
+                  <span class="fa fa-star checked"></span>
+                  <span class="fa fa-star checked"></span>
+                  <span class="fa fa-star checked"></span>
+                  <span class="fa fa-star checked"></span>
+                  <span class="fa fa-star"></span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+    <script>
+      document
+        .getElementById('addCourseBtn')
+        .addEventListener('click', function () {
+          const form = document.getElementById('addCourseForm');
+          if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+            gsap.fromTo(
+              form,
+              { opacity: 0, y: -50 },
+              { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+            );
+          } else {
+            gsap.to(form, {
+              opacity: 0,
+              y: -50,
+              duration: 0.6,
+              ease: 'power3.in',
+              onComplete: () => (form.style.display = 'none'),
+            });
+          }
+        });
+
+      function debounce(func, wait) {
+        let timeout;
+        return function (...args) {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+      }
+
+      document.getElementById('searchCourse').addEventListener(
+        'input',
+        debounce(function () {
+          let searchValue = this.value.toLowerCase();
+          let courses = document.querySelectorAll('#courseList .col-md-4');
+
+          courses.forEach((course) => {
+            let title = course
+              .querySelector('.card-title')
+              .innerText.toLowerCase();
+            if (title.includes(searchValue)) {
+              course.style.display = 'block';
+              gsap.to(course, {
+                opacity: 1,
+                duration: 0.4,
+                ease: 'power2.out',
+              });
+            } else {
+              gsap.to(course, {
+                opacity: 0,
+                duration: 0.4,
+                ease: 'power2.in',
+                onComplete: () => (course.style.display = 'none'),
+              });
+            }
+          });
+        }, 300)
+      );
+    </script>
+  </body>
+</html>
