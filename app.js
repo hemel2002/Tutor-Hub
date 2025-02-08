@@ -176,6 +176,7 @@ app.get('/signup', (req, res) => {
   // MongooseConnection();
   // await CreateNewUser.collection.drop();
 
+
   res.render('home/signup');
 });
 
@@ -347,6 +348,10 @@ app.get('/home', async (req, res) => {
   res.render('home/home', { courses });
 });
 ///////////////////////testing////////////////////////
+app.get('/testing', (req, res) => {
+console.log(req.query);
+res.send(`Alert ${req.query.name}`);
+});
 
 //////////////////////////contact/////////////////////////
 app.get('/contact', (req, res) => {

@@ -6,15 +6,19 @@
     <title>Available Students</title>
 
     <!-- MDB CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.1/mdb.min.css"
-      rel="stylesheet"
-    />
-    <!-- Font Awesome -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      rel="stylesheet"
-    />
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
+    rel="stylesheet"
+  />
+  <!-- FontAwesome -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    rel="stylesheet"
+  />
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
     <!-- Custom Styles -->
     <style>
       body {
@@ -48,6 +52,7 @@
         background-color: #f8f9fa;
         border-right: 1px solid #ddd;
         padding-top: 20px;
+        z-index: 1000;
       }
 
       .sidebar .nav-link {
@@ -63,6 +68,7 @@
       .main-content {
         margin-left: 250px;
         padding: 20px;
+        transition: margin-left 0.3s;
       }
 
       @media (max-width: 768px) {
@@ -91,7 +97,7 @@
     <%- include('header') %> <%- include('side_navbar') %>
 
     <!-- Main Content -->
-    <div class="container mt-5 pt-5">
+    <div class="container mt-5 pt-5 main-content">
       <h2 class="text-center mt-4">Available Students</h2>
 
       <!-- Filter Bar -->
@@ -172,11 +178,7 @@
       </nav>
     </div>
 
-    <!-- MDB JavaScript -->
-    <script
-      type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.1/mdb.min.js"
-    ></script>
+  
     <!-- GSAP Animation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script>

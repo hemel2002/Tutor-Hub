@@ -28,16 +28,27 @@
       body {
         font-family: 'Arial', sans-serif;
         background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
       }
+
+      /* Navbar */
+      .navbar {
+        height: 60px; /* Adjust based on your navbar height */
+      }
+
+      /* Sidebar */
       .sidebar {
         width: 250px;
         background: #eaeaea; /* Sidebar background */
-        height: 100vh;
+        height: calc(100vh - 60px); /* Full height minus navbar height */
         position: fixed;
-        top: 0;
+        top: 60px; /* Below the navbar */
         left: 0;
         padding: 20px 15px;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        overflow-y: auto; /* Add scroll if content overflows */
+        transition: transform 0.3s ease;
       }
 
       .sidebar .nav-link {
@@ -67,19 +78,28 @@
         text-align: center;
         color: black;
       }
+
+      /* Main Content */
       .main-content {
-        margin-left: 250px;
+        margin-left: 250px; /* Adjusted to match sidebar width */
+        margin-top: 60px; /* Adjusted to match navbar height */
         padding: 20px;
+        transition: margin-left 0.3s ease;
       }
+
       .main-content h3 {
         margin-bottom: 20px;
       }
+
       .form-outline {
         margin-bottom: 20px;
       }
+
       .btn-block {
         width: 100%;
       }
+
+      /* Footer */
       footer {
         text-align: center;
         padding: 10px;
@@ -87,18 +107,188 @@
         color: #f8f9fa;
         position: fixed;
         bottom: 0;
-        width: 100%;
-        margin-left: 250px;
+        width: calc(100% - 250px); /* Adjusted to account for sidebar width */
+        margin-left: 250px; /* Adjusted to match sidebar width */
+        transition: width 0.3s ease, margin-left 0.3s ease;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%); /* Hide sidebar on smaller screens */
+        }
+
+        .main-content {
+          margin-left: 0; /* Full width on smaller screens */
+        }
+
+        footer {
+          width: 100%; /* Full width on smaller screens */
+          margin-left: 0;
+        }
+
+        /* Show sidebar when toggled */
+        .sidebar.active {
+          transform: translateX(0);
+        }
+
+        /* Overlay for sidebar */
+        .overlay {
+          display: none;
+          position: fixed;
+          top: 60px;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 1000;
+        }
+
+        .overlay.active {
+          display: block;
+        }
       }
     </style>
   </head>
   <body>
-    <%- include('../NavBar/NavBar') %>
+    <!-- Navbar -->
+    <nav
+      class="navbar navbar-expand-lg navbar-light fixed-top"
+      style="background-color: #36c114"
+    >
+      <div class="container-fluid">
+        <!-- Navbar brand -->
+        <a class="navbar-brand text-white fw-bold" href="/home">Tutor-Hub</a>
+
+        <!-- Toggle button for sidebar -->
+        <button
+          class="navbar-toggler d-block d-md-none"
+          type="button"
+          id="sidebarToggle"
+        >
+          <i class="fas fa-bars text-white"></i>
+        </button>
+
+        <!-- Collapsible wrapper -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <!-- Left links -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link text-white" href="/home">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="/nearby">Nearby Teachers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="/contact">Contact</a>
+            </li>
+            <% if (UserId) { %>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="/<%= accountType %>/dashboard"
+                >Dashboard</a
+              >
+            </li>
+            <% } %>
+          </ul>
+
+          <!-- Right links -->
+          <ul class="navbar-nav d-flex flex-row align-items-center">
+            <!-- Notifications dropdown -->
+            <li class="nav-item dropdown me-3">
+              <a
+                class="nav-link dropdown-toggle hidden-arrow text-white"
+                href="#"
+                id="navbarDropdownMenuLink"
+                role="button"
+                data-mdb-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-bell"></i>
+                <span class="badge rounded-pill badge-notification bg-danger"
+                  >1</span
+                >
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-start"
+                aria-labelledby="navbarDropdownMenuLink"
+              >
+                <li>
+                  <a class="dropdown-item" href="#">Some news</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#">Another news</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#">Something else here</a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- Sign in button -->
+            <% if (!UserId) { %>
+            <li class="nav-item me-2">
+              <a class="nav-link" href="/signin">
+                <button class="btn btn-light text-success">Sign in</button>
+              </a>
+            </li>
+
+            <!-- Sign up button -->
+            <li class="nav-item">
+              <a class="nav-link" href="/signup">
+                <button class="btn btn-light">Sign up</button>
+              </a>
+            </li>
+            <% } %>
+          </ul>
+
+          <!-- Search -->
+          <form class="d-flex ms-3">
+            <input
+              type="search"
+              class="form-control"
+              placeholder="Type query"
+              aria-label="Search"
+            />
+            <button class="btn btn-light ms-2" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </nav>
+
     <!-- Sidebar -->
-    <%- include('SideNavBar') %>
+    <div class="sidebar" id="sidebar">
+      <a href="/teacher/dashboard" class="brand text-danger">Dashboard</a>
+      <a class="nav-link" href="/teacher/dashboard">
+        <i class="fas fa-home"></i> Dashboard
+      </a>
+      <a class="nav-link" href="/teacher/changecalender">
+        <i class="fas fa-calendar-alt"></i> Availability Calendar
+      </a>
+      <a class="nav-link" href="/teacher/PaymentHistory">
+        <i class="fas fa-history"></i> Transaction History
+      </a>
+      <a class="nav-link" href="/teacher/ChangePassword">
+        <i class="fas fa-key"></i> Change Password
+      </a>
+      <a class="nav-link" href="/teacher/viewprofile">
+        <i class="fas fa-user"></i> View Profile
+      </a>
+      <a class="nav-link" href="/teacher/GetVerified">
+        <i class="fas fa-check-circle"></i> Verify Profile
+      </a>
+      <a class="nav-link" href="/teacher/editprofile">
+        <i class="fas fa-edit"></i> Edit Profile
+      </a>
+      <a class="nav-link" href="/logout">
+        <i class="fas fa-sign-out-alt"></i> Log Out
+      </a>
+    </div>
+
+    <!-- Overlay for sidebar on mobile -->
+    <div class="overlay" id="overlay"></div>
 
     <!-- Main Content -->
-    <div class="main-content mt-5 pt-5">
+    <div class="main-content" id="mainContent">
       <div class="payment-history">
         <h3>Teacher Edit Profile</h3>
         <form>
@@ -171,5 +361,22 @@ Passionate about teaching and inspiring students.</textarea
       src="https://kit.fontawesome.com/a076d05399.js"
       crossorigin="anonymous"
     ></script>
+    <script>
+      // Toggle sidebar on mobile
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const mainContent = document.getElementById('mainContent');
+
+      sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+      });
+
+      overlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+      });
+    </script>
   </body>
 </html>

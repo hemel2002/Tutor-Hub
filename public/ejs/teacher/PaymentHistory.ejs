@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment History</title>
+    <!-- MDB CSS -->
     <link
       href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
       rel="stylesheet"
@@ -12,148 +14,232 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
       rel="stylesheet"
     />
-    <script
-      type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
-    ></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
     <!-- Font Awesome -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
-
-    <title>Payment History</title>
     <style>
+      :root {
+        --primary-color: #2d3e50;
+        --secondary-color: #1abc9c;
+        --accent-color: #e74c3c;
+        --text-color: #34495e;
+      }
+
       body {
-        font-family: 'Roboto', sans-serif;
-        margin: 0;
-        padding: 0;
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8f9fa;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-        background-color: #f4f5f7;
       }
 
       /* Sidebar Styles */
       .sidebar {
-        width: 250px;
-        background: #eaeaea; /* Sidebar background */
+        width: 280px;
+        background: #ffffff;
         height: 100vh;
         position: fixed;
         top: 0;
         left: 0;
         padding: 20px 15px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
       }
 
       .sidebar .nav-link {
-        color: rgb(0, 0, 0);
-        font-weight: bold;
+        color: var(--text-color);
+        font-weight: 500;
         display: flex;
         align-items: center;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
+        padding: 12px 20px;
+        border-radius: 8px;
         transition: all 0.3s ease;
       }
 
       .sidebar .nav-link:hover {
-        color: #ff6262;
-        text-decoration: none;
-        transform: translateX(5px);
+        background: #f8f9fa;
+        transform: translateX(8px);
+        color: var(--secondary-color);
       }
 
       .sidebar .nav-link i {
-        margin-right: 10px;
+        margin-right: 15px;
+        font-size: 1.1rem;
+        width: 25px;
+        text-align: center;
       }
 
       .sidebar .brand {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin-bottom: 30px;
-        display: block;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 40px;
+        color: var(--primary-color);
         text-align: center;
-        color: black;
+        letter-spacing: -1px;
       }
 
       /* Main Content Styles */
       .main-content {
-        margin-left: 270px; /* Sidebar width */
-        padding: 30px;
-        flex: 1; /* Push footer to the bottom */
-        width: 100%;
-        background-color: #f4f5f7;
+        margin-left: 280px;
+        padding: 40px;
+        flex: 1;
+        transition: all 0.3s ease;
       }
 
-      .payment-history {
+      .payment-card {
         background: white;
         border-radius: 15px;
-        padding: 20px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
       }
 
-      .payment-history h3 {
-        font-weight: bold;
-        color: #000;
-        margin-bottom: 20px;
+      .payment-card h3 {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 30px;
+        font-size: 1.8rem;
       }
 
       /* Table Styles */
-      table {
+      .transaction-table {
         width: 100%;
-        margin-top: 15px;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0 12px;
       }
 
-      table th {
-        background-color: #47e593;
+      .transaction-table thead th {
+        background-color: var(--primary-color);
         color: white;
-        padding: 10px;
-        text-align: left;
+        padding: 18px 25px;
+        font-weight: 500;
+        border: none;
       }
 
-      table td {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
+      .transaction-table thead th:first-child {
+        border-radius: 10px 0 0 10px;
       }
 
-      table tr:nth-child(even) {
-        background-color: #f9f9f9;
+      .transaction-table thead th:last-child {
+        border-radius: 0 10px 10px 0;
       }
 
-      table tr:nth-child(odd) {
-        background-color: #ffffff;
+      .transaction-table tbody td {
+        padding: 18px 25px;
+        background: white;
+        border: none;
+        vertical-align: middle;
+        position: relative;
       }
 
-      .badge-paid {
-        background-color: #28a745;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
+      .transaction-table tbody tr {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        border-radius: 10px;
+      }
+
+      .transaction-table tbody tr:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .status-badge {
+        padding: 6px 15px;
+        border-radius: 20px;
         font-size: 0.9rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
       }
 
-      .badge-unpaid {
-        background-color: #dc3545;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
+      .status-badge.paid {
+        background: #e8f6f3;
+        color: #1abc9c;
+        border: 1px solid #1abc9c;
+      }
+
+      .status-badge.unpaid {
+        background: #fdedec;
+        color: var(--accent-color);
+        border: 1px solid var(--accent-color);
+      }
+
+      .btn-action {
+        padding: 8px 15px;
+        border-radius: 8px;
         font-size: 0.9rem;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-view {
+        background: var(--primary-color);
+        color: white;
+        border: 1px solid var(--primary-color);
+      }
+
+      .btn-remind {
+        background: white;
+        color: var(--accent-color);
+        border: 1px solid var(--accent-color);
+      }
+
+      .btn-remind:hover {
+        background: var(--accent-color);
+        color: white;
       }
 
       footer {
-        background: #28a745;
+        background: var(--primary-color);
         color: white;
         padding: 20px;
         text-align: center;
         font-size: 0.9rem;
-        margin-top: auto; /* Ensure footer sticks at the bottom */
+        margin-top: auto;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+          z-index: 1000;
+        }
+
+        .main-content {
+          margin-left: 0;
+          padding: 20px;
+        }
+
+        .payment-card {
+          padding: 20px;
+        }
+
+        .transaction-table thead {
+          display: none;
+        }
+
+        .transaction-table tbody td {
+          display: block;
+          text-align: right;
+          padding: 15px;
+        }
+
+        .transaction-table tbody td::before {
+          content: attr(data-label);
+          float: left;
+          font-weight: 600;
+          color: var(--primary-color);
+        }
+
+        .transaction-table tbody tr {
+          margin-bottom: 15px;
+          display: block;
+        }
       }
     </style>
-    <script>
-      function sendReminder(studentName) {
-        alert(`Reminder sent to ${studentName}!`);
-      }
-    </script>
   </head>
   <body>
     <%- include('../NavBar/NavBar') %>
@@ -161,11 +247,10 @@
     <%- include('SideNavBar') %>
 
     <!-- Main Content -->
-    <div class="main-content mt-5">
-      <!-- Payment History -->
-      <div class="payment-history">
+    <div class="main-content">
+      <div class="payment-card">
         <h3>Payment History</h3>
-        <table>
+        <table class="transaction-table">
           <thead>
             <tr>
               <th>Student Name</th>
@@ -177,55 +262,39 @@
           </thead>
           <tbody>
             <tr>
-              <td>John Doe</td>
-              <td>$100</td>
-              <td>2025-01-05</td>
-              <td><span class="badge-paid">Paid</span></td>
-              <td>
-                <button class="btn btn-info btn-sm">
-                  <i class="fas fa-eye"></i> View
+              <td data-label="Student Name">John Doe</td>
+              <td data-label="Amount">$100</td>
+              <td data-label="Date">2025-01-05</td>
+              <td data-label="Status">
+                <span class="status-badge paid">
+                  <i class="fas fa-check-circle me-2"></i>Paid
+                </span>
+              </td>
+              <td data-label="Actions">
+                <button class="btn-action btn-view">
+                  <i class="fas fa-eye"></i>View
                 </button>
               </td>
             </tr>
             <tr>
-              <td>Jane Smith</td>
-              <td>$100</td>
-              <td>2025-01-06</td>
-              <td><span class="badge-unpaid">Unpaid</span></td>
-              <td>
+              <td data-label="Student Name">Jane Smith</td>
+              <td data-label="Amount">$100</td>
+              <td data-label="Date">2025-01-06</td>
+              <td data-label="Status">
+                <span class="status-badge unpaid">
+                  <i class="fas fa-exclamation-circle me-2"></i>Unpaid
+                </span>
+              </td>
+              <td data-label="Actions">
                 <button
-                  class="btn btn-warning btn-sm"
+                  class="btn-action btn-remind"
                   onclick="sendReminder('Jane Smith')"
                 >
-                  <i class="fas fa-bell"></i> Remind
+                  <i class="fas fa-bell"></i>Remind
                 </button>
               </td>
             </tr>
-            <tr>
-              <td>Alex Johnson</td>
-              <td>$150</td>
-              <td>2025-01-03</td>
-              <td><span class="badge-paid">Paid</span></td>
-              <td>
-                <button class="btn btn-info btn-sm">
-                  <i class="fas fa-eye"></i> View
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>Emily Davis</td>
-              <td>$200</td>
-              <td>2025-01-04</td>
-              <td><span class="badge-unpaid">Unpaid</span></td>
-              <td>
-                <button
-                  class="btn btn-warning btn-sm"
-                  onclick="sendReminder('Emily Davis')"
-                >
-                  <i class="fas fa-bell"></i> Remind
-                </button>
-              </td>
-            </tr>
+            <!-- Add more rows as needed -->
           </tbody>
         </table>
       </div>
@@ -233,5 +302,18 @@
 
     <!-- Footer -->
     <footer>© 2025 Tutor Hub | All Rights Reserved</footer>
+
+    <script>
+      function sendReminder(studentName) {
+        alert(`Reminder sent to ${studentName}!`);
+      }
+
+      // Mobile sidebar toggle
+      document
+        .querySelector('.navbar-toggler')
+        .addEventListener('click', function () {
+          document.querySelector('.sidebar').classList.toggle('active');
+        });
+    </script>
   </body>
 </html>

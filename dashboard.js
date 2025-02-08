@@ -17,6 +17,7 @@ if (!isBrowser) {
             const toast = new bootstrap.Toast(toastElement, {
               delay: 5000 // Set delay to 5000ms (5 seconds)
           });
+          
            // Show the toast
       toast.show();  
        // Add event listener to adjust stacking

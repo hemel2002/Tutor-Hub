@@ -1,235 +1,253 @@
 <!DOCTYPE html>
-<html lang="en" data-mdb-theme="auto">
+<html lang="en" data-mdb-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="A modern availability calendar with stunning animations and design."
-    />
-    <meta name="author" content="Your Name" />
     <title>Availability Calendar</title>
-
+    
     <!-- MDBootstrap CSS -->
     <link
       href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
       rel="stylesheet"
     />
-    <!-- MDB -->
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
       rel="stylesheet"
     />
-    <script
-      type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
-    ></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
     <!-- Font Awesome -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
 
-    <!-- Custom styles -->
-    <link href="<%= localhost %>/css/changecalender.css" rel="stylesheet" />
-
     <style>
+      :root {
+        --primary-color: #2d3e50;
+        --secondary-color: #1abc9c;
+        --accent-color: #e74c3c;
+        --text-color: #34495e;
+      }
+
       body {
-        font-family: 'Roboto', sans-serif;
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8f9fa;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
-        margin: 0;
       }
 
-      .content {
-        flex: 1;
-      }
-
-      h1 {
-        font-size: 3rem;
-        color: #ffffff;
-        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-        margin-bottom: 20px;
-      }
-
-      .calendar-header {
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 15px;
-        padding: 20px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      }
-
-      #month-year {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #333;
-      }
-
-      .calendar {
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 20px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      }
-
-      .calendar-day {
-        display: inline-block;
-        width: calc(100% / 7 - 10px);
-        height: 100px;
-        margin: 5px;
-        background: linear-gradient(135deg, #84fab0, #8fd3f4);
-        color: #fff;
-        font-size: 1.2rem;
-        font-weight: bold;
-        text-align: center;
-        line-height: 100px;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-
-      .calendar-day:hover {
-        transform: scale(1.1);
-        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
-      }
-
-      .btn-custom {
-        border: none;
-        padding: 10px 20px;
-        border-radius: 50px;
-        transition: background 0.3s ease;
-      }
-
-      .btn-custom:hover {
-        background: #ff6262;
-      }
-
-      .navbar {
-        z-index: 1000;
-      }
-
+      /* Sidebar Styles */
       .sidebar {
-        width: 250px;
-        background: linear-gradient(135deg, #ffffff 0%, #d8d8d8 100%);
+        width: 280px;
+        background: #ffffff;
         height: 100vh;
-        color: rgb(0, 0, 0);
         position: fixed;
         top: 0;
         left: 0;
         padding: 20px 15px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
       }
 
       .sidebar .nav-link {
-        color: rgb(0, 0, 0);
-        font-weight: bold;
+        color: var(--text-color);
+        font-weight: 500;
         display: flex;
         align-items: center;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
+        padding: 12px 20px;
+        border-radius: 8px;
         transition: all 0.3s ease;
       }
 
       .sidebar .nav-link:hover {
-        color: #ff6262;
-        text-decoration: none;
-        transform: translateX(5px);
+        background: #f8f9fa;
+        transform: translateX(8px);
+        color: var(--secondary-color);
       }
 
       .sidebar .nav-link i {
-        margin-right: 10px;
+        margin-right: 15px;
+        font-size: 1.1rem;
+        width: 25px;
+        text-align: center;
       }
 
       .sidebar .brand {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin-bottom: 30px;
-        display: block;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 40px;
+        color: var(--primary-color);
         text-align: center;
-        color: rgb(0, 0, 0);
+        letter-spacing: -1px;
       }
 
+      /* Main Content Styles */
       .main-content {
-        margin-left: 270px;
-        padding: 30px;
-        width: calc(100% - 270px);
-        background-color: #f4f5f7;
-      }
-
-      .add-material,
-      .materials-list {
-        background: rgb(215, 215, 215);
-        border-radius: 15px;
-        padding: 20px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      }
-
-      .add-material h3,
-      .materials-list h3 {
-        font-weight: bold;
-        color: #e8e8e8;
-      }
-
-      button {
+        margin-left: 280px;
+        padding: 40px;
+        flex: 1;
         transition: all 0.3s ease;
       }
 
-      button:hover {
-        transform: scale(1.05);
+      /* Calendar Styles */
+      .calendar-container {
+        max-width: 1200px;
+        margin: 0 auto;
       }
 
-      table {
-        margin-top: 15px;
+      .calendar-header {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
 
-      table th {
-        background-color: #f7f7f7;
+      .calendar-nav-btn {
+        background: var(--primary-color);
         color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
       }
 
-      table tr:nth-child(even) {
-        background-color: #f9f9f9;
+      .calendar-nav-btn:hover {
+        background: var(--secondary-color);
+        transform: translateY(-2px);
       }
 
-      table tr:nth-child(odd) {
-        background-color: #ffffff;
+      #month-year {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin: 0;
       }
 
-      footer {
-        background: linear-gradient(90deg, #36c114, #28a745);
-        color: white;
-        padding: 20px 0;
-        text-align: center;
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      .calendar-day {
+        aspect-ratio: 1;
+        background: #f8f9fa;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .calendar-day:hover {
+        background: var(--secondary-color);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(26, 188, 156, 0.3);
+      }
+
+      .calendar-day::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 2px solid transparent;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .calendar-day:hover::after {
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .day-number {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 5px;
+      }
+
+      .day-status {
         font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--secondary-color);
+        text-transform: uppercase;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+          z-index: 1000;
+        }
+
+        .main-content {
+          margin-left: 0;
+          padding: 20px;
+        }
+
+        .calendar-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .calendar-header {
+          flex-direction: column;
+          gap: 15px;
+          text-align: center;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .calendar-grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
   <body>
-    <%- include('../NavBar/NavBar') %> <%- include('SideNavBar') %>
-    <!-- Theme Toggle -->
+    <%- include('../NavBar/NavBar') %>
+    <!-- Sidebar -->
+    <%- include('SideNavBar') %>
 
-    <div class="content">
-      <!-- Availability Calendar -->
-      <div class="container mt-5 pt-5">
-        <h1 class="text-center text-danger">Availability Calendar</h1>
-        <div
-          class="calendar-header d-flex justify-content-between align-items-center"
-        >
-          <button id="prev-month" class="btn btn-custom">
-            <i class="fas fa-chevron-left"></i> Prev
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="calendar-container">
+        <div class="calendar-header">
+          <button class="calendar-nav-btn" id="prev-month">
+            <i class="fas fa-chevron-left"></i> Previous
           </button>
-          <h2 id="month-year" class="text-center"></h2>
-          <button id="next-month" class="btn btn-custom">
+          <h2 id="month-year">January 2024</h2>
+          <button class="calendar-nav-btn" id="next-month">
             Next <i class="fas fa-chevron-right"></i>
           </button>
         </div>
-        <div class="calendar mt-4" id="calendar">
+        
+        <div class="calendar-grid" id="calendar">
           <!-- Calendar days will be dynamically rendered here -->
+          <div class="calendar-day">
+            <span class="day-number">1</span>
+            <span class="day-status">Available</span>
+          </div>
+          <!-- Repeat for other days -->
         </div>
       </div>
     </div>
+
     <%- include('../Footer/footer') %>
 
     <!-- MDBootstrap JS -->
@@ -238,7 +256,13 @@
       src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"
     ></script>
 
-    <!-- Custom Scripts -->
-    <script src="<%= localhost %>/js/changecalender.js" defer></script>
+    <script>
+      // Mobile sidebar toggle
+      document
+        .querySelector('.navbar-toggler')
+        .addEventListener('click', function () {
+          document.querySelector('.sidebar').classList.toggle('active');
+        });
+    </script>
   </body>
 </html>
