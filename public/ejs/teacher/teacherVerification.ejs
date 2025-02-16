@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Teacher Dashboard</title>
+    <title>Teacher Verification</title>
     <!-- MDB CSS -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <!-- MDB -->
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
       rel="stylesheet"
@@ -122,45 +123,41 @@
         transition: all 0.3s ease;
       }
 
-      /* Card Styles */
-      .card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        transition: transform 0.2s ease;
-      }
-
-      .card:hover {
-        transform: translateY(-2px);
-      }
-
-      .card-header {
+      /* Verification Section */
+      .verification-section {
         background: var(--surface);
-        border-bottom: 1px solid #f3f4f6;
-        padding: 1.2rem 1.5rem;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
       }
 
-      .card-title {
-        font-size: 1.3rem;
+      .verification-section h3 {
+        font-size: 1.5rem;
         font-weight: 600;
         color: var(--text-primary);
-        margin: 0;
+        margin-bottom: 1.5rem;
       }
 
-      /* Form Elements */
-      .form-control {
+      .verification-section .form-label {
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .verification-section .form-control {
         border: 1px solid #e5e7eb;
         border-radius: 8px;
         padding: 0.75rem 1rem;
         transition: all 0.2s ease;
       }
 
-      .form-control:focus {
+      .verification-section .form-control:focus {
         border-color: var(--primary-color);
         box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
       }
 
-      .btn-primary {
+      .verification-section .btn-primary {
         background: var(--primary-color);
         border: none;
         padding: 0.75rem 1.5rem;
@@ -169,55 +166,41 @@
         transition: all 0.2s ease;
       }
 
-      .btn-primary:hover {
+      .verification-section .btn-primary:hover {
         background: #4338ca;
         transform: translateY(-1px);
       }
 
-      /* Delete Button */
-      .btn-danger {
-        background: var(--accent-color);
-        border: none;
-        padding: 8px 15px;
-        border-radius: 8px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-      }
-
-      .btn-danger:hover {
-        background: #c0392b;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-      }
-
-      /* Materials Table */
-      .materials-table {
-        border-collapse: separate;
-        border-spacing: 0 8px;
-        width: 100%;
-      }
-
-      .materials-table th {
+      /* Verification Status Section */
+      .verification-status {
         background: var(--surface);
-        color: var(--text-secondary);
-        font-weight: 600;
-        padding: 1rem;
-        border-bottom: 2px solid #f3f4f6;
-      }
-
-      .materials-table td {
-        background: var(--surface);
-        padding: 1.2rem;
-        border-top: 1px solid #f3f4f6;
-        vertical-align: middle;
-      }
-
-      .materials-table tr {
-        transition: all 0.2s ease;
-      }
-
-      .materials-table tr:hover {
+        border-radius: 12px;
+        padding: 2rem;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      .verification-status h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+      }
+
+      .verification-status .status {
+        font-size: 1.1rem;
+        font-weight: 500;
+      }
+
+      .verification-status .status.pending {
+        color: #f59e0b; /* Amber */
+      }
+
+      .verification-status .status.approved {
+        color: #10b981; /* Emerald */
+      }
+
+      .verification-status .status.rejected {
+        color: #ef4444; /* Red */
       }
 
       /* ========== Footer ========== */
@@ -246,28 +229,6 @@
           margin-left: 0;
           padding: 1.5rem;
         }
-
-        .navbar-brand {
-          font-size: 1.3rem;
-        }
-      }
-      .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 25px;
-        border-radius: 10px;
-        color: white;
-        font-weight: 500;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
-      }
-
-      .success {
-        background: #1abc9c;
-      }
-      .error {
-        background: #e74c3c;
       }
     </style>
   </head>
@@ -276,92 +237,57 @@
     <%- include('navbar') %>
 
     <!-- Sidebar -->
-    <%- include('SideNavBar') %> <%- include('notification') %>
+    <%- include('SideNavBar') %>
 
-    <!-- Main Content -->
     <div class="main-content">
-      <!-- Add Material Card -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h3 class="card-title">Upload New Material</h3>
-        </div>
-        <div class="card-body">
-          <form>
-            <div class="mb-4">
-              <label class="form-label">Material Title</label>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Enter title"
-              />
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Description</label>
-              <textarea
-                class="form-control"
-                rows="3"
-                placeholder="Add description"
-              ></textarea>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Upload File</label>
-              <div class="file-upload">
-                <input type="file" class="form-control" />
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              <i class="fas fa-cloud-upload-alt me-2"></i>Upload Material
-            </button>
-          </form>
-        </div>
+      <!-- Verification Section -->
+      <div class="verification-section">
+        <h3>Get Verified</h3>
+        <form
+          action="/teacher/GetVerified"
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          <div class="mb-4">
+            <label for="idCard" class="form-label">Upload ID Card</label>
+            <input
+              type="file"
+              class="form-control"
+              id="idCard"
+              name="idCard"
+              accept="image/*, application/pdf"
+              required
+            />
+          </div>
+          <div class="mb-4">
+            <label for="additionalDoc" class="form-label"
+              >Additional Document (Optional)</label
+            >
+            <input
+              type="file"
+              class="form-control"
+              id="additionalDoc"
+              name="additionalDoc"
+              accept="image/*, application/pdf"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-check-circle me-2"></i>Submit for Verification
+          </button>
+        </form>
       </div>
 
-      <!-- Materials List -->
-      <div class="card">
-        <div
-          class="card-header d-flex justify-content-between align-items-center"
-        >
-          <h3 class="card-title">Course Materials</h3>
-          <div class="badge bg-primary">24 Items</div>
-        </div>
-        <div class="card-body">
-          <table class="materials-table">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Upload Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Introduction to Physics</td>
-                <td><span class="badge bg-secondary">PDF</span></td>
-                <td>2025-02-15</td>
-                <td>
-                  <button class="btn btn-danger">
-                    <i class="fas fa-trash"></i> Delete
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>Algebra Basics</td>
-                <td><span class="badge bg-secondary">Video</span></td>
-                <td>2025-02-14</td>
-                <td>
-                  <button class="btn btn-danger">
-                    <i class="fas fa-trash"></i> Delete
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <!-- Verification Status Section -->
+      <div class="verification-status">
+        <h3>Verification Status</h3>
+        <% if (message[0]==='p') { %>
+        <div class="status pending"><%= message %></div>
+        <% } else { %>
+        <div class="status"><%= message %></div>
+        <% } %>
       </div>
     </div>
 
-    <!-- Footer -->
     <footer>
       <div class="container">© 2025 EduPortal. All rights reserved.</div>
     </footer>

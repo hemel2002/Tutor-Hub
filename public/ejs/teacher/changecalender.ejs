@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Availability Calendar</title>
-    
+
     <!-- MDBootstrap CSS -->
     <link
       href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
@@ -114,6 +114,9 @@
         padding: 12px 20px;
         border-radius: 10px;
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
 
       .calendar-nav-btn:hover {
@@ -130,12 +133,26 @@
 
       .calendar-grid {
         display: grid;
-        grid-template-columns: repeat(7, 1fr);
+        grid-template-columns: repeat(7, 1fr); /* 7 days */
         gap: 10px;
         background: white;
         padding: 25px;
         border-radius: 15px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      .calendar-weekday {
+        font-weight: 600;
+        color: var(--primary-color);
+        text-align: center;
+        padding: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .calendar-weekday:hover {
+        background: rgba(26, 188, 156, 0.1);
+        border-radius: 8px;
       }
 
       .calendar-day {
@@ -151,28 +168,28 @@
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
-      }
-
-      .calendar-day:hover {
-        background: var(--secondary-color);
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(26, 188, 156, 0.3);
-      }
-
-      .calendar-day::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
         border: 2px solid transparent;
-        border-radius: 10px;
-        transition: all 0.3s ease;
       }
 
-      .calendar-day:hover::after {
-        border-color: rgba(255, 255, 255, 0.3);
+      .calendar-day.adjacent-month {
+        opacity: 0.5;
+        background: #f0f0f0;
+        cursor: not-allowed;
+      }
+
+      .calendar-day.available {
+        background: #e8f5e9;
+        border-color: var(--secondary-color);
+      }
+
+      .calendar-day.busy {
+        background: #ffebee;
+        border-color: var(--accent-color);
+      }
+
+      .calendar-day:hover:not(.adjacent-month) {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
       }
 
       .day-number {
@@ -185,8 +202,40 @@
       .day-status {
         font-size: 0.9rem;
         font-weight: 500;
-        color: var(--secondary-color);
         text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .day-status i {
+        font-size: 0.8rem;
+      }
+
+      .fa-check {
+        color: var(--secondary-color);
+      }
+
+      .fa-times {
+        color: var(--accent-color);
+      }
+
+      /* Save Button */
+      .save-btn {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+        width: 100%;
+      }
+
+      .save-btn:hover {
+        background: var(--secondary-color);
+        transform: translateY(-2px);
       }
 
       /* Responsive Design */
@@ -217,10 +266,244 @@
           grid-template-columns: 1fr;
         }
       }
+      :root {
+        --primary-color: #2d3e50;
+        --secondary-color: #1abc9c;
+        --accent-color: #e74c3c;
+        --text-color: #34495e;
+        --text-secondary: #6b7280; /* Gray-500 */
+        --background: #f9fafb; /* Gray-50 */
+        --surface: #ffffff; /* White */
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--background);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ========== Navbar ========== */
+      .navbar {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        padding: 0.8rem 1.5rem;
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        color: var(--primary-color) !important;
+        font-size: 1.5rem;
+        letter-spacing: -0.5px;
+      }
+
+      .navbar-toggler {
+        border: none;
+        box-shadow: none !important;
+      }
+
+      /* ========== Sidebar ========== */
+      .sidebar {
+        width: 280px;
+        background: #ffffff;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 20px 15px;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .sidebar-brand {
+        color: #34495e;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 2.5rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .nav-link {
+        color: #34495e !important;
+        padding: 0.8rem 1.2rem !important;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .nav-link:hover {
+        background: #f8f9fa;
+        transform: translateX(8px);
+        color: var(--secondary-color) !important;
+      }
+
+      .nav-link.active {
+        background: rgba(255, 255, 255, 0.15) !important;
+        font-weight: 600;
+      }
+
+      .nav-link i {
+        width: 24px;
+        font-size: 1.1rem;
+      }
+
+      /* ========== Main Content ========== */
+      .main-content {
+        margin-left: 280px;
+        padding: 2.5rem;
+        flex: 1;
+        transition: all 0.3s ease;
+      }
+
+      /* Card Styles */
+      .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+      }
+
+      .card-header {
+        background: var(--surface);
+        border-bottom: 1px solid #f3f4f6;
+        padding: 1.2rem 1.5rem;
+      }
+
+      .card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+      }
+
+      /* Form Elements */
+      .form-control {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+      }
+
+      .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      }
+
+      .btn-primary {
+        background: var(--primary-color);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      .btn-primary:hover {
+        background: #4338ca;
+        transform: translateY(-1px);
+      }
+
+      /* Delete Button */
+      .btn-danger {
+        background: var(--accent-color);
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .btn-danger:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+      }
+
+      /* Materials Table */
+      .materials-table {
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        width: 100%;
+      }
+
+      .materials-table th {
+        background: var(--surface);
+        color: var(--text-secondary);
+        font-weight: 600;
+        padding: 1rem;
+        border-bottom: 2px solid #f3f4f6;
+      }
+
+      .materials-table td {
+        background: var(--surface);
+        padding: 1.2rem;
+        border-top: 1px solid #f3f4f6;
+        vertical-align: middle;
+      }
+
+      .materials-table tr {
+        transition: all 0.2s ease;
+      }
+
+      .materials-table tr:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      /* ========== Footer ========== */
+      footer {
+        background: var(--surface);
+        border-top: 1px solid #f3f4f6;
+        padding: 1.2rem;
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-top: auto;
+      }
+
+      /* ========== Responsive Design ========== */
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+          z-index: 1000;
+        }
+
+        .sidebar.active {
+          transform: translateX(0);
+        }
+
+        .main-content {
+          margin-left: 0;
+          padding: 1.5rem;
+        }
+
+        .navbar-brand {
+          font-size: 1.3rem;
+        }
+      }
     </style>
   </head>
   <body>
-    <%- include('../NavBar/NavBar') %>
+    <!-- Sidebar -->
+    <%- include('navbar') %>
+
     <!-- Sidebar -->
     <%- include('SideNavBar') %>
 
@@ -236,15 +519,13 @@
             Next <i class="fas fa-chevron-right"></i>
           </button>
         </div>
-        
-        <div class="calendar-grid" id="calendar">
-          <!-- Calendar days will be dynamically rendered here -->
-          <div class="calendar-day">
-            <span class="day-number">1</span>
-            <span class="day-status">Available</span>
-          </div>
-          <!-- Repeat for other days -->
-        </div>
+
+        <div class="calendar-grid" id="calendar"></div>
+
+        <!-- Save Button -->
+        <button class="save-btn" id="save-btn">
+          <i class="fas fa-save"></i> Save Availability
+        </button>
       </div>
     </div>
 
@@ -255,14 +536,148 @@
       type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"
     ></script>
-
     <script>
-      // Mobile sidebar toggle
-      document
-        .querySelector('.navbar-toggler')
-        .addEventListener('click', function () {
-          document.querySelector('.sidebar').classList.toggle('active');
+      document.addEventListener('DOMContentLoaded', function () {
+        const prevMonthBtn = document.getElementById('prev-month');
+        const nextMonthBtn = document.getElementById('next-month');
+        const monthYearEl = document.getElementById('month-year');
+        const calendarGrid = document.getElementById('calendar');
+        const saveBtn = document.getElementById('save-btn');
+
+        let currentDate = new Date();
+        let selectedDays = new Set();
+
+        function generateCalendar() {
+          calendarGrid.innerHTML = '';
+          const year = currentDate.getFullYear();
+          const month = currentDate.getMonth();
+
+          // Set month/year header
+          monthYearEl.textContent = new Intl.DateTimeFormat('en-US', {
+            month: 'long',
+            year: 'numeric',
+          }).format(currentDate);
+
+          // Generate weekday headers
+          const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          weekdays.forEach((day) => {
+            const header = document.createElement('div');
+            header.className = 'calendar-weekday';
+            header.textContent = day;
+            header.addEventListener('click', () => selectEntireWeek(day));
+            calendarGrid.appendChild(header);
+          });
+
+          // Calculate calendar days
+          const firstDay = new Date(year, month, 1);
+          const lastDay = new Date(year, month + 1, 0);
+          const startDay = firstDay.getDay();
+          const endDate = lastDay.getDate();
+
+          // Create calendar grid
+          let date = 1;
+          for (let i = 0; i < 6; i++) {
+            for (let j = 0; j < 7; j++) {
+              const dayEl = document.createElement('div');
+              dayEl.className = 'calendar-day';
+
+              if (i === 0 && j < startDay) {
+                // Previous month days
+                const prevMonthDay =
+                  new Date(year, month, 0).getDate() - startDay + j + 1;
+                dayEl.textContent = prevMonthDay;
+                dayEl.classList.add('adjacent-month');
+              } else if (date > endDate) {
+                // Next month days
+                dayEl.textContent = date - endDate;
+                dayEl.classList.add('adjacent-month');
+                date++;
+              } else {
+                // Current month days
+                dayEl.textContent = date;
+                dayEl.dataset.date = `${year}-${month + 1}-${date}`;
+                date++;
+
+                // Add click handler for current month days
+                dayEl.addEventListener('click', function () {
+                  this.classList.toggle('available');
+                  this.classList.toggle('busy');
+                  updateSelectedDays(
+                    this.dataset.date,
+                    this.classList.contains('available')
+                  );
+                });
+              }
+
+              calendarGrid.appendChild(dayEl);
+            }
+          }
+        }
+
+        function selectEntireWeek(weekday) {
+          const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          const targetIndex = weekdays.indexOf(weekday);
+
+          Array.from(calendarGrid.children).forEach((dayEl, index) => {
+            if (index > 6 && index % 7 === targetIndex) {
+              // Skip header row
+              if (!dayEl.classList.contains('adjacent-month')) {
+                dayEl.classList.toggle('available');
+                updateSelectedDays(
+                  dayEl.dataset.date,
+                  dayEl.classList.contains('available')
+                );
+              }
+            }
+          });
+        }
+
+        function updateSelectedDays(date, isSelected) {
+          if (isSelected) {
+            selectedDays.add(date);
+          } else {
+            selectedDays.delete(date);
+          }
+        }
+
+        prevMonthBtn.addEventListener('click', () => {
+          currentDate.setMonth(currentDate.getMonth() - 1);
+          generateCalendar();
         });
+
+        nextMonthBtn.addEventListener('click', () => {
+          currentDate.setMonth(currentDate.getMonth() + 1);
+          generateCalendar();
+        });
+
+        saveBtn.addEventListener('click', async () => {
+          try {
+            const response = await fetch('/api/availability', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                dates: Array.from(selectedDays),
+                month: currentDate.getMonth() + 1,
+                year: currentDate.getFullYear(),
+              }),
+            });
+
+            if (response.ok) {
+              alert('Availability saved successfully!');
+              selectedDays.clear();
+            } else {
+              alert('Error saving availability');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Error saving availability');
+          }
+        });
+
+        generateCalendar();
+      });
     </script>
   </body>
 </html>

@@ -31,7 +31,9 @@ const SkillDevelopmentCourses = require('./db/SkillDevelopmentCourses');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const CourseMaterial = require('./db/CourseMaterial');
 const requireLogin = require('./routes/RequireLoginMiddleware');
-
+const teacherSchema = require('./db/teacherSchema');
+const StudentSchema = require('./db/StudentSchema');
+const { error } = require('console');
 ///connect .env file
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -176,7 +178,6 @@ app.get('/signup', (req, res) => {
   // MongooseConnection();
   // await CreateNewUser.collection.drop();
 
-
   res.render('home/signup');
 });
 
@@ -237,8 +238,28 @@ app.post('/signup', async (req, res) => {
       password: hashPassword,
       accountType: account_type, // Updated field name
     });
+    if (account_type === 'teacher') {
+      const teacher = new teacherSchema({
+        userId: user_id,
+        email: email,
+        firstName: first_name,
+        lastName: last_name,
+      });
+      await teacher.save();
+      console.log(teacher);
+    } else {
+      const student = new StudentSchema({
+        userId: user_id,
+        email: email,
+        firstName: first_name,
+        lastName: last_name,
+      });
+      await student.save();
+      console.log(student);
+    }
 
     await newUser.save();
+
     req.flash('success', 'User created successfully');
 
     // Redirect to sign-in page
@@ -332,8 +353,17 @@ app.post('/resetpassword', async (req, res) => {
   }
 });
 //////////////////////////Nearby Teachers//////////////////////////
-app.get('/nearby', (req, res) => {
-  res.render('home/NearByTeachers');
+app.get('/nearby', async (req, res) => {
+  try {
+    await MongooseConnection();
+    const teachers = await teacherSchema.find();
+
+    res.render('home/NearByTeachers', { teachers });
+  } catch (error) {
+    console.error(error);
+  } finally {
+    await mongoose.connection.close();
+  }
 });
 //////////////////////////seccess ResetLink//////////////////////////
 app.get('/SuccessResetLink', (req, res) => {
@@ -349,55 +379,85 @@ app.get('/home', async (req, res) => {
 });
 ///////////////////////testing////////////////////////
 app.get('/testing', (req, res) => {
-console.log(req.query);
-res.send(`Alert ${req.query.name}`);
+  console.log(req.query);
+  res.send(`Alert ${req.query.data}`);
 });
 
 //////////////////////////contact/////////////////////////
 app.get('/contact', (req, res) => {
   res.render('home/contact');
 });
-app.get('/NearbyTutor', (req, res) => {
-  const teachers = [
-    {
-      name: 'Shahriar Hemal',
-      area: 'Mirpur 12, Dhaka Metropolitan, Dhaka Division, Bangladesh',
-      subject: 'Mathematics',
-      rating: '4.8🌟',
-      experience: '5 years',
-      imageUrl: 'https://via.placeholder.com/150',
-      T_ID: 1,
-    },
-    {
-      name: 'Tutor Abcd',
-      area: 'Mirpur-10, Begum Rokeya Sharani, Mirpur, Dhaka - 1216, Bangladesh',
-      subject: 'Physics',
-      rating: '4.6🌟',
-      experience: '3 years',
-      imageUrl: 'https://via.placeholder.com/150',
-      T_ID: 2,
-    },
-    {
-      name: 'Hemal',
-      area: 'West End Street',
-      subject: 'Chemistry',
-      rating: '4.9🌟',
-      experience: '7 years',
-      imageUrl: 'ECB Chottor, ECB Chattar, Matikata, Dhaka - 1206, Bangladesh',
-      T_ID: 3,
-    },
-    {
-      name: 'Tutor 001',
-      area: 'New Airport Road, Baunia, Dhaka - 1230, Bangladesh',
-      subject: 'Biology',
-      rating: '4.7🌟',
-      experience: '6 years',
-      imageUrl: 'https://via.placeholder.com/150',
-      T_ID: 4,
-    },
-  ];
-
-  return res.json(teachers);
+//////////////////////////about/////////////////////////
+app.get('/teacherprofile', async (req, res) => {
+  const email = req.query.email;
+  console.log(email);
+  try {
+    await MongooseConnection();
+    const teacher = await teacherSchema.findOne({ email: email });
+    if (!teacher) {
+      req.flash('error', 'Teacher not found');
+      return res.redirect('/home');
+    }
+    console.log(teacher);
+    res.render('home/viewprofile', { tutor: teacher });
+  } catch (error) {
+    console.log(error);
+    req.flash('error', 'Internal server error');
+    res.redirect('/home');
+  } finally {
+    mongoose.connection.close();
+  }
+});
+//////////////////////////services/////////////////////////
+app.get('/NearbyTutor', async (req, res) => {
+  // const teachers = [
+  //   {
+  //     name: 'Shahriar Hemal',
+  //     area: 'Mirpur 12, Dhaka Metropolitan, Dhaka Division, Bangladesh',
+  //     subject: 'Mathematics',
+  //     rating: '4.8🌟',
+  //     experience: '5 years',
+  //     imageUrl: 'https://via.placeholder.com/150',
+  //     T_ID: 1,
+  //   },
+  //   {
+  //     name: 'Tutor Abcd',
+  //     area: 'Mirpur-10, Begum Rokeya Sharani, Mirpur, Dhaka - 1216, Bangladesh',
+  //     subject: 'Physics',
+  //     rating: '4.6🌟',
+  //     experience: '3 years',
+  //     imageUrl: 'https://via.placeholder.com/150',
+  //     T_ID: 2,
+  //   },
+  //   {
+  //     name: 'Hemal',
+  //     area: 'West End Street',
+  //     subject: 'Chemistry',
+  //     rating: '4.9🌟',
+  //     experience: '7 years',
+  //     imageUrl: 'ECB Chottor, ECB Chattar, Matikata, Dhaka - 1206, Bangladesh',
+  //     T_ID: 3,
+  //   },
+  //   {
+  //     name: 'Tutor 001',
+  //     area: 'New Airport Road, Baunia, Dhaka - 1230, Bangladesh',
+  //     subject: 'Biology',
+  //     rating: '4.7🌟',
+  //     experience: '6 years',
+  //     imageUrl: 'https://via.placeholder.com/150',
+  //     T_ID: 4,
+  //   },
+  // ];
+  try {
+    await MongooseConnection();
+    const teachers = await teacherSchema.find();
+    return res.json(teachers);
+    console.log(teachers);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    mongoose.connection.close();
+  }
 });
 //////////Enroll////////////////////////
 app.get('/enrolled', (req, res) => {

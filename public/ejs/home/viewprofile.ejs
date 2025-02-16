@@ -156,7 +156,7 @@
     <!-- Profile Header -->
     <div class="profile-header">
       <h1><%= tutor.firstName %> <%= tutor.lastName %></h1>
-      <p>Mathematics | <%= tutor.experience %> Years of Experience</p>
+      <p><%= tutor.preferableSubjects %> | 2 Years of Experience</p>
     </div>
 
     <!-- Profile Content -->
@@ -173,23 +173,21 @@
           </div>
           <div class="col-md-8 mt-5">
             <div class="card-body">
-              <h5>About <%= tutor.firstName %> <%= tutor.lastName %></h5>
+              <h5>About <%= tutor.firstName %></h5>
               <p>
-                <%= tutor.firstName %> <%= tutor.lastName %> is an experienced
-                Mathematics tutor with a passion for teaching.
+                <%= tutor.firstName %> is an experienced <%=
+                tutor.preferableSubjects %> tutor with a passion for teaching.
               </p>
               <p>
                 <i class="fas fa-map-marker-alt me-2"></i><%= tutor.location
                 %><br />
                 <i class="fas fa-envelope me-2"></i><%= tutor.email %>
               </p>
-              <% if (UserId[0]==='S') { %>
               <a
                 href="mailto:<%= tutor.email %>"
                 class="btn btn-success btn-rounded"
                 >Contact</a
               >
-              <% } %>
             </div>
           </div>
         </div>
@@ -198,9 +196,9 @@
       <!-- Skills Section -->
       <div class="mt-4">
         <h3>Skills</h3>
-        <% tutor.preferableSubjects.forEach(subject => { %>
-        <span class="badge bg-success skills-badge"><%= subject %></span>
-        <% }) %>
+        <span class="badge bg-success skills-badge">Algebra</span>
+        <span class="badge bg-success skills-badge">Calculus</span>
+        <span class="badge bg-success skills-badge">Geometry</span>
       </div>
 
       <!-- Reviews Section -->
@@ -208,17 +206,17 @@
         <h3>Reviews</h3>
         <div class="review-card">
           <p>
-            "Tutor Abc is an excellent tutor who makes complex topics easy to
-            understand."
+            "<%= tutor.firstName %> is an excellent tutor who makes complex
+            topics easy to understand."
           </p>
           <p><strong>- Student 1</strong>, 5 ★</p>
         </div>
         <div class="review-card">
           <p>
-            "Highly recommend John for anyone looking to improve their math
-            skills."
+            "Highly recommend <%= tutor.firstName %> for anyone looking to
+            improve their math skills."
           </p>
-          <p><strong>-Student 2</strong>, 4 ★</p>
+          <p><strong>- Student 2</strong>, 4 ★</p>
         </div>
       </div>
 

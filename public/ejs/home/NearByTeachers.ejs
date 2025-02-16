@@ -113,9 +113,14 @@
                   </div>
                   <div class="modal-body">
                     <p>
+                      <strong>Email:</strong>
+                      <span id="T_ID"></span>
+                    </p>
+                    <p>
                       <strong>Subject:</strong>
                       <span id="teacherSubject"></span>
                     </p>
+
                     <p>
                       <strong>Experience:</strong>
                       <span id="teacherExperience"></span>
@@ -132,7 +137,8 @@
                     <a
                       id="detailsLink"
                       class="btn btn-primary"
-                      href="/teacher/viewprofile"
+                      href="/teacherprofile"
+                      data-base-url="/teacherprofile"
                       >View Details</a
                     >
                     <button
@@ -248,13 +254,13 @@
             console.log(data);
 
             const address = data.map((item) => ({
-              name: item.name,
-              area: item.area,
-              subject: item.subject,
-              rating: item.rating,
-              experience: item.experience,
+              name: item.firstName + ' ' + item.lastName,
+              area: item.location,
+              subject: item.preferableSubjects,
+              rating: 0,
+              experience: 2,
               imageUrl: 'https://via.placeholder.com/150',
-              T_ID: item.T_ID,
+              T_ID: item.email,
             })); // Convert to the desired format
             addAddressMarkers(address); // Call the function to add markers after data is fetched
           })
@@ -441,6 +447,8 @@
                   selectedShopCoordinates = coordinates;
 
                   // Populate modal with shop details
+                  document.getElementById('T_ID').innerText = location.T_ID;
+
                   document.getElementById('teacherModalLabel').innerText =
                     location.name;
                   document.getElementById('teacherSubject').innerText =
@@ -451,6 +459,8 @@
                     location.rating;
                   document.getElementById('totalDistance').innerText =
                     'Calculating...';
+                  const detailsLink = document.getElementById('detailsLink');
+                  detailsLink.href = `${detailsLink.dataset.baseUrl}?email=${location.T_ID}`;
 
                   // Show the modal
                   var modal = new mdb.Modal(
