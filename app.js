@@ -20,6 +20,7 @@ const app = express();
 const TokenModel = require('./db/ForgetModel');
 const sendOtpEmail = require('./routes/email');
 const { PASSWORD_RESET_REQUEST_TEMPLATE } = require('./routes/EmailTemp');
+const { FIRE_ALERT_TEMPLATE } = require('./routes/EmailTemp');
 const getWirelessIP = require('./routes/GetWirelessIp');
 const admin = require('./routes/admin');
 const teacher = require('./routes/teacher');
@@ -378,11 +379,18 @@ app.get('/home', async (req, res) => {
   res.render('home/home', { courses });
 });
 ///////////////////////testing////////////////////////
-app.get('/testing', (req, res) => {
-  console.log(req.query);
-  res.send(`Alert ${req.query.data}`);
+app.get('/testing', async (req, res) => {
+  try {
+    const message = FIRE_ALERT_TEMPLATE;
+    const { email } = req.query;
+    const subject = 'Fire Alert';
+    await sendOtpEmail(email, subject, message);
+    res.send(`Alert sent to ${email}`);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('An error occurred while sending the alert');
+  }
 });
-
 //////////////////////////contact/////////////////////////
 app.get('/contact', (req, res) => {
   res.render('home/contact');

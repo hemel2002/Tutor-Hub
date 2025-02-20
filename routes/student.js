@@ -51,6 +51,8 @@ router.post('/cardPayment', async (req, res) => {
       success_url: 'http://localhost:3000/student/success',
       cancel_url: 'http://localhost:3000/student/cancel',
     });
+
+    
     console.log(session);
     console.log(process.env.STRIPE_SECRET_KEY);
 
