@@ -596,6 +596,10 @@ app.get('/CourseMaterials', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+//////////////////////////Book Appointment/////////////////////////
+app.get('/bookAppointment', (req, res) => {
+  res.render('home/BookAppointment');
+});
 ////////////////logout/////////////////////////
 app.get('/logout', (req, res) => {
   req.session.destroy();

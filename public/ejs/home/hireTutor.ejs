@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hire a Tutor</title>
+    <style>
+      /* Global Styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #36c114, #28a745);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 400px;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+        color: #28a745;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #555;
+      }
+
+      select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+
+      select:focus {
+        border-color: #28a745;
+        outline: none;
+      }
+
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        background: linear-gradient(135deg, #28a745, #36c114);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+      }
+
+      button:hover {
+        background: linear-gradient(135deg, #36c114, #28a745);
+        transform: translateY(-2px);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      #schedule {
+        margin-top: 2rem;
+        text-align: center;
+      }
+
+      #schedule h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #28a745;
+      }
+
+      #busyDays {
+        list-style-type: none;
+      }
+
+      #busyDays li {
+        background: #ffebee;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        color: #d32f2f;
+        animation: slideIn 0.5s ease-in-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      /* Responsive Design */
+      @media (max-width: 480px) {
+        .container {
+          padding: 1.5rem;
+        }
+
+        h1 {
+          font-size: 1.75rem;
+        }
+
+        #schedule h2 {
+          font-size: 1.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Hire a Tutor</h1>
+      <form id="tutorForm">
+        <div class="form-group">
+          <label for="week">Select a Day:</label>
+          <select id="week" name="week">
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+          </select>
+        </div>
+        <button type="submit">Check Availability</button>
+        <button type="button" id="hireTutorButton">Hire Tutor</button>
+      </form>
+      <div id="schedule">
+        <h2>Tutor's Busy Days</h2>
+        <ul id="busyDays"></ul>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById('tutorForm')
+        .addEventListener('submit', function (event) {
+          event.preventDefault();
+
+          const selectedDay = document.getElementById('week').value;
+
+          // List of busy days
+          const busyDaysList = ['Saturday', 'Sunday'];
+
+          const busyDaysContainer = document.getElementById('busyDays');
+          busyDaysContainer.innerHTML = '';
+
+          busyDaysList.forEach((day) => {
+            const li = document.createElement('li');
+            li.textContent = day;
+            busyDaysContainer.appendChild(li);
+          });
+
+          if (busyDaysList.includes(selectedDay)) {
+            alert(`The tutor is busy on ${selectedDay}.`);
+          } else {
+            alert(`The tutor is available on ${selectedDay}.`);
+          }
+        });
+
+      document
+        .getElementById('hireTutorButton')
+        .addEventListener('click', function () {
+          alert('Tutor hired successfully!');
+        });
+    </script>
+  </body>
+</html>

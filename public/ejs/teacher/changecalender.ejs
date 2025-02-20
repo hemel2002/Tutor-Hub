@@ -545,7 +545,7 @@
         const saveBtn = document.getElementById('save-btn');
 
         let currentDate = new Date();
-        let selectedDays = new Set();
+        let selectedWeekdays = new Set(); // Store only unique weekdays
 
         function generateCalendar() {
           calendarGrid.innerHTML = '';
@@ -564,7 +564,8 @@
             const header = document.createElement('div');
             header.className = 'calendar-weekday';
             header.textContent = day;
-            header.addEventListener('click', () => selectEntireWeek(day));
+            header.addEventListener('click', () => toggleWeekSelection(day));
+            if (selectedWeekdays.has(day)) header.classList.add('busy'); // Highlight if already selected
             calendarGrid.appendChild(header);
           });
 
@@ -574,7 +575,6 @@
           const startDay = firstDay.getDay();
           const endDate = lastDay.getDate();
 
-          // Create calendar grid
           let date = 1;
           for (let i = 0; i < 6; i++) {
             for (let j = 0; j < 7; j++) {
@@ -582,30 +582,23 @@
               dayEl.className = 'calendar-day';
 
               if (i === 0 && j < startDay) {
-                // Previous month days
-                const prevMonthDay =
-                  new Date(year, month, 0).getDate() - startDay + j + 1;
-                dayEl.textContent = prevMonthDay;
                 dayEl.classList.add('adjacent-month');
               } else if (date > endDate) {
-                // Next month days
-                dayEl.textContent = date - endDate;
                 dayEl.classList.add('adjacent-month');
                 date++;
               } else {
-                // Current month days
                 dayEl.textContent = date;
-                dayEl.dataset.date = `${year}-${month + 1}-${date}`;
+                dayEl.dataset.weekday = weekdays[j];
                 date++;
 
-                // Add click handler for current month days
+                // Apply selection if the weekday is already marked
+                if (selectedWeekdays.has(weekdays[j])) {
+                  dayEl.classList.add('busy');
+                }
+
+                // Click event to toggle selection
                 dayEl.addEventListener('click', function () {
-                  this.classList.toggle('available');
-                  this.classList.toggle('busy');
-                  updateSelectedDays(
-                    this.dataset.date,
-                    this.classList.contains('available')
-                  );
+                  toggleWeekSelection(this.dataset.weekday);
                 });
               }
 
@@ -614,30 +607,29 @@
           }
         }
 
-        function selectEntireWeek(weekday) {
-          const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-          const targetIndex = weekdays.indexOf(weekday);
+        function toggleWeekSelection(weekday) {
+          if (selectedWeekdays.has(weekday)) {
+            selectedWeekdays.delete(weekday);
+          } else {
+            selectedWeekdays.add(weekday);
+          }
 
-          Array.from(calendarGrid.children).forEach((dayEl, index) => {
-            if (index > 6 && index % 7 === targetIndex) {
-              // Skip header row
-              if (!dayEl.classList.contains('adjacent-month')) {
-                dayEl.classList.toggle('available');
-                updateSelectedDays(
-                  dayEl.dataset.date,
-                  dayEl.classList.contains('available')
-                );
-              }
+          // Update all calendar cells based on selected weekdays
+          Array.from(calendarGrid.children).forEach((dayEl) => {
+            if (dayEl.dataset.weekday === weekday) {
+              dayEl.classList.toggle('busy', selectedWeekdays.has(weekday));
             }
           });
-        }
 
-        function updateSelectedDays(date, isSelected) {
-          if (isSelected) {
-            selectedDays.add(date);
-          } else {
-            selectedDays.delete(date);
-          }
+          // Update header highlight
+          Array.from(calendarGrid.children).forEach((header) => {
+            if (
+              header.classList.contains('calendar-weekday') &&
+              header.textContent === weekday
+            ) {
+              header.classList.toggle('busy', selectedWeekdays.has(weekday));
+            }
+          });
         }
 
         prevMonthBtn.addEventListener('click', () => {
@@ -652,21 +644,23 @@
 
         saveBtn.addEventListener('click', async () => {
           try {
-            const response = await fetch('/api/availability', {
+            const response = await fetch('/teacher/changecalender', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                dates: Array.from(selectedDays),
+                weekdays: Array.from(selectedWeekdays), // Send only unique weekdays
                 month: currentDate.getMonth() + 1,
                 year: currentDate.getFullYear(),
+                status: 'busy',
               }),
             });
 
             if (response.ok) {
               alert('Availability saved successfully!');
-              selectedDays.clear();
+              selectedWeekdays.clear();
+              generateCalendar();
             } else {
               alert('Error saving availability');
             }

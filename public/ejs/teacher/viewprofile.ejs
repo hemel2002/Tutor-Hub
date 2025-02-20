@@ -155,8 +155,8 @@
 
     <!-- Profile Header -->
     <div class="profile-header">
-      <h1><%= tutor.firstName %> <%= tutor.lastName %></h1>
-      <p>Mathematics | <%= tutor.experience %> Years of Experience</p>
+      <h1>Tutor Abc</h1>
+      <p>Mathematics | 10 Years of Experience</p>
     </div>
 
     <!-- Profile Content -->
@@ -165,7 +165,7 @@
         <div class="row g-0">
           <div class="col-md-4 text-center">
             <img
-              src="<%= tutor.profilePicture %>"
+              src="<%= localhost %>/images/profile2.svg"
               class="img-fluid rounded-circle mt-4"
               alt="Tutor Image"
               style="width: 150px; height: 150px; border: 4px solid #36c114"
@@ -173,19 +173,18 @@
           </div>
           <div class="col-md-8 mt-5">
             <div class="card-body">
-              <h5>About <%= tutor.firstName %> <%= tutor.lastName %></h5>
+              <h5>About Tutor Abc</h5>
               <p>
-                <%= tutor.firstName %> <%= tutor.lastName %> is an experienced
-                Mathematics tutor with a passion for teaching.
+                Tutor Abc is an experienced Mathematics tutor with a passion for
+                teaching.
               </p>
               <p>
-                <i class="fas fa-map-marker-alt me-2"></i><%= tutor.location
-                %><br />
-                <i class="fas fa-envelope me-2"></i><%= tutor.email %>
+                <i class="fas fa-map-marker-alt me-2"></i>Dhaka, Bangladesh<br />
+                <i class="fas fa-envelope me-2"></i>TutorAbc@example.com
               </p>
               <% if (UserId[0]==='S') { %>
               <a
-                href="mailto:<%= tutor.email %>"
+                href="mailto:john.doe@example.com"
                 class="btn btn-success btn-rounded"
                 >Contact</a
               >
@@ -198,9 +197,9 @@
       <!-- Skills Section -->
       <div class="mt-4">
         <h3>Skills</h3>
-        <% tutor.preferableSubjects.forEach(subject => { %>
-        <span class="badge bg-success skills-badge"><%= subject %></span>
-        <% }) %>
+        <span class="badge bg-success skills-badge">Algebra</span>
+        <span class="badge bg-success skills-badge">Calculus</span>
+        <span class="badge bg-success skills-badge">Geometry</span>
       </div>
 
       <!-- Reviews Section -->

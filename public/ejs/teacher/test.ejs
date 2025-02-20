@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutor Schedule</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css"
+    />
+    <style>
+      .schedule-container {
+        display: grid;
+        grid-template-columns: auto repeat(7, 1fr);
+        gap: 2px;
+        margin: 20px auto;
+        max-width: 1200px;
+      }
+
+      .header-cell {
+        padding: 15px;
+        background-color: #3b71ca;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        position: sticky;
+        top: 0;
+      }
+
+      .time-cell {
+        padding: 10px;
+        background-color: #f8f9fa;
+        text-align: center;
+        border-right: 1px solid #dee2e6;
+      }
+
+      .schedule-slot {
+        padding: 15px;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid #dee2e6;
+        min-height: 60px;
+      }
+
+      .schedule-slot:hover {
+        background-color: #e3f2fd;
+      }
+
+      .schedule-slot.selected {
+        background-color: #3b71ca;
+        color: white;
+      }
+
+      .save-btn-container {
+        text-align: center;
+        margin: 20px 0;
+      }
+
+      .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container py-5">
+      <h2 class="text-center mb-4">Tutor Schedule Manager</h2>
+
+      <div class="schedule-container">
+        <!-- Header Row -->
+        <div class="header-cell">Time</div>
+        <div class="header-cell">Sun</div>
+        <div class="header-cell">Mon</div>
+        <div class="header-cell">Tue</div>
+        <div class="header-cell">Wed</div>
+        <div class="header-cell">Thu</div>
+        <div class="header-cell">Fri</div>
+        <div class="header-cell">Sat</div>
+
+        <!-- Time Slots -->
+        <script>
+          const startHour = 8;
+          const endHour = 20;
+          const container = document.querySelector('.schedule-container');
+
+          for (let hour = startHour; hour < endHour; hour++) {
+            // Add time cell
+            const timeCell = document.createElement('div');
+            timeCell.className = 'time-cell';
+            timeCell.textContent = `${hour}:00 - ${hour + 1}:00`;
+            container.appendChild(timeCell);
+
+            // Add day slots
+            for (let day = 0; day < 7; day++) {
+              const slot = document.createElement('div');
+              slot.className = 'schedule-slot';
+              slot.dataset.day = day;
+              slot.dataset.time = `${hour}:00`;
+              slot.onclick = function () {
+                this.classList.toggle('selected');
+              };
+              container.appendChild(slot);
+            }
+          }
+        </script>
+      </div>
+
+      <div class="save-btn-container">
+        <button class="btn btn-primary btn-lg" id="saveSchedule">
+          <i class="fas fa-save me-2"></i>Save Schedule
+        </button>
+      </div>
+
+      <div class="loading">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Function to mark selected slots
+      function markSelectedSlots(schedule) {
+        document.querySelectorAll('.schedule-slot').forEach((slot) => {
+          const isSelected = schedule.some(
+            (item) =>
+              item.day === parseInt(slot.dataset.day) &&
+              item.time === slot.dataset.time
+          );
+          if (isSelected) slot.classList.add('selected');
+        });
+      }
+
+      // Fetch and mark saved schedule on page load
+      window.addEventListener('DOMContentLoaded', async () => {
+        try {
+          const response = await fetch('/teacher/get-schedule');
+          if (!response.ok) throw new Error('Failed to fetch schedule');
+
+          const existingSchedule = await response.json();
+          markSelectedSlots(existingSchedule);
+        } catch (error) {
+          console.log(
+            'No existing schedule found or error fetching schedule:',
+            error
+          );
+        }
+      });
+
+      // Save schedule button click handler
+      document
+        .getElementById('saveSchedule')
+        .addEventListener('click', async function () {
+          const selectedSlots = document.querySelectorAll(
+            '.schedule-slot.selected'
+          );
+          const schedule = Array.from(selectedSlots).map((slot) => ({
+            day: parseInt(slot.dataset.day),
+            time: slot.dataset.time,
+          }));
+
+          const loading = document.querySelector('.loading');
+          try {
+            loading.style.display = 'flex';
+
+            const response = await fetch('/teacher/save-schedule', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ schedule }),
+            });
+
+            if (!response.ok) throw new Error('Server error');
+
+            alert('Schedule saved successfully!');
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Error saving schedule: ' + error.message);
+          } finally {
+            loading.style.display = 'none';
+          }
+        });
+    </script>
+  </body>
+</html>
