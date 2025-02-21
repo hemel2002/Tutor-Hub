@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile Settings</title>
+    <!-- MDB CSS -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- MDB -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #2d3e50;
+        --secondary-color: #1abc9c;
+        --accent-color: #e74c3c;
+        --text-color: #34495e;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .profile-container {
+        background: white;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 800px;
+        padding: 2.5rem;
+        box-shadow: var(--shadow);
+        animation: fadeIn 0.6s ease-out;
+      }
+
+      .profile-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+      }
+
+      .profile-title {
+        font-size: 2.2rem;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+      }
+
+      .profile-subtitle {
+        color: #666;
+        font-size: 1rem;
+      }
+
+      .avatar-section {
+        position: relative;
+        width: 150px;
+        margin: 0 auto 2rem;
+      }
+
+      .avatar-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: var(--shadow);
+        transition: transform 0.3s ease;
+      }
+
+      .avatar-image:hover {
+        transform: scale(1.05);
+      }
+
+      .avatar-upload {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: var(--secondary-color);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow);
+      }
+
+      .avatar-upload:hover {
+        background: #16a085;
+        transform: scale(1.1);
+      }
+
+      .form-section {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+        font-weight: 500;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 0.8rem 1.2rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.1);
+      }
+
+      .address-autocomplete {
+        position: relative;
+        grid-column: 1 / -1;
+      }
+
+      .suggestions-container {
+        position: absolute;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        margin-top: 0.5rem;
+      }
+
+      .suggestion-item {
+        padding: 0.8rem 1.2rem;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .suggestion-item:hover {
+        background: #f8f9fa;
+      }
+
+      .submit-btn {
+        grid-column: 1 / -1;
+        background: var(--secondary-color);
+        color: white;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .submit-btn:hover {
+        background: #16a085;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+
+      @media (max-width: 768px) {
+        .form-section {
+          grid-template-columns: 1fr;
+        }
+
+        .profile-container {
+          padding: 1.5rem;
+        }
+
+        .profile-title {
+          font-size: 1.8rem;
+        }
+      }
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 10px;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+      }
+
+      .success {
+        background: #1abc9c;
+      }
+      .error {
+        background: #e74c3c;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="profile-container">
+      <!-- Profile Header -->
+      <div class="profile-header">
+        <div class="avatar-section">
+          <img
+            src="<%= user.profilePicture %>"
+            alt="Profile Picture"
+            class="avatar-image"
+            id="profile-picture"
+          />
+          <div
+            class="avatar-upload"
+            onclick="document.getElementById('fileInput').click();"
+          >
+            <i class="fas fa-camera text-white"></i>
+          </div>
+          <!-- Hidden form for profile picture upload -->
+          <form
+            id="profilePicForm"
+            style="display: none"
+            enctype="multipart/form-data"
+            method="POST"
+            action="/teacher/profilePic"
+          >
+            <input
+              type="file"
+              id="fileInput"
+              name="PROFILE_IMAGE"
+              accept="image/*"
+              onchange="handleProfilePicUpload(event)"
+            />
+          </form>
+        </div>
+        <h1 class="profile-title">Complete Profile</h1>
+        <p class="profile-subtitle">Keep your information updated and secure</p>
+      </div>
+
+      <!-- Profile Form -->
+      <form
+      id="profileForm"
+      class="form-section"
+      method="POST"
+      action="/student/completeProfile"
+    >
+      <!-- First Name -->
+      <div class="form-group">
+        <label class="form-label" for="FirstName">First Name</label>
+        <input
+          type="text"
+          class="form-control"
+          id="FirstName"
+          name="FIRST_NAME"
+          value="<%= user.firstName %>"
+          required
+        />
+      </div>
+    
+      <!-- Last Name -->
+      <div class="form-group">
+        <label class="form-label" for="LastName">Last Name</label>
+        <input
+          type="text"
+          class="form-control"
+          id="LastName"
+          name="LAST_NAME"
+          value="<%= user.lastName %>"
+          required
+        />
+      </div>
+    
+      <!-- Email -->
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          name="EMAIL"
+          value="<%= user.email %>"
+          readonly
+          required
+        />
+      </div>
+    
+      <!-- Class -->
+      <div class="form-group">
+        <label class="form-label" for="class">Class</label>
+        <input
+          type="text"
+          class="form-control"
+          id="class"
+          name="class"
+          value="<%= user.class %>"
+          required
+        />
+      </div>
+    
+      <!-- Address Autocomplete -->
+      <div class="address-autocomplete">
+        <label class="form-label" for="locationInput">Address</label>
+        <input
+          type="text"
+          class="form-control"
+          id="locationInput"
+          name="AREA"
+          placeholder="Enter your home address"
+          required
+        />
+        <div id="suggestions" class="suggestions-container"></div>
+      </div>
+    
+      <!-- Submit Button -->
+      <button type="submit" class="submit-btn">
+        <i class="fas fa-save me-2"></i>Update Profile
+      </button>
+    </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      // Image Preview Function
+      function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          document.getElementById('profile-picture').src = e.target.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+      }
+
+      // Handle Profile Picture Upload
+      async function handleProfilePicUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('PROFILE_IMAGE', file);
+
+        try {
+          const response = await fetch('/teacher/profilePic', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!response.ok) throw new Error(await response.text());
+
+          const result = await response.json();
+          const profilePicture = document.getElementById('profile-picture');
+          profilePicture.src = result.path;
+
+          showNotification('Profile picture uploaded successfully!', 'success');
+        } catch (error) {
+          console.error('Error uploading profile picture:', error);
+          showNotification(`Error: ${error.message}`, 'error');
+        }
+      }
+      // Address Autocomplete
+      const locationInput = document.getElementById('locationInput');
+      const suggestionsContainer = document.getElementById('suggestions');
+
+      locationInput.addEventListener('input', async function () {
+        const input = this.value.trim();
+        if (!input) {
+          suggestionsContainer.innerHTML = '';
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+              input
+            )}`
+          );
+          if (!response.ok) throw new Error('Failed to fetch suggestions');
+
+          const suggestions = await response.json();
+          suggestionsContainer.innerHTML = suggestions
+            .map(
+              (suggestion) =>
+                `<div class="suggestion-item" onclick="selectSuggestion('${suggestion.display_name}')">${suggestion.display_name}</div>`
+            )
+            .join('');
+        } catch (error) {
+          console.error('Error fetching suggestions:', error);
+          showNotification('Failed to fetch address suggestions.', 'error');
+        }
+      });
+
+      function selectSuggestion(suggestion) {
+        locationInput.value = suggestion;
+        suggestionsContainer.innerHTML = '';
+      }
+
+      // Notification function
+      function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>

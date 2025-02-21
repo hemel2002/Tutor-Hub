@@ -90,7 +90,7 @@ const options = {
 app.get('/signin', async (req, res) => {
   try {
     const response = await axios.request(options);
-    console.log(response.data[0]);
+   
     res.render('home/signin', { quotes: response.data[0] });
   } catch (error) {
     console.error(error);
@@ -117,7 +117,7 @@ app.post('/signin', async (req, res) => {
     mongoose.connection.close();
   }
 
-  console.log(req.body);
+
 });
 /////////valid user signin/////////////
 app.get('/validuser', async (req, res) => {
@@ -125,7 +125,7 @@ app.get('/validuser', async (req, res) => {
   try {
     await MongooseConnection();
     const user = await CreateNewUser.findOne({ email: email });
-    console.log(user.fullName);
+ 
 
     res.render('home/SigninAfterValidation', {
       fullname: user.fullName,
@@ -140,8 +140,8 @@ app.get('/validuser', async (req, res) => {
 });
 app.post('/validuser', async (req, res) => {
   const { email, password } = req.body;
-  console.log(req.body);
-  console.log(email, password);
+
+
 
   try {
     await MongooseConnection();
@@ -158,8 +158,9 @@ app.post('/validuser', async (req, res) => {
       }
       req.flash('success', 'Successfully signed in');
       req.session.UserId = user.userId;
+      req.session.email = user.email;
       req.session.accountType = user.accountType;
-      console.log(req.session.accountType);
+      
       res.redirect(`${account_type}/dashboard`);
     } else {
       req.flash('error', 'Invalid email or password');
@@ -192,7 +193,7 @@ app.post('/signup', async (req, res) => {
     confirmPassword,
   } = req.body;
 
-  console.log(req.body);
+
 
   // Check if passwords match
   if (password !== confirmPassword) {
@@ -228,7 +229,7 @@ app.post('/signup', async (req, res) => {
 
     // Hash the password
     const hashPassword = await bcrypt.hash(password, 10);
-    console.log(user_id);
+
 
     // Create the new user
     const newUser = new CreateNewUser({
@@ -247,7 +248,7 @@ app.post('/signup', async (req, res) => {
         lastName: last_name,
       });
       await teacher.save();
-      console.log(teacher);
+    
     } else {
       const student = new StudentSchema({
         userId: user_id,
@@ -256,7 +257,7 @@ app.post('/signup', async (req, res) => {
         lastName: last_name,
       });
       await student.save();
-      console.log(student);
+
     }
 
     await newUser.save();
@@ -285,12 +286,12 @@ app.post('/forgetpassword', async (req, res) => {
   const Token = uuidv4();
   const subject = 'Password Reset Request';
   const resetLink = `http://${getWirelessIP()}:${PORT}/resetpassword?token=${Token}&email=${email}`;
-  console.log(resetLink);
+
   const message = PASSWORD_RESET_REQUEST_TEMPLATE.replace(
     `{resetURL}`,
     resetLink
   );
-  console.log(message);
+
   try {
     await MongooseConnection();
     const user = await CreateNewUser.findOne({ email: email });
@@ -333,7 +334,7 @@ app.get('/resetpassword', async (req, res) => {
 });
 app.post('/resetpassword', async (req, res) => {
   const { password, confirmpassword, email } = req.body;
-  console.log(req.body);
+
   if (password !== confirmpassword) {
     req.flash('error', 'Passwords do not match');
     return res.redirect(`/resetpassword?email=${email}`);
@@ -343,7 +344,7 @@ app.post('/resetpassword', async (req, res) => {
     const user = await CreateNewUser.findOne({ email: email });
     const hashPassword = await hashPass(password);
     user.password = hashPassword;
-    console.log(user);
+
     await user.save();
     req.flash('success', 'Password reset successfully');
     return res.redirect('/signin');
@@ -374,7 +375,7 @@ app.get('/SuccessResetLink', (req, res) => {
 //////////////////////////LANDING/////////////////////////
 app.get('/home', async (req, res) => {
   const courses = await course();
-  console.log(courses);
+
 
   res.render('home/home', { courses });
 });
@@ -398,7 +399,7 @@ app.get('/contact', (req, res) => {
 //////////////////////////about/////////////////////////
 app.get('/teacherprofile', async (req, res) => {
   const email = req.query.email;
-  console.log(email);
+
   try {
     await MongooseConnection();
     const teacher = await teacherSchema.findOne({ email: email });
@@ -406,7 +407,7 @@ app.get('/teacherprofile', async (req, res) => {
       req.flash('error', 'Teacher not found');
       return res.redirect('/home');
     }
-    console.log(teacher);
+
     res.render('home/viewprofile', { tutor: teacher });
   } catch (error) {
     console.log(error);
@@ -460,7 +461,7 @@ app.get('/NearbyTutor', async (req, res) => {
     await MongooseConnection();
     const teachers = await teacherSchema.find();
     return res.json(teachers);
-    console.log(teachers);
+
   } catch (error) {
     console.log(error);
   } finally {
@@ -473,8 +474,7 @@ app.get('/enrolled', (req, res) => {
 });
 //////////////////////////courses/////////////////////////
 app.get('/courses', async (req, res) => {
-  const courses = await course();
-  console.log(courses);
+
   res.render('home/Courses', { courses });
 });
 
@@ -485,7 +485,6 @@ app.get('/courseDetails', async (req, res) => {
     await MongooseConnection();
     const course = await SkillDevelopmentCourses.find({ _id: id });
     const courseMaterial = await CourseMaterial.find({ courseId: id });
-    console.log(course);
 
     res.render('home/CourseDetails', { course, courseMaterial });
   } catch (error) {
@@ -501,7 +500,7 @@ app.get('/enroll', requireLogin, async (req, res) => {
     const amount = Number(req.query.amount);
     const image = req.query.image;
 
-    console.log(courseId); // Debugging line
+
 
     if (!course || !user || !amount || isNaN(amount)) {
       return res.status(400).send('Invalid request parameters');
@@ -515,7 +514,7 @@ app.get('/enroll', requireLogin, async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    console.log(finduser); // Debugging line
+
 
     // Properly check if the user is already enrolled
     if (finduser.enrolledCourses.some((c) => c.courseId === courseId)) {
@@ -544,7 +543,6 @@ app.get('/enroll', requireLogin, async (req, res) => {
       cancel_url: `http://localhost:3000/courseDetails`,
     });
 
-    console.log(session); // Debugging line
 
     res.redirect(session.url);
   } catch (error) {
@@ -555,7 +553,7 @@ app.get('/enroll', requireLogin, async (req, res) => {
 //////////////////////////course details/////////////////////////
 app.get('/successfullyEnrolled', async (req, res) => {
   const userId = req.session.UserId; // Ensure UserId exists in session
-  console.log('User ID:', userId);
+
   const courseId = req.query.id;
 
   if (!userId) {
@@ -603,6 +601,10 @@ app.get('/CourseMaterials', async (req, res) => {
     console.error('Error fetching course materials:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+});
+//////////////////////////Book Appointment/////////////////////////
+app.get('/bookAppointment', (req, res) => {
+  res.render('home/BookAppointment');
 });
 ////////////////logout/////////////////////////
 app.get('/logout', (req, res) => {

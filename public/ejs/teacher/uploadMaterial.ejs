@@ -278,88 +278,90 @@
     <!-- Sidebar -->
     <%- include('SideNavBar') %> <%- include('notification') %>
 
-    <!-- Main Content -->
-    <div class="main-content">
-      <!-- Add Material Card -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h3 class="card-title">Upload New Material</h3>
-        </div>
-        <div class="card-body">
-          <form>
-            <div class="mb-4">
-              <label class="form-label">Material Title</label>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Enter title"
-              />
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Description</label>
-              <textarea
-                class="form-control"
-                rows="3"
-                placeholder="Add description"
-              ></textarea>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Upload File</label>
-              <div class="file-upload">
-                <input type="file" class="form-control" />
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              <i class="fas fa-cloud-upload-alt me-2"></i>Upload Material
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- Materials List -->
-      <div class="card">
-        <div
-          class="card-header d-flex justify-content-between align-items-center"
-        >
-          <h3 class="card-title">Course Materials</h3>
-          <div class="badge bg-primary">24 Items</div>
-        </div>
-        <div class="card-body">
-          <table class="materials-table">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Upload Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Introduction to Physics</td>
-                <td><span class="badge bg-secondary">PDF</span></td>
-                <td>2025-02-15</td>
-                <td>
-                  <button class="btn btn-danger">
-                    <i class="fas fa-trash"></i> Delete
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>Algebra Basics</td>
-                <td><span class="badge bg-secondary">Video</span></td>
-                <td>2025-02-14</td>
-                <td>
-                  <button class="btn btn-danger">
-                    <i class="fas fa-trash"></i> Delete
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Add Material Card -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3 class="card-title">Upload New Material</h3>
     </div>
+    <div class="card-body">
+      <form action="/teacher/uploadMaterial" method="POST" enctype="multipart/form-data">
+        <div class="mb-4">
+          <label class="form-label">Material Title</label>
+          <input
+            type="text"
+            class="form-control"
+            name="title"
+            placeholder="Enter title"
+          />
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Description</label>
+          <textarea
+            class="form-control"
+            name="description"
+            rows="3"
+            placeholder="Add description"
+          ></textarea>
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Upload File</label>
+          <div class="file-upload">
+            <input type="file" class="form-control" name="file" />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-cloud-upload-alt me-2"></i>Upload Material
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Materials List -->
+  <div class="card">
+    <div
+      class="card-header d-flex justify-content-between align-items-center"
+    >
+      <h3 class="card-title">Course Materials</h3>
+      <div class="badge bg-primary">24 Items</div>
+    </div>
+    <div class="card-body">
+      <table class="materials-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Upload Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Introduction to Physics</td>
+            <td><span class="badge bg-secondary">PDF</span></td>
+            <td>2025-02-15</td>
+            <td>
+              <button class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Algebra Basics</td>
+            <td><span class="badge bg-secondary">Video</span></td>
+            <td>2025-02-14</td>
+            <td>
+              <button class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
     <!-- Footer -->
     <footer>

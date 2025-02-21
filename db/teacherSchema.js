@@ -6,7 +6,8 @@ const teacherSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Something went wrong, please try again'],
       unique: true,
-      ref: 'User', // Assuming a User model exists
+      ref: 'User',
+      match: [/^T[a-zA-Z0-9]+$/, 'Teacher ID must start with "T"'],
     },
     firstName: {
       type: String,
@@ -51,12 +52,19 @@ const teacherSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    busySchedule: [
+      {
+        type: String,
+        enum: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        trim: true,
+      },
+    ],
     enrolledCourses: [
       {
         courseId: {
           type: mongoose.Schema.Types.ObjectId,
           required: true,
-          ref: 'Course', // Assuming a Course model exists
+          ref: 'Course',
         },
         enrolledAt: { type: Date, default: Date.now },
       },
@@ -72,11 +80,33 @@ const teacherSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
       trim: true,
+      match: [/^\+?[0-9]{7,15}$/, 'Please provide a valid phone number'],
     },
+    schedule: [
+      {
+        day: {
+          type: Number,
+          required: true,
+          min: 0,
+          max: 6,
+        },
+        time: {
+          type: String,
+          required: true,
+          match: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
   }
+);
+
+// Add a compound unique index to prevent duplicate schedule slots
+teacherSchema.index(
+  { userId: 1, 'schedule.day': 1, 'schedule.time': 1 },
+  { unique: true }
 );
 
 module.exports = mongoose.model('Teacher', teacherSchema);

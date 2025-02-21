@@ -1,19 +1,15 @@
 const mongoose = require('mongoose');
 const TeachesSchema = new mongoose.Schema({
-  tutor_id: {
-    type: mongoose.Schema.Types.ObjectId,
+  tutorEmail: {
+    type:String,
     ref: 'Tutor',
     required: true,
   },
-  student_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Student',
+  studentEmail: {
+    type:String,
     required: true,
   },
-  subject: {
-    type: String,
-    required: true,
-  },
+ 
   class: {
     type: String,
     required: true,
@@ -23,8 +19,13 @@ const TeachesSchema = new mongoose.Schema({
     enum: ['Pending', 'Completed'],
     default: 'Pending',
   },
-
-  WeeklySchedule: [
+  request:{
+    type: String,
+    required: true,
+    enum: ['Accepted', 'Rejected', 'Pending'],
+    default: 'Pending',
+  },
+ WeeklySchedule: [
     {
       day: {
         type: String,

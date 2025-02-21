@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutor Dashboard</title>
+    <style>
+      :root {
+        --primary-color: #2d3e50;
+        --secondary-color: #1abc9c;
+        --accent-color: #e74c3c;
+        --text-color: #34495e;
+        --text-secondary: #6b7280; /* Gray-500 */
+        --background: #f9fafb; /* Gray-50 */
+        --surface: #ffffff; /* White */
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--background);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ========== Navbar ========== */
+      .navbar {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        padding: 0.8rem 1.5rem;
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        color: var(--primary-color) !important;
+        font-size: 1.5rem;
+        letter-spacing: -0.5px;
+      }
+
+      .navbar-toggler {
+        border: none;
+        box-shadow: none !important;
+      }
+
+      /* ========== Sidebar ========== */
+      .sidebar {
+        width: 280px;
+        background: #ffffff;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 20px 15px;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .sidebar-brand {
+        color: #34495e;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 2.5rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .nav-link {
+        color: #34495e !important;
+        padding: 0.8rem 1.2rem !important;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .nav-link:hover {
+        background: #f8f9fa;
+        transform: translateX(8px);
+        color: var(--secondary-color) !important;
+      }
+
+      .nav-link.active {
+        background: rgba(255, 255, 255, 0.15) !important;
+        font-weight: 600;
+      }
+
+      .nav-link i {
+        width: 24px;
+        font-size: 1.1rem;
+      }
+
+      /* ========== Main Content ========== */
+      .main-content {
+        margin-left: 280px;
+        padding: 2.5rem;
+        flex: 1;
+        transition: all 0.3s ease;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+        color: var(--primary-color);
+      }
+
+      .profile-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .profile-pic {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--secondary-color);
+      }
+
+      .stats-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background: var(--surface);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        text-align: center;
+      }
+
+      .stat-card h3 {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--primary-color);
+      }
+
+      .upcoming-sessions {
+        background: var(--surface);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+      }
+
+      .upcoming-sessions h2 {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+      }
+
+      .session-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .session-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: var(--background);
+        border-radius: 8px;
+      }
+
+      .session-item div {
+        font-size: 1rem;
+        color: var(--text-color);
+      }
+
+      .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+      }
+
+      .btn-primary:hover {
+        background: #1a2a3a;
+      }
+
+      .student-table {
+        background: var(--surface);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      .student-table h2 {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #f3f4f6;
+      }
+
+      th {
+        background: var(--background);
+        color: var(--text-secondary);
+        font-weight: 600;
+      }
+
+      .action-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        margin-right: 0.5rem;
+      }
+
+      .action-btn.view {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+      }
+
+      .action-btn.edit {
+        background: var(--secondary-color);
+        color: white;
+        border: none;
+      }
+
+      .action-btn.delete {
+        background: var(--accent-color);
+        color: white;
+        border: none;
+      }
+
+      .action-btn:hover {
+        opacity: 0.9;
+      }
+
+      /* ========== Footer ========== */
+      footer {
+        background: var(--surface);
+        border-top: 1px solid #f3f4f6;
+        padding: 1.2rem;
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-top: auto;
+      }
+
+      /* ========== Responsive Design ========== */
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+          z-index: 1000;
+        }
+
+        .sidebar.active {
+          transform: translateX(0);
+        }
+
+        .main-content {
+          margin-left: 0;
+          padding: 1.5rem;
+        }
+
+        .stats-container {
+          grid-template-columns: 1fr;
+        }
+
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('navbar') %>
+
+    <!-- Sidebar -->
+    <%- include('SideNavBar') %>
+
+    <div class="main-content">
+      <div class="header">
+        <h1>Welcome Back, Sarah!</h1>
+        <div class="profile-section">
+          <div class="profile-pic"></div>
+          <button class="btn btn-primary">Notifications (2)</button>
+        </div>
+      </div>
+
+      <div class="stats-container">
+        <div class="stat-card">
+          <h3>Total Students</h3>
+          <div class="stat-number">24</div>
+        </div>
+        <div class="stat-card">
+          <h3>Upcoming Sessions</h3>
+          <div class="stat-number">5</div>
+        </div>
+        <div class="stat-card">
+          <h3>Monthly Hours</h3>
+          <div class="stat-number">38</div>
+        </div>
+      </div>
+
+      <div class="upcoming-sessions">
+        <h2>Today's Sessions</h2>
+        <div class="session-list">
+          <div class="session-item">
+            <div>Mathematics - John Doe</div>
+            <div>3:00 PM - 4:30 PM</div>
+            <button class="btn btn-primary">Start Session</button>
+          </div>
+          <div class="session-item">
+            <div>Physics - Jane Smith</div>
+            <div>5:00 PM - 6:30 PM</div>
+            <button class="btn btn-primary">Prepare</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Table Section -->
+      <div class="student-table">
+        <h2>All Students</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Subject</th>
+              <th>Grade</th>
+              <th>Progress</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>John Doe</td>
+              <td>Mathematics</td>
+              <td>A</td>
+              <td>85%</td>
+              <td>
+                <button class="action-btn view">View</button>
+                <button class="action-btn edit">Edit</button>
+                <button class="action-btn delete">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Jane Smith</td>
+              <td>Physics</td>
+              <td>B+</td>
+              <td>72%</td>
+              <td>
+                <button class="action-btn view">View</button>
+                <button class="action-btn edit">Edit</button>
+                <button class="action-btn delete">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Alice Johnson</td>
+              <td>Chemistry</td>
+              <td>A-</td>
+              <td>90%</td>
+              <td>
+                <button class="action-btn view">View</button>
+                <button class="action-btn edit">Edit</button>
+                <button class="action-btn delete">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Bob Brown</td>
+              <td>Biology</td>
+              <td>B</td>
+              <td>68%</td>
+              <td>
+                <button class="action-btn view">View</button>
+                <button class="action-btn edit">Edit</button>
+                <button class="action-btn delete">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

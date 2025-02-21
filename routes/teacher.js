@@ -2,7 +2,6 @@ const path = require('path');
 const methodOverride = require('method-override');
 const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require('uuid');
-
 const mongoose = require('mongoose');
 const multer = require('multer');
 const { storage } = require('./cloudinary');
@@ -14,13 +13,17 @@ const Teacher = require('../db/teacherSchema');
 const requireLogin = require('../routes/RequireLoginMiddleware.js');
 const completeProfile = require('../function/completeProfile.js');
 const User = require('../db/userModel.js');
-
+const Schedule = require('../db/scheduleSchema.js');
+const Material = require('../db/MaterialsSchema.js');
 const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
+const cloudinary = require('cloudinary').v2; // Add this line
+
+// ...existing code...
 
 router.get('/dashboard', requireLogin, completeProfile, (req, res) => {
-  res.render('teacher/Dashboard');
+  res.render('teacher/teacher');
 });
 
 router.get('/Profile', requireLogin, completeProfile, (req, res) => {
@@ -129,8 +132,29 @@ router.post('/ChangePassword', requireLogin, async (req, res) => {
 });
 ////////// Calendar ////////////////////////
 router.get('/changecalender', requireLogin, (req, res) => {
-  res.render('teacher/changecalender');
+  res.render('teacher/schedule');
 });
+router.post('/changecalender', async (req, res) => {
+  const { weekdays } = req.body;
+
+  const userId = req.session.UserId;
+  try {
+    await MongooseConnection();
+    const teacher = await Teacher.findOne({ userId });
+    teacher.busySchedule = weekdays;
+    await teacher.save();
+    req.flash('success', 'Availability updated successfully');
+    res.redirect('/teacher/dashboard');
+  } catch (error) {
+    console.error(error);
+    req.flash('error', 'Something went wrong, please try again');
+    return res.redirect('/teacher/changecalender');
+  } finally {
+    await mongoose.disconnect();
+  }
+  console.log(req.body);
+});
+////////////////////////// //// //////////////////////////
 router.get('/completeProfile', requireLogin, async (req, res) => {
   const userId = req.session.UserId;
   try {
@@ -149,8 +173,7 @@ router.post(
   '/completeProfile',
   upload.single('ID_CARD_IMAGE'),
   async (req, res) => {
-    console.log(req.body); // Other form fields
-    console.log(req.file.path); // ID card file details
+
     const {
       FIRST_NAME,
       LAST_NAME,
@@ -181,6 +204,112 @@ router.post(
     }
   }
 );
+/////////need to fix this route///////////////////////////
+router.post('/schedule', async (req, res) => {
+  const { slots, timezone } = req.body;
+  const tutorId = req.session.UserId;
+  console.log(req.body);
+
+  try {
+    // Find existing schedule or create a new one
+    let schedule = await Schedule.findOne({ tutorId });
+
+    if (!schedule) {
+      schedule = new Schedule({ tutorId, slots, timezone });
+    } else {
+      schedule.slots = slots;
+      schedule.timezone = timezone;
+    }
+
+    await schedule.save();
+    res.status(200).json({ message: 'Schedule saved successfully', schedule });
+  } catch (err) {
+    console.error('Error saving schedule:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+router.get('/getSchedule', async (req, res) => {
+  const tutorId = req.session.UserId;
+
+  try {
+    const schedule = await Schedule.findOne({ tutorId });
+    console.log('schedule', schedule);
+    if (!schedule) {
+      return res.status(404).json({ message: 'Schedule not found' });
+    }
+    res.status(200).json(schedule);
+  } catch (err) {
+    console.error('Error fetching schedule:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+////////////////need to fix this route///////////////////////////
+router.post('/save-schedule', async (req, res) => {
+  const { schedule } = req.body;
+  const tutorId = req.session.UserId; // Expecting something like "T67b69d2e53ba0b544181b289"
+
+  console.log('Request body:', req.body);
+  console.log('Tutor ID from session:', tutorId);
+
+  try {
+    // Validate tutor ID format
+
+    // Find teacher using tutorId as userId
+    const teacher = await Teacher.findOne({ userId: tutorId });
+    console.log('Teacher:', teacher);
+
+    if (!teacher) {
+      console.log('Teacher not found');
+      return res.status(404).json({ error: 'Teacher not found' });
+    }
+
+    // Validate schedule data
+    if (!Array.isArray(schedule)) {
+      return res.status(400).json({ error: 'Schedule must be an array' });
+    }
+
+    // Add new schedule slots to the teacher's schedule
+    teacher.schedule.push(...schedule);
+
+    // Save the updated teacher document
+    await teacher.save();
+
+    console.log('Updated teacher schedule:', teacher.schedule);
+    res.status(201).json(teacher.schedule);
+  } catch (error) {
+    console.error('Error saving schedule:', error);
+    if (error.code === 11000) {
+      return res.status(400).json({ error: 'Duplicate schedule slot' });
+    }
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/get-schedule', async (req, res) => {
+  const tutorId = req.session.UserId; // Assuming the tutor ID is stored in the session
+
+  try {
+    // Validate tutor ID format
+
+    // Find the teacher using the tutorId (userId)
+    const teacher = await Teacher.findOne({ userId: tutorId });
+
+    if (!teacher) {
+      return res.status(404).json({ error: 'Teacher not found' });
+    }
+
+    // Return the saved schedule
+    res.status(200).json(teacher.schedule);
+  } catch (error) {
+    console.error('Error fetching schedule:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+router.get('/test', async (req, res) => {
+  res.render('teacher/test');
+});
+////////////////////////// //// //////////////////////////
 router.post('/profilePic', upload.single('PROFILE_IMAGE'), async (req, res) => {
   console.log(req.file);
   // Uploaded file details
@@ -203,5 +332,89 @@ router.post('/profilePic', upload.single('PROFILE_IMAGE'), async (req, res) => {
     await mongoose.disconnect();
   }
 });
+//////////////////////////uplaod materrial//////////////////////////
+router.get('/uploadMaterial', requireLogin, (req, res) => {
+  res.render('teacher/uploadMaterial');
+});
+router.post('/uploadMaterial', upload.single('file'), async (req, res) => {
+  try {
+    console.log('Request Body:', req.body);
+    console.log('Uploaded File:', req.file);
+
+    if (!req.file) {
+      throw new Error('File upload failed. Please select a valid file.');
+    }
+
+    const { title, description } = req.body;
+    const studentID = req.query.studentID;
+    const userId = req.session.UserId;
+
+    if (!userId) {
+      req.flash('error', 'Unauthorized! Please log in.');
+      return res.redirect('/login');
+    }
+
+    let assets;
+
+    // ✅ Manually upload buffer to Cloudinary
+    if (req.file.buffer) {
+      const uploadResult = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { resource_type: 'raw', folder: 'materials', public_id: path.parse(req.file.originalname).name },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        );
+        uploadStream.end(req.file.buffer);
+      });
+
+      assets = uploadResult.secure_url;
+      console.log('Cloudinary File URL:', assets);
+    } else {
+      assets = req.file.path; // Fallback if Multer storage works correctly
+    }
+
+    console.log('Final File URL:', assets);
+
+    // Save to database
+    // const material = new Material({ teacher_id: userId, student_id: studentID, title, description, assets });
+    // await material.save();
+
+    req.flash('success', 'Material uploaded successfully');
+    res.redirect('/teacher/dashboard');
+
+  } catch (error) {
+    console.error('Upload Error:', error);
+    req.flash('error', error.message);
+    res.redirect('/teacher/uploadMaterial');
+  }
+});
+///////////////////////////////delete material//////////////////////////
+router.get('/deleteMaterial/:id', async (req, res) => {
+  const materialId = req.params.id;
+  try {
+    await MongooseConnection();
+    const material = await Material.findByIdAndDelete(materialId);
+    if (!material) {
+      req.flash('error', 'Material not found');
+      return res.status(404).redirect('/teacher/dashboard');
+    }
+    req.flash('success', 'Material deleted successfully');
+    res.redirect('/teacher/dashboard');
+  } catch (error) {
+    console.error('Error deleting material:', error);
+    req.flash('error', 'Internal Server Error');
+    res.status(500).redirect('/teacher/dashboard');
+  } finally {
+    await mongoose.disconnect();
+  }
+});
+
+////////////////////////// //// //////////////////////////
+
 
 module.exports = router;

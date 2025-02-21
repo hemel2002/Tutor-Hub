@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Select Schedule</title>
+    <style>
+      .schedule-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+
+      .calendar {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+        margin-bottom: 2rem;
+      }
+
+      .calendar-day {
+        padding: 15px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .calendar-day.selected {
+        background-color: #4caf50;
+        color: white;
+        border-color: #4caf50;
+      }
+
+      .time-slots {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+      }
+
+      .time-slot {
+        padding: 12px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #f9f9f9;
+      }
+
+      .time-slot.selected {
+        background-color: #2196f3;
+        color: white;
+        border-color: #2196f3;
+      }
+
+      .confirm-button {
+        margin-top: 2rem;
+        padding: 15px 30px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .confirm-button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="schedule-container">
+      <h2>Select Date</h2>
+      <div class="calendar" id="calendar">
+        <!-- Calendar days will be populated by JavaScript -->
+      </div>
+
+      <h2>Available Time Slots</h2>
+      <div class="time-slots" id="timeSlots">
+        <!-- Time slots will be populated by JavaScript -->
+      </div>
+
+      <div id="selectedInfo" style="margin-top: 20px"></div>
+      <button class="confirm-button" id="confirmBtn" disabled>
+        Confirm Appointment
+      </button>
+    </div>
+
+    <script>
+      // Sample available dates and times (would normally come from server)
+      const availableDates = ['2024-02-20', '2024-02-21', '2024-02-22'];
+      const availableTimes = ['09:00', '10:00', '14:00', '15:00'];
+
+      // Initialize calendar
+      const calendar = document.getElementById('calendar');
+      const timeSlots = document.getElementById('timeSlots');
+      const confirmBtn = document.getElementById('confirmBtn');
+      const selectedInfo = document.getElementById('selectedInfo');
+
+      let selectedDate = null;
+      let selectedTime = null;
+
+      // Generate calendar days (next 7 days)
+      function generateCalendar() {
+        const today = new Date();
+        calendar.innerHTML = '';
+
+        for (let i = 0; i < 7; i++) {
+          const date = new Date();
+          date.setDate(today.getDate() + i);
+
+          const dayElement = document.createElement('div');
+          dayElement.className = 'calendar-day';
+          dayElement.textContent = date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            day: 'numeric',
+          });
+
+          if (availableDates.includes(formatDate(date))) {
+            dayElement.addEventListener('click', () => selectDate(date));
+          } else {
+            dayElement.style.opacity = '0.5';
+            dayElement.style.cursor = 'not-allowed';
+          }
+
+          calendar.appendChild(dayElement);
+        }
+      }
+
+      // Select date handler
+      function selectDate(date) {
+        selectedDate = date;
+        document.querySelectorAll('.calendar-day').forEach((day) => {
+          day.classList.remove('selected');
+        });
+        event.target.classList.add('selected');
+        loadTimeSlots();
+      }
+
+      // Load time slots
+      function loadTimeSlots() {
+        timeSlots.innerHTML = '';
+        availableTimes.forEach((time) => {
+          const timeElement = document.createElement('div');
+          timeElement.className = 'time-slot';
+          timeElement.textContent = time;
+          timeElement.addEventListener('click', () => selectTime(time));
+          timeSlots.appendChild(timeElement);
+        });
+      }
+
+      // Select time handler
+      function selectTime(time) {
+        selectedTime = time;
+        document.querySelectorAll('.time-slot').forEach((slot) => {
+          slot.classList.remove('selected');
+        });
+        event.target.classList.add('selected');
+        updateConfirmation();
+      }
+
+      // Update confirmation section
+      function updateConfirmation() {
+        if (selectedDate && selectedTime) {
+          confirmBtn.disabled = false;
+          selectedInfo.innerHTML = `
+                    Selected: ${formatDate(selectedDate)} at ${selectedTime}
+                `;
+        }
+      }
+
+      // Format date as YYYY-MM-DD
+      function formatDate(date) {
+        return date.toISOString().split('T')[0];
+      }
+
+      // Initial setup
+      generateCalendar();
+
+      // Confirm button handler
+      confirmBtn.addEventListener('click', () => {
+        alert(
+          `Appointment confirmed for ${formatDate(
+            selectedDate
+          )} at ${selectedTime}`
+        );
+        // Here you would typically send data to your server
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hire Tutor</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css">
+  <style>
+    /* Custom Styles */
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .tutor-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .tutor-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .schedule-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .schedule-slot {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .schedule-slot.available {
+      background-color: #e3f2fd;
+      color: #0d6efd;
+    }
+
+    .schedule-slot.booked {
+      background-color: #ffebee;
+      color: #dc3545;
+      cursor: not-allowed;
+    }
+
+    .schedule-slot.selected {
+      background-color: #0d6efd;
+      color: white;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn-booking {
+      background: linear-gradient(45deg, #0d6efd, #0b5ed7);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-booking:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <!-- Tutor Profile Section -->
+    <div class="row fade-in">
+      <div class="col-md-4 text-center">
+        <img src="https://via.placeholder.com/150" alt="Tutor Image" class="img-fluid rounded-circle mb-3">
+        <h3>John Doe</h3>
+        <p class="text-muted">Math Tutor</p>
+        <p>⭐️⭐️⭐️⭐️⭐️ (4.9)</p>
+      </div>
+      <div class="col-md-8">
+        <div class="tutor-card p-4">
+          <h4>About Me</h4>
+          <p>Hi! I'm John, a certified math tutor with over 5 years of experience. I specialize in algebra, calculus, and geometry. Let's make learning fun and effective!</p>
+          <hr>
+          <h4>Availability</h4>
+          <div class="schedule-container" id="scheduleContainer">
+            <!-- Schedule slots will be dynamically populated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Form -->
+    <div class="row mt-4 fade-in">
+      <div class="col-md-8 offset-md-2">
+        <div class="tutor-card p-4">
+          <h4>Book a Session</h4>
+          <form id="bookingForm">
+            <div class="mb-3">
+              <label for="name" class="form-label">Your Name</label>
+              <input type="text" class="form-control" id="name" required>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Your Email</label>
+              <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3">
+              <label for="selectedSlot" class="form-label">Selected Time Slot</label>
+              <input type="text" class="form-control" id="selectedSlot" readonly>
+            </div>
+            <button type="submit" class="btn btn-booking w-100">Confirm Booking</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>
+  <script>
+    // Sample Tutor Schedule Data
+    const tutorSchedule = [
+      { day: 1, time: '10:00', available: true },
+      { day: 1, time: '14:00', available: false },
+      { day: 2, time: '09:00', available: true },
+      { day: 3, time: '11:00', available: true },
+      { day: 4, time: '16:00', available: false },
+      { day: 5, time: '13:00', available: true },
+    ];
+
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    // Render Schedule
+    const scheduleContainer = document.getElementById('scheduleContainer');
+    tutorSchedule.forEach(slot => {
+      const slotElement = document.createElement('div');
+      slotElement.classList.add('schedule-slot', slot.available ? 'available' : 'booked');
+      slotElement.textContent = `${days[slot.day]} ${slot.time}`;
+      slotElement.dataset.day = slot.day;
+      slotElement.dataset.time = slot.time;
+
+      if (slot.available) {
+        slotElement.addEventListener('click', () => {
+          document.querySelectorAll('.schedule-slot').forEach(el => el.classList.remove('selected'));
+          slotElement.classList.add('selected');
+          document.getElementById('selectedSlot').value = `${days[slot.day]} ${slot.time}`;
+        });
+      }
+
+      scheduleContainer.appendChild(slotElement);
+    });
+
+    // Handle Booking Form Submission
+    document.getElementById('bookingForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const selectedSlot = document.getElementById('selectedSlot').value;
+      if (!selectedSlot) {
+        alert('Please select a time slot.');
+        return;
+      }
+      alert(`Booking confirmed for ${selectedSlot}!`);
+      // Here you can send the data to the backend
+    });
+  </script>
+</body>
+</html>

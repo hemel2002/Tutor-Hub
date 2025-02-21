@@ -4,6 +4,13 @@ const StudentSchema = new mongoose.Schema({
   userId: { type: String, required: true, unique: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
+  class: { type: String, required: true ,
+    default: 'Class'
+  },
+  location: { type: String, required: true,
+    default: 'Location'
+  },
+  
 
   email: { type: String, required: true, unique: true },
   profilePicture: {
