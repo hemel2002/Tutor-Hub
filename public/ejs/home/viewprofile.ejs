@@ -4,21 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>View Profile</title>
-    <!-- MDB CSS -->
+    <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
       rel="stylesheet"
     />
-    <!-- MDB -->
+    <!-- MDB CSS -->
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
       rel="stylesheet"
     />
-    <script
-      type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
-    ></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
     <!-- Font Awesome -->
     <link
       rel="stylesheet"
@@ -27,124 +22,98 @@
     <style>
       body {
         font-family: 'Poppins', sans-serif;
-        background-color: #f1f1f1;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-      }
-
-      .navbar {
-        background: linear-gradient(90deg, #36c114, #28a745);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
-
-      .navbar-brand {
-        font-weight: bold;
-        font-size: 1.8rem;
-        color: white !important;
-      }
-
-      .navbar-nav .nav-link {
-        color: white !important;
-        font-weight: 500;
-        transition: color 0.3s;
-      }
-
-      .navbar-nav .nav-link:hover {
-        color: #d4edda !important;
+        background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+        color: #333;
       }
 
       .profile-header {
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-          url('<%= localhost %>/images/home.svg') center center no-repeat;
-        background-size: cover;
-        height: 400px;
+        background: linear-gradient(135deg, #36c114, #2a9d8f);
         color: white;
+        padding: 60px 20px;
         text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
       }
 
       .profile-header h1 {
-        font-size: 3rem;
-        font-weight: bold;
-        animation: fadeInDown 1s;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
       }
 
       .profile-header p {
-        font-size: 1.5rem;
-        animation: fadeInUp 1s;
+        font-size: 1.2rem;
+        font-weight: 400;
       }
 
       .card {
-        margin-top: -50px;
+        border: none;
         border-radius: 15px;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         overflow: hidden;
+        transition: transform 0.3s ease;
       }
 
-      .card .card-body h5 {
-        color: #36c114;
-        font-weight: bold;
+      .card:hover {
+        transform: translateY(-10px);
+      }
+
+      .img-fluid.rounded-circle {
+        border: 4px solid #36c114;
+        transition: transform 0.3s ease;
+      }
+
+      .img-fluid.rounded-circle:hover {
+        transform: scale(1.1);
       }
 
       .skills-badge {
-        margin: 5px;
         font-size: 0.9rem;
-      }
-
-      .skills-badge:hover {
-        background-color: #28a745;
+        margin: 5px;
+        padding: 8px 12px;
+        border-radius: 20px;
       }
 
       .review-card {
-        background: #fff;
+        background: white;
         border-radius: 10px;
         padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s, box-shadow 0.3s;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       }
 
-      .review-card:hover {
-        transform: scale(1.02);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      .review-card p {
+        margin: 0;
+        font-size: 1rem;
       }
 
-      .container {
-        flex: 1;
+      .map-section iframe {
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       }
 
       footer {
-        background: linear-gradient(90deg, #36c114, #28a745);
+        background: #333;
         color: white;
-        padding: 20px 0;
         text-align: center;
-        font-size: 0.9rem;
-        margin-top: auto;
+        padding: 20px 0;
+        margin-top: 40px;
       }
 
-      @keyframes fadeInDown {
-        from {
-          opacity: 0;
-          transform: translateY(-20px);
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .profile-header h1 {
+          font-size: 2rem;
         }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
 
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
+        .profile-header p {
+          font-size: 1rem;
         }
-        to {
-          opacity: 1;
-          transform: translateY(0);
+
+        .card-body {
+          text-align: center;
+        }
+
+        .col-md-4.text-center {
+          margin-bottom: 20px;
         }
       }
     </style>
@@ -154,7 +123,7 @@
     <%- include('../NavBar/NavBar') %>
 
     <!-- Profile Header -->
-    <div class="profile-header">
+    <div class="profile-header mt-5">
       <h1><%= tutor.firstName %> <%= tutor.lastName %></h1>
       <p><%= tutor.preferableSubjects %> | 2 Years of Experience</p>
     </div>
@@ -168,7 +137,7 @@
               src="<%= tutor.profilePicture %>"
               class="img-fluid rounded-circle mt-4"
               alt="Tutor Image"
-              style="width: 150px; height: 150px; border: 4px solid #36c114"
+              style="width: 150px; height: 150px"
             />
           </div>
           <div class="col-md-8 mt-5">
@@ -188,11 +157,15 @@
                 class="btn btn-success btn-rounded"
                 >Contact</a
               >
-              <a
-                href="/student/hireTutor?tutorEmail=<%= tutor.email %>"
+              <!-- Hire Tutor Button with Modal Trigger -->
+              <button
+                type="button"
                 class="btn btn-success btn-rounded"
-                >Hire Tutor
-              </a>
+                data-mdb-toggle="modal"
+                data-mdb-target="#hireTutorModal"
+              >
+                Hire Tutor
+              </button>
             </div>
           </div>
         </div>
@@ -243,6 +216,174 @@
       <p>&copy; 2025 Tutor-Hub. All Rights Reserved.</p>
     </footer>
 
+    <!-- Hire Tutor Modal -->
+    <div
+      class="modal fade"
+      id="hireTutorModal"
+      tabindex="-1"
+      aria-labelledby="hireTutorModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="hireTutorModalLabel">Hire Tutor</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-mdb-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="hireTutorForm" action="/student/hireTutor" method="get">
+              <!-- Student Location -->
+              <div class="mb-3">
+                <label for="studentLocation" class="form-label"
+                  >Your Location</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="studentLocation"
+                  placeholder="Enter your location"
+                  name="location"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="tutorEmail" class="form-label">Teacher Email</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="tutorEmail"
+                  name="tutorEmail"
+                  value="<%= tutor.email %>"
+                  readonly
+                  required
+                />
+              </div>
+              <!-- Salary -->
+              <div class="mb-3">
+                <label for="salary" class="form-label">Salary</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="salary"
+                  name="salary"
+                />
+              </div>
+              <!-- Class -->
+              <div class="mb-3">
+                <label for="class" class="form-label">Class</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="class"
+                  name="class"
+                  placeholder="Enter Class"
+                  required
+                />
+              </div>
+              <!-- Subject -->
+              <div class="mb-3">
+                <label for="subject" class="form-label">Subject</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="subject"
+                  name="subject"
+                  placeholder="Enter subject"
+                  required
+                />
+              </div>
+              <!-- Message -->
+              <div class="mb-3">
+                <label for="message" class="form-label">Message</label>
+                <textarea
+                  class="form-control"
+                  id="message"
+                  name="message"
+                  rows="4"
+                  placeholder="Enter your message"
+                  required
+                ></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-mdb-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-success"
+              onclick="submitHireRequest()"
+            >
+              <i class="fas fa-paper-plane me-2"></i>Send Request
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Notification Toast -->
+    <div
+      class="toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-3"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      id="successToast"
+    >
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="fas fa-check-circle me-2"></i>Request submitted
+          successfully!
+        </div>
+        <button
+          type="button"
+          class="btn-close btn-close-white me-2 m-auto"
+          data-mdb-dismiss="toast"
+          aria-label="Close"
+        ></button>
+      </div>
+    </div>
+
     <!-- MDB Scripts -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
+    ></script>
+    <script>
+      // Function to submit hire request
+      function submitHireRequest() {
+        const form = document.getElementById('hireTutorForm');
+
+        // Validate inputs
+        if (!form.checkValidity()) {
+          form.reportValidity(); // Show validation messages
+          return;
+        }
+
+        // Submit the form
+        form.submit();
+
+        // Show success notification
+        const toast = new mdb.Toast(document.getElementById('successToast'));
+        toast.show();
+
+        // Close the modal after 2 seconds
+        setTimeout(() => {
+          const modal = mdb.Modal.getInstance(
+            document.getElementById('hireTutorModal')
+          );
+          modal.hide();
+        }, 2000);
+      }
+    </script>
   </body>
 </html>

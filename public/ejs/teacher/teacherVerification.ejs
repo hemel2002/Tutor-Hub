@@ -171,6 +171,35 @@
         transform: translateY(-1px);
       }
 
+      /* Submission Confirmation Section */
+      .submission-confirmation {
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .submission-confirmation svg {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 1.5rem;
+        fill: var(--secondary-color);
+      }
+
+      .submission-confirmation h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+      }
+
+      .submission-confirmation p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+      }
+
       /* Verification Status Section */
       .verification-status {
         background: var(--surface);
@@ -241,6 +270,7 @@
 
     <div class="main-content">
       <!-- Verification Section -->
+      <% if (accountStatus!=='Pending') { %>
       <div class="verification-section">
         <h3>Get Verified</h3>
         <form
@@ -259,33 +289,30 @@
               required
             />
           </div>
-          <div class="mb-4">
-            <label for="additionalDoc" class="form-label"
-              >Additional Document (Optional)</label
-            >
-            <input
-              type="file"
-              class="form-control"
-              id="additionalDoc"
-              name="additionalDoc"
-              accept="image/*, application/pdf"
-            />
-          </div>
+
           <button type="submit" class="btn btn-primary">
             <i class="fas fa-check-circle me-2"></i>Submit for Verification
           </button>
         </form>
       </div>
+      <% } %>
 
-      <!-- Verification Status Section -->
-      <div class="verification-status">
-        <h3>Verification Status</h3>
-        <% if (message[0]==='p') { %>
-        <div class="status pending"><%= message %></div>
-        <% } else { %>
-        <div class="status"><%= message %></div>
-        <% } %>
+      <!-- Submission Confirmation Section -->
+      <% if (accountStatus==='Pending') { %>
+      <div class="submission-confirmation">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+          />
+        </svg>
+        <h3>Your document has been submitted!</h3>
+        <p>Please wait while we verify your details.</p>
       </div>
+      <% } %>
     </div>
 
     <footer>

@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment History</title>
+    <!-- Fonts -->
     <link
       href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700&display=swap"
       rel="stylesheet"
@@ -12,29 +14,47 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
       rel="stylesheet"
     />
-    <script
-      type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
-    ></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
     <!-- Font Awesome -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
-
-    <title>Payment History</title>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+      }
+
+      body {
+        background-color: #f4f5f7;
+        color: #333;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      body.dark-mode {
+        background-color: #1a1a1a;
+        color: #ffffff;
+      }
+
       .sidebar {
         width: 250px;
         background-color: #ffffff;
         padding: 20px;
-        border-right: 1px solid #ffffff;
+        border-right: 1px solid #ddd;
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
         display: flex;
         flex-direction: column;
         align-items: center;
+        position: fixed;
+        height: 100vh;
+      }
+
+      body.dark-mode .sidebar {
+        background-color: #2c2c2c;
+        border-right: 1px solid #444;
       }
 
       .sidebar h2 {
@@ -60,6 +80,7 @@
 
       .sidebar ul {
         list-style-type: none;
+        width: 100%;
       }
 
       .sidebar ul li {
@@ -76,6 +97,10 @@
         transition: all 0.3s ease;
       }
 
+      body.dark-mode .sidebar ul li a {
+        color: #ffffff;
+      }
+
       .sidebar ul li a:hover,
       .sidebar ul li a.active {
         background-color: #007bff;
@@ -86,63 +111,19 @@
       .sidebar ul li .icon {
         margin-right: 10px;
       }
-      body {
-        font-family: 'Roboto', sans-serif;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        background-color: #f4f5f7;
-      }
-
-      /* Sidebar Styles */
-      .sidebar {
-        width: 250px;
-        background: #ffffff; /* Sidebar background */
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        padding: 20px 15px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-      }
-
-      .sidebar .nav-link {
-        color: rgb(0, 0, 0);
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-        transition: all 0.3s ease;
-      }
-
-      .sidebar .nav-link:hover {
-        color: #ff6262;
-        text-decoration: none;
-        transform: translateX(5px);
-      }
-
-      .sidebar .nav-link i {
-        margin-right: 10px;
-      }
-
-      .sidebar .brand {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin-bottom: 30px;
-        display: block;
-        text-align: center;
-        color: black;
-      }
 
       /* Main Content Styles */
       .main-content {
-        margin-left: 270px; /* Sidebar width */
+        margin-left: 270px;
         padding: 30px;
-        flex: 1; /* Push footer to the bottom */
-        width: 100%;
+        flex: 1;
         background-color: #f4f5f7;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      body.dark-mode .main-content {
+        background-color: #1a1a1a;
+        color: #ffffff;
       }
 
       .payment-history {
@@ -150,12 +131,22 @@
         border-radius: 15px;
         padding: 20px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      body.dark-mode .payment-history {
+        background-color: #2c2c2c;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       }
 
       .payment-history h3 {
         font-weight: bold;
-        color: #000;
+        color: #333;
         margin-bottom: 20px;
+      }
+
+      body.dark-mode .payment-history h3 {
+        color: #ffffff;
       }
 
       /* Table Styles */
@@ -177,12 +168,24 @@
         border-bottom: 1px solid #ddd;
       }
 
+      body.dark-mode table td {
+        border-bottom: 1px solid #444;
+      }
+
       table tr:nth-child(even) {
         background-color: #f9f9f9;
       }
 
+      body.dark-mode table tr:nth-child(even) {
+        background-color: #3c3c3c;
+      }
+
       table tr:nth-child(odd) {
         background-color: #ffffff;
+      }
+
+      body.dark-mode table tr:nth-child(odd) {
+        background-color: #2c2c2c;
       }
 
       .badge-paid {
@@ -201,45 +204,137 @@
         font-size: 0.9rem;
       }
 
+      /* Search Bar */
+      .search-bar {
+        margin-bottom: 20px;
+      }
+
+      .search-bar input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+      }
+
+      body.dark-mode .search-bar input {
+        background-color: #444;
+        border-color: #666;
+        color: #ffffff;
+      }
+
+      /* Pagination */
+      .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .pagination button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        margin: 0 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .pagination button:hover {
+        background-color: #0056b3;
+      }
+
+      .pagination button.active {
+        background-color: #0056b3;
+      }
+
+      /* Export Button */
+      .export-btn {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-bottom: 20px;
+      }
+
+      .export-btn:hover {
+        background-color: #218838;
+      }
+
+      /* Footer */
       footer {
         background: #28a745;
         color: white;
         padding: 20px;
         text-align: center;
         font-size: 0.9rem;
-        margin-top: auto; /* Ensure footer sticks at the bottom */
+        margin-top: auto;
+      }
+
+      body.dark-mode footer {
+        background-color: #218838;
+      }
+
+      /* Dark Mode Toggle */
+      .dark-mode-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .dark-mode-toggle:hover {
+        background-color: #0056b3;
       }
     </style>
-    <script>
-      function sendReminder(studentName) {
-        alert(`Reminder sent to ${studentName}!`);
-      }
-    </script>
   </head>
   <body>
-    <%- include('../NavBar/NavBar') %>
     <!-- Sidebar -->
     <%- include('NavBar') %>
 
     <!-- Main Content -->
-    <div class="main-content mt-5">
+    <div class="main-content">
       <!-- Payment History -->
       <div class="payment-history">
         <h3>Payment History</h3>
+        <!-- Search Bar -->
+        <div class="search-bar">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search by student name..."
+          />
+        </div>
+        <!-- Export Button -->
+        <button class="export-btn" onclick="exportToCSV()">
+          <i class="fas fa-download"></i> Export to CSV
+        </button>
+        <!-- Table -->
         <table>
           <thead>
             <tr>
-              <th>Student Name</th>
+              <th>Tutor Name</th>
               <th>Amount</th>
               <th>Date</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="payment-table-body">
             <tr>
-              <td>John Doe</td>
-              <td>$100</td>
+              <td>Fahim Sikhder</td>
+              <td>10000Tk</td>
               <td>2025-01-05</td>
               <td><span class="badge-paid">Paid</span></td>
               <td>
@@ -249,8 +344,8 @@
               </td>
             </tr>
             <tr>
-              <td>Jane Smith</td>
-              <td>$100</td>
+              <td>Ariful</td>
+              <td>7000Tk</td>
               <td>2025-01-06</td>
               <td><span class="badge-unpaid">Unpaid</span></td>
               <td>
@@ -263,8 +358,8 @@
               </td>
             </tr>
             <tr>
-              <td>Alex Johnson</td>
-              <td>$150</td>
+              <td>Mir Sayef</td>
+              <td>6000Tk</td>
               <td>2025-01-03</td>
               <td><span class="badge-paid">Paid</span></td>
               <td>
@@ -274,8 +369,8 @@
               </td>
             </tr>
             <tr>
-              <td>Emily Davis</td>
-              <td>$200</td>
+              <td>Sayef Adnan</td>
+              <td>8000Tk</td>
               <td>2025-01-04</td>
               <td><span class="badge-unpaid">Unpaid</span></td>
               <td>
@@ -289,10 +384,75 @@
             </tr>
           </tbody>
         </table>
+        <!-- Pagination -->
+        <div class="pagination">
+          <button onclick="changePage(1)" class="active">1</button>
+          <button onclick="changePage(2)">2</button>
+          <button onclick="changePage(3)">3</button>
+        </div>
       </div>
     </div>
 
     <!-- Footer -->
-    <footer>© 2025 Tutor Hub | All Rights Reserved</footer>
+
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+      Toggle Dark Mode
+    </button>
+
+    <script>
+      // Dark Mode Toggle
+      function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+      }
+
+      // Search Functionality
+      const searchInput = document.getElementById('search-input');
+      const tableBody = document.getElementById('payment-table-body');
+
+      searchInput.addEventListener('input', function () {
+        const searchTerm = searchInput.value.toLowerCase();
+        const rows = tableBody.getElementsByTagName('tr');
+
+        for (let row of rows) {
+          const studentName = row.cells[0].textContent.toLowerCase();
+          if (studentName.includes(searchTerm)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        }
+      });
+
+      // Export to CSV
+      function exportToCSV() {
+        const rows = document.querySelectorAll('table tr');
+        let csv = [];
+        for (let row of rows) {
+          const rowData = [];
+          for (let cell of row.cells) {
+            rowData.push(cell.textContent);
+          }
+          csv.push(rowData.join(','));
+        }
+        const csvContent = 'data:text/csv;charset=utf-8,' + csv.join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'payment_history.csv');
+        document.body.appendChild(link);
+        link.click();
+      }
+
+      // Pagination
+      function changePage(page) {
+        alert(`Page ${page} clicked`);
+      }
+
+      // Send Reminder
+      function sendReminder(studentName) {
+        alert(`Reminder sent to ${studentName}!`);
+      }
+    </script>
   </body>
 </html>

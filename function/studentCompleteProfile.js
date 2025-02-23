@@ -10,12 +10,7 @@ const completeProfile = async (req, res, next) => {
     const user = await StudentSchema.findOne({ userId: userId });
     console.log(user);
 
-    if (
- 
-      user.location!=='Location' &&
-      
-      user.class!=='Class' 
-    ) {
+    if (user.location !== 'Location' && user.class !== 'Class') {
       next();
     } else {
       return res.redirect('http://localhost:3000/student/completeProfile');

@@ -37,14 +37,17 @@ router.get('/Payment', requireLogin, completeProfile, (req, res) => {
 router.get('/GetVerified', completeProfile, async (req, res) => {
   try {
     await MongooseConnection();
-    const teacher = await Teacher.findOne({ userId: req.session.UserId });
+    const teacher = await Teacher.findOne({ email: req.session.email });
     let message = 'Please submit your documents';
     if (teacher.idCardUrl) {
       message = 'Your documents are already  Submitted';
     }
-    console.log(teacher);
-    console.log(message);
-    return res.render('teacher/teacherVerification', { message });
+    console.log('Teacher:', teacher.accoutStatus);
+    return res.render('teacher/teacherVerification', {
+      message,
+      teacher,
+      accountStatus: teacher.accoutStatus,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -53,20 +56,39 @@ router.get('/GetVerified', completeProfile, async (req, res) => {
   }
 });
 
-// router.post(
-//   '/GetVerified',
-//   upload.fields([
-//     { name: 'idCard', maxCount: 1 },
-//     { name: 'additionalDoc', maxCount: 1 },
-//   ]),
-//   async (req, res) => {
-//     console.log(req.files);
-//     const { idCard, additionalDoc } = req.files;
-//     const idCardPath = idCard ? idCard[0].path : null;
-//     const additionalDocPath = additionalDoc ? additionalDoc[0].path : null;
-//     const userId = req.session.UserId;
+router.post('/GetVerified', upload.single('idCard'), async (req, res) => {
+  try {
+    // Check if file was uploaded
+    await MongooseConnection();
+    if (!req.file) {
+      req.flash('error', 'No file uploaded');
+      return res.redirect('/teacher/GetVerified');
+    }
 
-// );
+    // Check if session email exists
+    const teacherEmail = req.session.email;
+    if (!teacherEmail) {
+      return res.status(401).send('Unauthorized: No session email found');
+    }
+
+    // Find teacher and update their record
+    const teacher = await Teacher.findOne({ email: teacherEmail });
+    if (!teacher) {
+      req.flash('error', 'Teacher not found');
+      return res.redirect('/teacher/GetVerified');
+    }
+
+    teacher.idCardUrl = req.file.path;
+    teacher.accoutStatus = 'Pending';
+    await teacher.save();
+
+    req.flash('success', 'Documents submitted successfully');
+    return res.redirect('/teacher/GetVerified');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 router.get('/viewprofile', requireLogin, (req, res) => {
   res.render('teacher/viewprofile');
@@ -155,94 +177,8 @@ router.post('/changecalender', async (req, res) => {
   console.log(req.body);
 });
 ////////////////////////// //// //////////////////////////
-router.get('/completeProfile', requireLogin, async (req, res) => {
-  const userId = req.session.UserId;
-  try {
-    await MongooseConnection();
-    const teacher = await Teacher.findOne({ userId: userId });
-    console.log(teacher);
-    res.render('teacher/CompleteProfile.ejs', { teacher });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  } finally {
-    await mongoose.disconnect();
-  }
-});
-router.post(
-  '/completeProfile',
-  upload.single('ID_CARD_IMAGE'),
-  async (req, res) => {
 
-    const {
-      FIRST_NAME,
-      LAST_NAME,
-      PHONE,
-      PREFERRED_SUBJECT,
-      INSTITUTE_NAME,
-      EXPERIENCE,
-      AREA,
-    } = req.body;
-    try {
-      await MongooseConnection();
-      const teacher = await Teacher.findOne({ userId: req.session.UserId });
-      teacher.firstName = FIRST_NAME;
-      teacher.lastName = LAST_NAME;
-      teacher.phone = PHONE;
-      teacher.preferableSubjects = PREFERRED_SUBJECT;
-      teacher.instituteName = INSTITUTE_NAME;
-      teacher.experience = EXPERIENCE;
-      teacher.location = AREA;
-      teacher.idCardUrl = req.file.path;
-      await teacher.save();
-      return res.redirect('/teacher/dashboard');
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-    } finally {
-      await mongoose.disconnect();
-    }
-  }
-);
 /////////need to fix this route///////////////////////////
-router.post('/schedule', async (req, res) => {
-  const { slots, timezone } = req.body;
-  const tutorId = req.session.UserId;
-  console.log(req.body);
-
-  try {
-    // Find existing schedule or create a new one
-    let schedule = await Schedule.findOne({ tutorId });
-
-    if (!schedule) {
-      schedule = new Schedule({ tutorId, slots, timezone });
-    } else {
-      schedule.slots = slots;
-      schedule.timezone = timezone;
-    }
-
-    await schedule.save();
-    res.status(200).json({ message: 'Schedule saved successfully', schedule });
-  } catch (err) {
-    console.error('Error saving schedule:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-router.get('/getSchedule', async (req, res) => {
-  const tutorId = req.session.UserId;
-
-  try {
-    const schedule = await Schedule.findOne({ tutorId });
-    console.log('schedule', schedule);
-    if (!schedule) {
-      return res.status(404).json({ message: 'Schedule not found' });
-    }
-    res.status(200).json(schedule);
-  } catch (err) {
-    console.error('Error fetching schedule:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
 
 ////////////////need to fix this route///////////////////////////
 router.post('/save-schedule', async (req, res) => {
@@ -256,6 +192,7 @@ router.post('/save-schedule', async (req, res) => {
     // Validate tutor ID format
 
     // Find teacher using tutorId as userId
+    await MongooseConnection();
     const teacher = await Teacher.findOne({ userId: tutorId });
     console.log('Teacher:', teacher);
 
@@ -291,7 +228,7 @@ router.get('/get-schedule', async (req, res) => {
 
   try {
     // Validate tutor ID format
-
+    await MongooseConnection();
     // Find the teacher using the tutorId (userId)
     const teacher = await Teacher.findOne({ userId: tutorId });
 
@@ -333,8 +270,22 @@ router.post('/profilePic', upload.single('PROFILE_IMAGE'), async (req, res) => {
   }
 });
 //////////////////////////uplaod materrial//////////////////////////
-router.get('/uploadMaterial', requireLogin, (req, res) => {
-  res.render('teacher/uploadMaterial');
+router.get('/uploadMaterial', requireLogin, async (req, res) => {
+  const teacherId = req.session.email;
+  console.log('Teacher ID:', teacherId);
+  try {
+    await MongooseConnection();
+    const Student = await TeachesSchema.find({ tutorEmail: teacherId });
+    const materials = await Material.find({ teacherEmail: teacherId });
+    console.log('Student:', Student);
+    return res.render('teacher/uploadMaterial', { Student, materials });
+  } catch (error) {
+    console.error(error);
+    req.flash('error', 'Internal Server Error');
+    return res.redirect('/teacher/dashboard');
+  } finally {
+    await mongoose.disconnect();
+  }
 });
 router.post('/uploadMaterial', upload.single('file'), async (req, res) => {
   try {
@@ -345,22 +296,25 @@ router.post('/uploadMaterial', upload.single('file'), async (req, res) => {
       throw new Error('File upload failed. Please select a valid file.');
     }
 
-    const { title, description } = req.body;
-    const studentID = req.query.studentID;
-    const userId = req.session.UserId;
+    const { title, description, studentEmail } = req.body;
 
-    if (!userId) {
+    const teacherEmail = req.session.email;
+
+    if (!teacherEmail) {
       req.flash('error', 'Unauthorized! Please log in.');
-      return res.redirect('/login');
+      return res.redirect('/signin');
     }
 
     let assets;
 
-    // ✅ Manually upload buffer to Cloudinary
     if (req.file.buffer) {
       const uploadResult = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
-          { resource_type: 'raw', folder: 'materials', public_id: path.parse(req.file.originalname).name },
+          {
+            resource_type: 'raw',
+            folder: 'materials',
+            public_id: path.parse(req.file.originalname).name,
+          },
           (error, result) => {
             if (error) {
               reject(error);
@@ -373,24 +327,46 @@ router.post('/uploadMaterial', upload.single('file'), async (req, res) => {
       });
 
       assets = uploadResult.secure_url;
-      console.log('Cloudinary File URL:', assets);
     } else {
       assets = req.file.path; // Fallback if Multer storage works correctly
     }
-
-    console.log('Final File URL:', assets);
+    await MongooseConnection();
+    const ExistMaterial = await Material.findOne({
+      studentEmail,
+      teacherEmail,
+    });
+    if (ExistMaterial) {
+      ExistMaterial.assets.push({
+        title,
+        url: assets,
+        description,
+      });
+      await ExistMaterial.save();
+      req.flash('success', 'Material updated successfully');
+    } else {
+      const material = new Material({
+        studentEmail,
+        teacherEmail,
+        assets: [
+          {
+            title,
+            url: assets,
+            description,
+          },
+        ],
+      });
+      await material.save();
+      req.flash('success', 'Material uploaded successfully');
+    }
+    return res.redirect('/teacher/uploadMaterial');
 
     // Save to database
     // const material = new Material({ teacher_id: userId, student_id: studentID, title, description, assets });
     // await material.save();
-
-    req.flash('success', 'Material uploaded successfully');
-    res.redirect('/teacher/dashboard');
-
   } catch (error) {
     console.error('Upload Error:', error);
     req.flash('error', error.message);
-    res.redirect('/teacher/uploadMaterial');
+    return res.redirect('/teacher/uploadMaterial');
   }
 });
 ///////////////////////////////delete material//////////////////////////
@@ -415,6 +391,185 @@ router.get('/deleteMaterial/:id', async (req, res) => {
 });
 
 ////////////////////////// //// //////////////////////////
+router.get('/studentRequests', requireLogin, async (req, res) => {
+  const userEmail = req.session.email;
+  console.log('email', userEmail);
+  try {
+    await MongooseConnection();
 
+    const requests = await TeachesSchema.find({
+      tutorEmail: userEmail,
+      request: 'Pending',
+    });
+    console.log('requests', requests);
+    res.render('teacher/studentRequest', { requests });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  } finally {
+    await mongoose.disconnect();
+  }
+});
+////////////////////////// complete Profile //////////////////////////
+router.get('/completeProfile', requireLogin, async (req, res) => {
+  const userId = req.session.UserId;
+  try {
+    await MongooseConnection();
+    const teacher = await Teacher.findOne({ userId: userId });
 
+    res.render('teacher/CompleteProfile.ejs', { teacher });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  } finally {
+    await mongoose.connection.close();
+  }
+});
+router.post(
+  '/completeProfile',
+  upload.single('ID_CARD_IMAGE'),
+  async (req, res) => {
+    const {
+      FIRST_NAME,
+      LAST_NAME,
+      PHONE,
+      PREFERRED_SUBJECT,
+      INSTITUTE_NAME,
+      EXPERIENCE,
+      AREA,
+    } = req.body;
+    try {
+      await MongooseConnection();
+      const teacher = await Teacher.findOne({ userId: req.session.UserId });
+      teacher.firstName = FIRST_NAME;
+      teacher.lastName = LAST_NAME;
+      teacher.phone = PHONE;
+      teacher.preferableSubjects = PREFERRED_SUBJECT;
+      teacher.instituteName = INSTITUTE_NAME;
+      teacher.experience = EXPERIENCE;
+      teacher.location = AREA;
+      teacher.idCardUrl = req.file.path;
+      await teacher.save();
+      return res.redirect('/teacher/dashboard');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    } finally {
+      await mongoose.connection.close();
+    }
+  }
+);
+/////////////////////////student schedule//////////////////////////
+router.get('/studentSchedule', requireLogin, async (req, res) => {
+  const userId = req.session.UserId;
+  try {
+    await MongooseConnection();
+    const teacher = await Teacher.findOne({ userId });
+    const schedule = teacher.busySchedule;
+    res.render('teacher/studentSchedule', { schedule });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  } finally {
+    await mongoose.disconnect();
+  }
+});
+////////////////////////// //// //////////////////////////
+// Adjust the path as necessary
+
+router.post('/acceptRequest', async (req, res) => {
+  const { schedule, studentEmail } = req.body; // Ensure tutorId is extracted from the request
+  const tutorId = req.session.email; // Assuming the tutor ID is stored in the session
+  console.log('Request body:', req.body);
+
+  if (!schedule || !tutorId) {
+    return res
+      .status(400)
+      .send('Request ID, schedule, and tutor ID are required');
+  }
+
+  try {
+    // Ensure Mongoose is connected (you might want to do this once at app startup)
+    await MongooseConnection();
+
+    // Find the teacher
+    const teacher = await Teacher.findOne({ email: tutorId });
+
+    if (!teacher) {
+      return res.status(404).json({ error: 'Teacher not found' });
+    }
+
+    // Validate schedule data
+    if (!Array.isArray(schedule)) {
+      return res.status(400).json({ error: 'Schedule must be an array' });
+    }
+    teacher.schedule.push(...schedule);
+    await teacher.save();
+    // Convert numeric day to string day and format schedule for teacher
+    const dayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const formattedSchedule = schedule.map((entry) => {
+      const startTime = entry.time;
+      const endTime = calculateEndTime(startTime, 1); // Calculate end time by adding 1 hour
+      return {
+        day: dayMap[entry.day],
+        startTime,
+        endTime,
+      };
+    });
+    console.log('tutorId', tutorId);
+    console.log('StudentEmail', studentEmail);
+    // Update the request status and weekly schedule
+    const request = await TeachesSchema.findOne({
+      studentEmail: studentEmail,
+      tutorEmail: tutorId,
+    });
+    if (!request) {
+      console.log('Request not found');
+
+      return res.status(404).send('Request not found');
+    }
+
+    request.request = 'Accepted';
+    request.WeeklySchedule = formattedSchedule;
+    await request.save();
+    console.log('Request accepted:', request);
+
+    res.status(200).send('Request accepted successfully');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Helper function to calculate end time
+function calculateEndTime(startTime) {
+  const [hour, minute] = startTime.split(':').map(Number);
+  const endHour = hour + 1; // Always add 1 hour
+  return `${endHour.toString().padStart(2, '0')}:${minute
+    .toString()
+    .padStart(2, '0')}`;
+}
+/////////////////////////cancel request//////////////////////////
+router.get('/cancelRequest', async (req, res) => {
+  const { studentEmail } = req.query;
+  const tutorEmail = req.session.email;
+  try {
+    await MongooseConnection();
+    const request = await TeachesSchema.deleteOne({
+      studentEmail,
+      tutorEmail,
+    });
+    if (!request) {
+      return res.status(404).send('Request not found');
+    }
+
+    req.flash('success', 'Request rejected successfully');
+    return res.redirect('/teacher/studentRequests');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  } finally {
+    await mongoose.disconnect();
+  }
+});
 module.exports = router;

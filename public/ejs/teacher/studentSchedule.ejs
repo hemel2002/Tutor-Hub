@@ -56,6 +56,12 @@
         color: white;
       }
 
+      .busy-slot {
+        background-color: #ffcccc; /* Light red color for busy slots */
+        cursor: not-allowed; /* Change cursor to indicate it's not clickable */
+        pointer-events: none; /* Disable click events */
+      }
+
       .save-btn-container {
         text-align: center;
         margin: 20px 0;
@@ -110,7 +116,9 @@
               slot.dataset.day = day;
               slot.dataset.time = `${hour}:00`;
               slot.onclick = function () {
-                this.classList.toggle('selected');
+                if (!this.classList.contains('busy-slot')) {
+                  this.classList.toggle('selected');
+                }
               };
               container.appendChild(slot);
             }
@@ -132,31 +140,40 @@
     </div>
 
     <script>
-      // Function to mark selected slots
-      function markSelectedSlots(schedule) {
+      // Function to mark busy slots
+      function markBusySlots(busySchedule) {
         document.querySelectorAll('.schedule-slot').forEach((slot) => {
-          const isSelected = schedule.some(
+          const isBusy = busySchedule.some(
             (item) =>
               item.day === parseInt(slot.dataset.day) &&
               item.time === slot.dataset.time
           );
-          if (isSelected) slot.classList.add('selected');
+
+          if (isBusy) {
+            slot.classList.add('busy-slot');
+            slot.onclick = null; // Disable click event for busy slots
+          }
         });
       }
 
-      // Fetch and mark saved schedule on page load
+      // Function to get query parameter value by name
+      function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+      }
+
+      // Fetch and mark busy schedule on page load
       window.addEventListener('DOMContentLoaded', async () => {
         try {
+          // Fetch busy schedule
           const response = await fetch('/teacher/get-schedule');
           if (!response.ok) throw new Error('Failed to fetch schedule');
+          const busySchedule = await response.json();
 
-          const existingSchedule = await response.json();
-          markSelectedSlots(existingSchedule);
+          // Mark busy slots
+          markBusySlots(busySchedule);
         } catch (error) {
-          console.log(
-            'No existing schedule found or error fetching schedule:',
-            error
-          );
+          console.log('Error fetching busy schedule:', error);
         }
       });
 
@@ -165,23 +182,27 @@
         .getElementById('saveSchedule')
         .addEventListener('click', async function () {
           const selectedSlots = document.querySelectorAll(
-            '.schedule-slot.selected'
+            '.schedule-slot.selected:not(.busy-slot)' // Exclude busy slots
           );
           const schedule = Array.from(selectedSlots).map((slot) => ({
             day: parseInt(slot.dataset.day),
             time: slot.dataset.time,
           }));
 
+          // Get the studentEmail from the query parameters
+          const studentEmail = getQueryParam('StudentEmail');
+
           const loading = document.querySelector('.loading');
           try {
             loading.style.display = 'flex';
 
-            const response = await fetch('/teacher/save-schedule', {
+            // Include studentEmail in the request body
+            const response = await fetch(`/teacher/acceptRequest`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ schedule }),
+              body: JSON.stringify({ schedule, studentEmail }), // Add studentEmail to the body
             });
 
             if (!response.ok) throw new Error('Server error');

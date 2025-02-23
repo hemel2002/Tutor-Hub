@@ -97,7 +97,13 @@ const teacherSchema = new mongoose.Schema(
         },
       },
     ],
+    accoutStatus: {
+      type: String,
+      enum: ['Active', 'Inactive', 'Pending'],
+      default: 'Inactive',
+    },
   },
+
   {
     timestamps: true,
   }

@@ -1,0 +1,33 @@
+<% if (success && success.length>0) { %>
+<script>
+  function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
+  }
+
+  // Call the function with flash data
+  showNotification('<%= success %>', 'success');
+</script>
+<% } %> <% if (error && error.length>0) { %>
+<script>
+  function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
+  }
+  showNotification('<%= error %>', 'error');
+</script>
+<% } %>

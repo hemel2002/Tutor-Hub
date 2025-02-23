@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Requests</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #2d3e50;
+        --secondary-color: #1abc9c;
+        --accent-color: #e74c3c;
+        --text-color: #34495e;
+        --text-secondary: #6b7280; /* Gray-500 */
+        --background: #f9fafb; /* Gray-50 */
+        --surface: #ffffff; /* White */
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--background);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ========== Navbar ========== */
+      .navbar {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+      }
+
+      .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white !important;
+      }
+
+      .navbar-nav {
+        margin-left: auto;
+      }
+
+      .nav-link {
+        color: white !important;
+        margin: 0 0.5rem;
+        font-weight: 500;
+      }
+
+      .nav-link:hover {
+        color: var(--secondary-color) !important;
+      }
+
+      /* ========== Sidebar ========== */
+      .sidebar {
+        width: 280px;
+        background: #ffffff;
+        height: 100vh;
+        position: fixed;
+        top: 60px; /* Adjusted for navbar height */
+        left: 0;
+        padding: 20px 15px;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 999;
+      }
+
+      .sidebar-brand {
+        color: #34495e;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 2.5rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .sidebar-nav .nav-link {
+        color: #34495e !important;
+        padding: 0.8rem 1.2rem !important;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .sidebar-nav .nav-link:hover {
+        background: #f8f9fa;
+        transform: translateX(8px);
+        color: var(--secondary-color) !important;
+      }
+
+      .sidebar-nav .nav-link.active {
+        background: rgba(255, 255, 255, 0.15) !important;
+        font-weight: 600;
+      }
+
+      .sidebar-nav .nav-link i {
+        width: 24px;
+        font-size: 1.1rem;
+      }
+
+      /* ========== Main Content ========== */
+      .main-content {
+        margin-left: 280px;
+        margin-top: 60px; /* Adjusted for navbar height */
+        padding: 2.5rem;
+        flex: 1;
+        transition: all 0.3s ease;
+      }
+
+      .request-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .request-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .request-card .btn {
+        width: 100px;
+      }
+
+      .request-card .btn-accept {
+        background-color: #28a745;
+        color: white;
+      }
+
+      .request-card .btn-reject {
+        background-color: #dc3545;
+        color: white;
+      }
+
+      .request-card .btn-accept:hover {
+        background-color: #218838;
+      }
+
+      .request-card .btn-reject:hover {
+        background-color: #c82333;
+      }
+
+      .request-card .student-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .request-card .request-details {
+        color: #666;
+      }
+
+      .no-requests {
+        text-align: center;
+        color: #999;
+        font-size: 1.2rem;
+      }
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 10px;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+      }
+
+      .success {
+        background: #1abc9c;
+      }
+      .error {
+        background: #e74c3c;
+      }
+
+      /* ========== Responsive Design ========== */
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+
+        .sidebar.active {
+          transform: translateX(0);
+        }
+
+        .main-content {
+          margin-left: 0;
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+
+    <%- include('navbar') %>
+    <!-- Sidebar -->
+    <%- include('SideNavBar') %> <%- include('notification') %>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <div class="container py-5">
+        <h1 class="text-center mb-4">Student Requests</h1>
+
+        <!-- Request List -->
+        <div class="row g-4" id="requestList">
+          <!-- Example Request Card -->
+          <% requests.forEach(element => { %>
+          <div class="col-md-6 col-lg-4">
+            <div class="request-card p-4">
+              <div class="student-name mb-3"><%= element.studentEmail %></div>
+              <div class="request-details mb-3">
+                <p><strong>Subject :</strong> <%= element.subject %></p>
+                <p><strong>Message:</strong> <%= element.message %></p>
+                <p><strong>Remuneration:</strong> <%= element.salary %> Tk</p>
+                <p><strong>Date:</strong> <%= element.createdAt %></p>
+              </div>
+              <div class="d-flex gap-2">
+                <button
+                  class="btn btn-accept"
+                  onclick="handleRequest(this, 'accept', '<%= element.studentEmail %>')"
+                >
+                  <i class="fas fa-check"></i> Accept
+                </button>
+                <button
+                  class="btn btn-reject"
+                  onclick="handleRequest(this, 'reject', '<%= element.studentEmail %>')"
+                >
+                  <i class="fas fa-times"></i> Reject
+                </button>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+
+          <!-- No Requests Message -->
+          <div class="col-12 no-requests" id="noRequests" style="display: none">
+            No student requests found.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Function to handle accept/reject actions
+      function handleRequest(button, action, studentEmail) {
+        const requestCard = button.closest('.col-md-6');
+        const studentName =
+          requestCard.querySelector('.student-name').textContent;
+
+        if (action === 'accept') {
+          alert(`Accepted request from ${studentName}`);
+          // Redirect to another page
+          window.location.href = `/teacher/studentSchedule?StudentEmail=${studentName}`;
+        } else if (action === 'reject') {
+          alert(`Rejected request from ${studentName}`);
+          window.location.href = `/teacher/cancelRequest?studentEmail=${studentName}`;
+        }
+
+        // Remove the request card from the UI
+        requestCard.remove();
+
+        // Show "No Requests" message if no cards are left
+        const requestList = document.getElementById('requestList');
+        if (requestList.children.length === 1) {
+          document.getElementById('noRequests').style.display = 'block';
+        }
+      }
+
+      // Check if there are no requests on page load
+      window.addEventListener('DOMContentLoaded', () => {
+        const requestList = document.getElementById('requestList');
+        if (requestList.children.length === 1) {
+          document.getElementById('noRequests').style.display = 'block';
+        }
+      });
+
+      // Function to toggle sidebar on mobile
+      function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('active');
+      }
+    </script>
+  </body>
+</html>

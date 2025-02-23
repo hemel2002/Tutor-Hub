@@ -90,7 +90,7 @@ const options = {
 app.get('/signin', async (req, res) => {
   try {
     const response = await axios.request(options);
-   
+
     res.render('home/signin', { quotes: response.data[0] });
   } catch (error) {
     console.error(error);
@@ -116,8 +116,6 @@ app.post('/signin', async (req, res) => {
   } finally {
     mongoose.connection.close();
   }
-
-
 });
 /////////valid user signin/////////////
 app.get('/validuser', async (req, res) => {
@@ -125,7 +123,6 @@ app.get('/validuser', async (req, res) => {
   try {
     await MongooseConnection();
     const user = await CreateNewUser.findOne({ email: email });
- 
 
     res.render('home/SigninAfterValidation', {
       fullname: user.fullName,
@@ -141,8 +138,6 @@ app.get('/validuser', async (req, res) => {
 app.post('/validuser', async (req, res) => {
   const { email, password } = req.body;
 
-
-
   try {
     await MongooseConnection();
     const user = await CreateNewUser.findOne({ email: email });
@@ -153,6 +148,7 @@ app.post('/validuser', async (req, res) => {
       if (req.session.returnTo) {
         const redirect = req.session.returnTo;
         req.session.UserId = user.userId;
+        req.session.email = user.email;
         delete req.session.returnTo;
         return res.redirect(redirect);
       }
@@ -160,7 +156,7 @@ app.post('/validuser', async (req, res) => {
       req.session.UserId = user.userId;
       req.session.email = user.email;
       req.session.accountType = user.accountType;
-      
+
       res.redirect(`${account_type}/dashboard`);
     } else {
       req.flash('error', 'Invalid email or password');
@@ -192,8 +188,6 @@ app.post('/signup', async (req, res) => {
     account_type,
     confirmPassword,
   } = req.body;
-
-
 
   // Check if passwords match
   if (password !== confirmPassword) {
@@ -230,7 +224,6 @@ app.post('/signup', async (req, res) => {
     // Hash the password
     const hashPassword = await bcrypt.hash(password, 10);
 
-
     // Create the new user
     const newUser = new CreateNewUser({
       userId: user_id, // Updated field name
@@ -248,7 +241,6 @@ app.post('/signup', async (req, res) => {
         lastName: last_name,
       });
       await teacher.save();
-    
     } else {
       const student = new StudentSchema({
         userId: user_id,
@@ -257,7 +249,6 @@ app.post('/signup', async (req, res) => {
         lastName: last_name,
       });
       await student.save();
-
     }
 
     await newUser.save();
@@ -376,7 +367,6 @@ app.get('/SuccessResetLink', (req, res) => {
 app.get('/home', async (req, res) => {
   const courses = await course();
 
-
   res.render('home/home', { courses });
 });
 ///////////////////////testing////////////////////////
@@ -461,7 +451,6 @@ app.get('/NearbyTutor', async (req, res) => {
     await MongooseConnection();
     const teachers = await teacherSchema.find();
     return res.json(teachers);
-
   } catch (error) {
     console.log(error);
   } finally {
@@ -474,7 +463,6 @@ app.get('/enrolled', (req, res) => {
 });
 //////////////////////////courses/////////////////////////
 app.get('/courses', async (req, res) => {
-
   res.render('home/Courses', { courses });
 });
 
@@ -500,8 +488,6 @@ app.get('/enroll', requireLogin, async (req, res) => {
     const amount = Number(req.query.amount);
     const image = req.query.image;
 
-
-
     if (!course || !user || !amount || isNaN(amount)) {
       return res.status(400).send('Invalid request parameters');
     }
@@ -513,8 +499,6 @@ app.get('/enroll', requireLogin, async (req, res) => {
     if (!finduser) {
       return res.status(404).send('User not found');
     }
-
-
 
     // Properly check if the user is already enrolled
     if (finduser.enrolledCourses.some((c) => c.courseId === courseId)) {
@@ -542,7 +526,6 @@ app.get('/enroll', requireLogin, async (req, res) => {
       success_url: `http://localhost:3000/successfullyEnrolled?id=${courseId}&userId=${req.session.UserId}`,
       cancel_url: `http://localhost:3000/courseDetails`,
     });
-
 
     res.redirect(session.url);
   } catch (error) {

@@ -269,6 +269,83 @@
       .error {
         background: #e74c3c;
       }
+
+      .search-results {
+        position: absolute;
+        background: var(--surface);
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        width: 100%;
+        margin-top: 5px;
+      }
+
+      .search-results div {
+        padding: 10px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .search-results div:hover {
+        background: #f8f9fa;
+      }
+
+      .selected-student {
+        margin-top: 10px;
+        font-weight: 500;
+        color: var(--primary-color);
+      }
+
+      .materials-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+      }
+
+      .materials-table th,
+      .materials-table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #f3f4f6;
+      }
+
+      .materials-table th {
+        background: var(--surface);
+        color: var(--text-secondary);
+        font-weight: 600;
+      }
+
+      .materials-table tr:hover {
+        background: #f8f9fa;
+      }
+
+      .materials-table .actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .materials-table .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+
+      .materials-table .btn-success {
+        background: var(--secondary-color);
+        border: none;
+      }
+
+      .materials-table .btn-danger {
+        background: var(--accent-color);
+        border: none;
+      }
+
+      .materials-table .btn-success:hover,
+      .materials-table .btn-danger:hover {
+        opacity: 0.9;
+      }
     </style>
   </head>
   <body>
@@ -278,90 +355,121 @@
     <!-- Sidebar -->
     <%- include('SideNavBar') %> <%- include('notification') %>
 
-<!-- Main Content -->
-<div class="main-content">
-  <!-- Add Material Card -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h3 class="card-title">Upload New Material</h3>
-    </div>
-    <div class="card-body">
-      <form action="/teacher/uploadMaterial" method="POST" enctype="multipart/form-data">
-        <div class="mb-4">
-          <label class="form-label">Material Title</label>
-          <input
-            type="text"
-            class="form-control"
-            name="title"
-            placeholder="Enter title"
-          />
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Add Material Card -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title">Upload New Material</h3>
         </div>
-        <div class="mb-4">
-          <label class="form-label">Description</label>
-          <textarea
-            class="form-control"
-            name="description"
-            rows="3"
-            placeholder="Add description"
-          ></textarea>
-        </div>
-        <div class="mb-4">
-          <label class="form-label">Upload File</label>
-          <div class="file-upload">
-            <input type="file" class="form-control" name="file" />
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-cloud-upload-alt me-2"></i>Upload Material
-        </button>
-      </form>
-    </div>
-  </div>
+        <div class="card-body">
+          <form
+            action="/teacher/uploadMaterial"
+            method="POST"
+            enctype="multipart/form-data"
+          >
+            <!-- Dynamic Student Search -->
+            <div class="mb-4">
+              <label class="form-label">Select Student</label>
+              <input
+                type="text"
+                class="form-control"
+                id="studentSearch"
+                placeholder="Search for a student..."
+                autocomplete="off"
+              />
+              <div class="search-results" id="searchResults"></div>
+              <div class="selected-student" id="selectedStudent"></div>
+              <input type="hidden" name="studentId" id="studentId" required />
+            </div>
 
-  <!-- Materials List -->
-  <div class="card">
-    <div
-      class="card-header d-flex justify-content-between align-items-center"
-    >
-      <h3 class="card-title">Course Materials</h3>
-      <div class="badge bg-primary">24 Items</div>
+            <div class="mb-4">
+              <label class="form-label">Material Title</label>
+              <input
+                type="text"
+                class="form-control"
+                name="title"
+                placeholder="Enter title"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Description</label>
+              <textarea
+                class="form-control"
+                name="description"
+                rows="3"
+                placeholder="Add description"
+                required
+              ></textarea>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Upload File</label>
+              <div class="file-upload">
+                <input type="file" class="form-control" name="file" required />
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="submitButton"
+              name="studentEmail"
+              value=""
+            >
+              <i class="fas fa-cloud-upload-alt me-2"></i>Upload Material
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Materials List -->
+      <div class="card">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h3 class="card-title">Course Materials</h3>
+          <% materials.forEach(material => { %>
+          <div class="badge bg-primary">
+            Assets: <%= material.assets.length %>
+          </div>
+          <% }) %>
+        </div>
+        <div class="card-body">
+          <table class="materials-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Student Email</th>
+                <th>Upload Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% materials.forEach(material => { %> <%
+              material.assets.forEach(asset => { %>
+              <tr>
+                <td><%= asset.title %></td>
+                <td><%= asset.description %></td>
+                <td><%= material.studentEmail %></td>
+                <td><%= material.createdAt.toLocaleDateString() %></td>
+                <td class="actions">
+                  <!-- Download Button -->
+                  <a href="<%= asset.url %>" download class="btn btn-success">
+                    <i class="fas fa-download"></i> Download
+                  </a>
+                  <!-- Delete Button -->
+                  <button class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </td>
+              </tr>
+              <% }) %> <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <table class="materials-table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Type</th>
-            <th>Upload Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Introduction to Physics</td>
-            <td><span class="badge bg-secondary">PDF</span></td>
-            <td>2025-02-15</td>
-            <td>
-              <button class="btn btn-danger">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td>Algebra Basics</td>
-            <td><span class="badge bg-secondary">Video</span></td>
-            <td>2025-02-14</td>
-            <td>
-              <button class="btn btn-danger">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
 
     <!-- Footer -->
     <footer>
@@ -370,11 +478,76 @@
 
     <script>
       // Mobile sidebar toggle
-      document
-        .querySelector('.navbar-toggler')
-        .addEventListener('click', () => {
-          document.querySelector('.sidebar').classList.toggle('active');
-        });
+      document.querySelector('.navbar-toggler').addEventListener('click', () => {
+        document.querySelector('.sidebar').classList.toggle('active');
+      });
+
+      // Dynamic Student Search
+      const studentSearch = document.getElementById('studentSearch');
+      const searchResults = document.getElementById('searchResults');
+      const selectedStudent = document.getElementById('selectedStudent');
+      const studentIdInput = document.getElementById('studentId');
+      const submitButton = document.getElementById('submitButton'); // Get the submit button
+
+      // Embed student data directly into the page
+      const students = <%- JSON.stringify(Student) %>;
+
+      // Populate search results
+      studentSearch.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        searchResults.innerHTML = '';
+
+        if (query.length > 0) {
+          const filteredStudents = students.filter((student) =>
+            student.studentEmail.toLowerCase().includes(query)
+          );
+
+          if (filteredStudents.length > 0) {
+            filteredStudents.forEach((student) => {
+              const resultItem = document.createElement('div');
+              resultItem.textContent = student.studentEmail;
+              resultItem.addEventListener('click', () => {
+                studentSearch.value = student.studentEmail;
+                selectedStudent.textContent = `Selected: ${student.studentEmail}`;
+                studentIdInput.value = student._id; // Use the student's _id from the backend
+                submitButton.value = student.studentEmail; // Set the value of the submit button
+                searchResults.innerHTML = '';
+              });
+              searchResults.appendChild(resultItem);
+            });
+          } else {
+            const noResults = document.createElement('div');
+            noResults.textContent = 'No students found';
+            searchResults.appendChild(noResults);
+          }
+        }
+      });
+
+      // Close search results when clicking outside
+      document.addEventListener('click', (e) => {
+        if (
+          !e.target.closest('#studentSearch') &&
+          !e.target.closest('#searchResults')
+        ) {
+          searchResults.innerHTML = '';
+        }
+      });
+
+      // Notification handling (if needed)
+      const showNotification = (message, type) => {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      };
+
+      // Example usage of notification
+      // showNotification('Material uploaded successfully!', 'success');
+      // showNotification('Failed to upload material.', 'error');
     </script>
   </body>
 </html>
