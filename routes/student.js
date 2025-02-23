@@ -83,21 +83,6 @@ router.get('/dashboard', completeProfile, async (req, res) => {
     const weekName = date.toLocaleString('en-us', { weekday: 'short' });
     console.log('Today:', weekName);
 
-    // Map week names to numbers
-    const myDate = {
-      Sun: 0,
-      Mon: 1,
-      Tue: 2,
-      Wed: 3,
-      Thu: 4,
-      Fri: 5,
-      Sat: 6,
-    };
-
-    // Get today's numeric value
-    const Today = myDate[weekName];
-    console.log('Today (numeric):', Today);
-
     // Find today's sessions for the student
     let findTodaySession = await Teaches.find({
       studentEmail: userEmail,
@@ -120,8 +105,17 @@ router.get('/dashboard', completeProfile, async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-router.get('/SearchTutor', (req, res) => {
-  res.render('student/searchTutor');
+router.get('/SearchTutor', async (req, res) => {
+  try {
+    await MongooseConnection();
+    const teacher = await Tutor.find();
+    return res.render('student/SearchTutor', { teacher });
+  } catch (error) {
+    console.error('Error in /SearchTutor route:', error);
+    res.status(500).send('Internal Server Error');
+  } finally {
+    await mongoose.connection.close();
+  }
 });
 router.get('/rating&commnet', (req, res) => {
   res.render('student/RatingAndCommentPage');
@@ -243,6 +237,10 @@ router.get('/completeProfile', async (req, res) => {
     await mongoose.connection.close();
   }
 });
+
+//////////////////////////available tuttor////////////////////////////////////////
+
+//////////////////////////available tuttor end////////////////////////////////////////
 
 router.get('/success', (req, res) => {
   res.render('student/PaymentSuccess');
