@@ -16,10 +16,10 @@ const caveat = Caveat({
 });
 
 export const metadata: Metadata = {
-  title: "James Stanfield Tutor Hub - Specialized Learning Marketplace",
+  title: " Tutor Hub - Specialized Learning Marketplace",
   description: "The most trusted educational hub for parents, students, and educators. Featuring specialized social skills learning, AI matching, last-minute QuickBookings, and performance snapshots.",
   keywords: "tutoring, social skills, video modeling, educational marketplace, AI matching, child learning, test prep",
-  authors: [{ name: "James Stanfield Company" }],
+  authors: [{ name: " Tutor Hub Company" }],
 };
 
 export default function RootLayout({

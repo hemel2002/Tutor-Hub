@@ -4,16 +4,16 @@ import React, { useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 import TiltCard from "@/components/TiltCard";
-import { 
-  GraduationCap, 
-  BookOpen, 
-  TrendingUp, 
-  ShieldCheck, 
-  Award, 
-  Users, 
-  Clock, 
-  Play, 
-  UserCheck, 
+import {
+  GraduationCap,
+  BookOpen,
+  TrendingUp,
+  ShieldCheck,
+  Award,
+  Users,
+  Clock,
+  Play,
+  UserCheck,
   HelpCircle,
   Volume2,
   Calendar,
@@ -31,7 +31,7 @@ export default function LandingPage() {
       <nav className={styles.navbar}>
         <div className={styles.logo}>
           <GraduationCap size={32} />
-          <span>James Stanfield</span>
+          <span>Tutor Hub</span>
         </div>
         <ul className={styles.navLinks}>
           <li><Link href="#why-us">Why Us</Link></li>
@@ -61,7 +61,7 @@ export default function LandingPage() {
             tremendous way to expand learners' knowledge base and help staff
             enhance their skills.
           </p>
-          
+
           {/* Interactive Portal Switcher Banner */}
           <div style={{
             background: "rgba(255, 255, 255, 0.9)",
@@ -103,7 +103,7 @@ export default function LandingPage() {
             <Award size={20} className="sway-element" style={{ color: "var(--color-primary)" }} />
             <span>Success Guarantee</span>
           </div>
-          
+
           <div className={`${styles.floatingBadge} ${styles.badge2} float-element`} style={{ animationDelay: "2s" }}>
             <ShieldCheck size={20} className="pulse-element" style={{ color: "var(--color-accent)" }} />
             <span>Verified Safety Check</span>
@@ -189,13 +189,13 @@ export default function LandingPage() {
               {/* Screen stand */}
               <path d="M 170 270 L 170 330 L 230 330 L 230 270 Z" fill="var(--text-navy)" />
               <ellipse cx="200" cy="330" rx="60" ry="15" fill="var(--text-navy)" />
-              
+
               {/* Kids Illustration */}
               <circle cx="120" cy="140" r="30" fill="var(--color-secondary)" stroke="var(--text-navy)" strokeWidth="4" />
               <circle cx="280" cy="140" r="30" fill="var(--color-accent)" stroke="var(--text-navy)" strokeWidth="4" />
               <path d="M 90 220 Q 120 180 150 220" fill="none" stroke="var(--text-navy)" strokeWidth="4" />
               <path d="M 250 220 Q 280 180 310 220" fill="none" stroke="var(--text-navy)" strokeWidth="4" />
-              
+
               {/* UI Elements */}
               <rect x="170" y="90" width="60" height="15" rx="4" fill="var(--color-primary)" />
               <circle cx="200" cy="150" r="10" fill="var(--color-white)" />
@@ -363,7 +363,7 @@ export default function LandingPage() {
               Creating trusted environments for specialized learning
             </h2>
             <p style={{ color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "2rem" }}>
-              For years, we've pioneered educational tools that bridge the communication gap, 
+              For years, we've pioneered educational tools that bridge the communication gap,
               delivering customized social learning plans that yield measurable, real-world growth.
             </p>
             <Link href="/parent" className={styles.btnSecondary}>
@@ -422,7 +422,7 @@ export default function LandingPage() {
           ) : (
             <div style={{ width: "100%", height: "450px", background: "#000", position: "relative" }}>
               {/* Play simulated educational video with close button */}
-              <button 
+              <button
                 onClick={() => setIsPlayingVideo(false)}
                 style={{ position: "absolute", top: "20px", right: "20px", zIndex: 10, background: "white", border: "none", padding: "0.5rem 1rem", borderRadius: "8px", fontWeight: "bold", cursor: "pointer" }}
               >
@@ -510,7 +510,7 @@ export default function LandingPage() {
           <div className={styles.footerCol}>
             <div className={styles.logo} style={{ color: "white" }}>
               <GraduationCap size={32} />
-              <span>James Stanfield</span>
+              <span>Tutor Hub</span>
             </div>
             <p style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.9rem" }}>
               Empowering specialized education through technology, trust automation, and interactive video modeling.
@@ -546,7 +546,7 @@ export default function LandingPage() {
         </div>
 
         <div className={styles.footerBottom}>
-          <span>&copy; {new Date().getFullYear()} James Stanfield Company. All rights reserved.</span>
+          <span>&copy; {new Date().getFullYear()} Tutor HUb Company. All rights reserved.</span>
           <span>Trust & Safety Vetted Marketplace</span>
         </div>
       </footer>
