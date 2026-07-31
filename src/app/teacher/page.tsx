@@ -55,37 +55,11 @@ import {
   RefreshCw
 } from "lucide-react";
 import { useAuth, ProtectedRoute } from "@/components/AuthProvider";
-import { db, Child } from "@/lib/db";
+import { db, Child, SessionReport } from "@/lib/db";
 import AvatarIcon from "@/components/AvatarIcon";
 
 
 // Bookings are fetched dynamically from Supabase database.
-
-// Mock Invoices list
-const INVOICES_DATA = {
-  "June 2026": {
-    gross: 3850,
-    classesTaught: 32,
-    rate: 120,
-    hours: 32,
-    details: [
-      { date: "June 23, 2026", desc: "Tyler Jenkins - Conversational Dynamics", rate: 120, duration: "1.0 hr" },
-      { date: "June 20, 2026", desc: "Emily Jenkins - Anxiety Coping Tools", rate: 120, duration: "1.0 hr" },
-      { date: "June 18, 2026", desc: "Sophie Rosales - Social Skills Intro", rate: 120, duration: "1.0 hr" }
-    ]
-  },
-  "May 2026": {
-    gross: 4200,
-    classesTaught: 35,
-    rate: 120,
-    hours: 35,
-    details: [
-      { date: "May 28, 2026", desc: "Tyler Jenkins - Active Listening", rate: 120, duration: "1.0 hr" },
-      { date: "May 25, 2026", desc: "Emily Jenkins - Visual Arts Focus", rate: 120, duration: "1.0 hr" },
-      { date: "May 22, 2026", desc: "Sophie Rosales - Non-verbal Cues", rate: 120, duration: "1.0 hr" }
-    ]
-  }
-};
 
 // AI Recommendation Types
 interface AIRecommendation {
@@ -122,6 +96,8 @@ interface TeacherScheduleItem {
   student: string;
   childId: string;
   subject: string;
+  tutorName: string;
+  date: string;
   startTime: string;
   endTime: string;
   durationMin: number;
@@ -152,6 +128,7 @@ export default function TeacherDashboard() {
     { sender: 'AI', message: 'Hello! I am your AI teaching assistant. I can help you optimize sessions and analyze student progress.', timestamp: new Date().toLocaleTimeString() }
   ]);
   const [userMessage, setUserMessage] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
 
   // Gamification States
   const [gamificationStats, setGamificationStats] = useState<GamificationStats>({
@@ -172,18 +149,24 @@ export default function TeacherDashboard() {
   // Session Timer - Functional
   const [sessionTimer, setSessionTimer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [currentSession, setCurrentSession] = useState<{student: string, subject: string} | null>(null);
+  const [currentSession, setCurrentSession] = useState<TeacherScheduleItem | null>(null);
+  const [sessionReports, setSessionReports] = useState<SessionReport[]>([]);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [savingReport, setSavingReport] = useState(false);
+  const [reportSummary, setReportSummary] = useState("");
+  const [reportNotes, setReportNotes] = useState("");
+  const [reportScores, setReportScores] = useState({ engagement: 4, mastery: 3, behavior: 4 });
 
-  const startSession = (student: string, subject: string) => {
-    setCurrentSession({ student, subject });
+  const startSession = (session: TeacherScheduleItem) => {
+    setCurrentSession(session);
     setSessionTimer(0);
     setIsTimerRunning(true);
+    setCollaborationSessions([{ id: session.id, studentId: session.childId, studentName: session.student, isActive: true, startTime: session.startTime, tools: collaborationTools }]);
   };
 
   const stopSession = () => {
     setIsTimerRunning(false);
-    setCurrentSession(null);
-    setSessionTimer(0);
+    setShowCompletionModal(true);
   };
 
   // Functional collaboration tools
@@ -201,30 +184,17 @@ export default function TeacherDashboard() {
   // Enhanced Analytics
   const [analyticsPeriod, setAnalyticsPeriod] = useState<"week" | "month" | "quarter">("month");
   const [engagementMetrics, setEngagementMetrics] = useState({
-    avgRating: 4.9,
-    totalSessions: 156,
-    retentionRate: 96.2,
-    parentSatisfaction: 98,
-    skillImprovement: 85
+    avgRating: 0,
+    totalSessions: 0,
+    retentionRate: 0,
+    parentSatisfaction: 0,
+    skillImprovement: 0
   });
-
-  // Real-time analytics updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setEngagementMetrics(prev => ({
-        ...prev,
-        avgRating: Math.min(5.0, prev.avgRating + (Math.random() - 0.5) * 0.1),
-        totalSessions: prev.totalSessions + Math.floor(Math.random() * 3),
-        parentSatisfaction: Math.min(100, Math.max(80, prev.parentSatisfaction + (Math.random() - 0.5) * 2))
-      }));
-    }, 5000); // Update every 5 seconds
-
-    return () => clearInterval(interval);
-  }, []);
 
   // DB-driven Schedule States & Helpers
   const [bookings, setBookings] = useState<TeacherScheduleItem[]>([]);
   const [childrenMap, setChildrenMap] = useState<Record<string, Child>>({});
+  const [hourlyRate, setHourlyRate] = useState(0);
   const [loadingSchedule, setLoadingSchedule] = useState<boolean>(true);
   const [scheduleError, setScheduleError] = useState<string | null>(null);
 
@@ -241,47 +211,25 @@ export default function TeacherDashboard() {
     return `${String(hours).padStart(2, "0")}:${minutes}`;
   };
 
-  const updateCollaborationStatus = useCallback(() => {
-    const activeSessions: CollaborationSession[] = [
-      {
-        id: "collab_1",
-        studentId: "tyler",
-        studentName: "Tyler Jenkins",
-        isActive: true,
-        startTime: "14:00",
-        tools: ["whiteboard", "screen_share"]
-      },
-      {
-        id: "collab_2",
-        studentId: "emily",
-        studentName: "Emily Jenkins",
-        isActive: false,
-        startTime: "15:30",
-        tools: ["document_share", "polls"]
-      }
-    ];
-    setCollaborationSessions(activeSessions);
-  }, []);
-
   useEffect(() => {
-    let collaborationInterval: ReturnType<typeof setInterval> | undefined;
-
     async function loadData() {
       if (!user) return;
       try {
         setLoadingSchedule(true);
         setScheduleError(null);
 
-        const [childrenData, bookingsData] = await Promise.all([
+        const [childrenData, bookingsData, reportsData, tutorsData] = await Promise.all([
           db.getChildren(),
-          db.getBookings()
+          db.getBookings(),
+          db.getSessionReports(),
+          db.getTutors(),
         ]);
 
         setChildrenMap(childrenData);
 
-        const tutorBookings = bookingsData.filter(
-          (b) => b.tutorName.toLowerCase() === user.name.toLowerCase()
-        );
+        const tutorName = user.isMock ? "Coach Alex M." : user.name;
+        setHourlyRate(tutorsData.find((tutor) => tutor.name === tutorName)?.rate ?? 0);
+        const tutorBookings = bookingsData.filter((booking) => booking.tutorName.toLowerCase() === tutorName.toLowerCase());
 
         const mapped = tutorBookings.map((b) => {
           const startTime = parse12To24(b.time);
@@ -290,6 +238,8 @@ export default function TeacherDashboard() {
             student: b.childName,
             childId: b.childId,
             subject: b.subject,
+            tutorName: b.tutorName,
+            date: b.date,
             startTime,
             endTime: getBufferedTime(startTime, 60),
             durationMin: 60,
@@ -299,9 +249,7 @@ export default function TeacherDashboard() {
 
         mapped.sort((a, b) => a.startTime.localeCompare(b.startTime));
         setBookings(mapped);
-
-        // Simulate real-time collaboration updates
-        collaborationInterval = setInterval(updateCollaborationStatus, 30000);
+        setSessionReports(reportsData.filter((report) => report.tutorName === tutorName));
       } catch (err: unknown) {
         console.error("Failed to load schedule from Supabase:", err);
         setScheduleError(err instanceof Error ? err.message : "Failed to load schedule.");
@@ -310,87 +258,98 @@ export default function TeacherDashboard() {
       }
     }
     loadData();
-    return () => {
-      if (collaborationInterval) clearInterval(collaborationInterval);
-    };
-  }, [user, updateCollaborationStatus]);
+  }, [user]);
 
-  // AI Recommendation System - Functional Demo
+  // Recommendations are based on the tutor's saved session reports.
   function generateAIRecommendations() {
-    const mockRecommendations: AIRecommendation[] = [
+    if (sessionReports.length === 0) {
+      setAiRecommendations([{ id: "first-report", type: "resource_suggestion", title: "Complete your first session report", description: "Reports unlock evidence-based progress views and clear family follow-ups.", priority: "medium", action: "Open session workspace", timestamp: "Ready now" }]);
+      return;
+    }
+
+    const latest = sessionReports[0];
+    const recommendations: AIRecommendation[] = [
       {
-        id: "ai_1",
-        type: "session_optimization",
-        title: "Optimize Tyler's Session Timing",
-        description: "Based on engagement patterns, moving Tyler's session to 3:30 PM could improve focus by 23%",
-        priority: "high",
-        action: "Reschedule for better engagement",
-        timestamp: "2 hours ago"
+        id: `report-${latest.id}`,
+        type: latest.engagement < 3 ? "session_optimization" : "resource_suggestion",
+        title: latest.engagement < 3 ? `Plan shorter focus blocks for ${latest.childName}` : `Reuse what engaged ${latest.childName}`,
+        description: latest.engagement < 3
+          ? `The latest ${latest.subject} report logged engagement at ${latest.engagement}/5. Add a reset break and a clearer first task next time.`
+          : `The latest ${latest.subject} report logged engagement at ${latest.engagement}/5. Turn the successful activity into the next session's opening prompt.`,
+        priority: latest.engagement < 3 ? "high" : "medium",
+        action: "Open whiteboard",
+        timestamp: latest.date,
       },
       {
-        id: "ai_2",
-        type: "resource_suggestion",
-        title: "New Visual Learning Resource Available",
-        description: "Interactive social stories tool matches Emily's learning style perfectly",
-        priority: "medium",
-        action: "Review and integrate resource",
-        timestamp: "5 hours ago"
+        id: "family-update",
+        type: "parent_communication",
+        title: "Share a concise family update",
+        description: `Send the latest progress note for ${latest.childName} directly to the parent conversation.`,
+        priority: "low",
+        action: "Send update",
+        timestamp: "Based on latest report",
       },
-      {
-        id: "ai_3",
-        type: "skill_focus",
-        title: "Focus on Executive Function Skills",
-        description: "75% of students show improvement when tasks are chunked into 5-minute segments",
-        priority: "medium",
-        action: "Implement chunking strategy",
-        timestamp: "1 day ago"
-      }
     ];
-    setAiRecommendations(mockRecommendations);
+    setAiRecommendations(recommendations);
   }
 
-  // Functional AI Chat
-  const sendAIMessage = () => {
-    if (!userMessage.trim()) return;
+  const sendAIMessage = async () => {
+    const message = userMessage.trim();
+    if (!message || aiLoading) return;
 
-    // Add user message
-    const newMessage = {
-      sender: 'You',
-      message: userMessage,
-      timestamp: new Date().toLocaleTimeString()
-    };
-    setAiChatMessages(prev => [...prev, newMessage]);
-    setUserMessage('');
+    const newMessage = { sender: "You", message, timestamp: new Date().toLocaleTimeString() };
+    const history = aiChatMessages.map((item, index) => ({
+      id: `teacher-chat-${index}`,
+      role: item.sender === "AI" ? "assistant" as const : "user" as const,
+      text: item.message,
+      createdAt: new Date().toISOString(),
+    }));
+    setAiChatMessages((current) => [...current, newMessage]);
+    setUserMessage("");
+    setAiLoading(true);
 
-    // Simulate AI response after 1 second
-    setTimeout(() => {
-      const aiResponses = [
-        "Great question! Based on your teaching patterns, I recommend using visual aids for this session.",
-        "I've analyzed your recent sessions and noticed that shorter, focused segments work better for most of your students.",
-        "Try implementing the chunking technique - break down tasks into 5-minute segments with short breaks in between.",
-        "Your student engagement data shows improvement when using interactive games. Consider adding more game-based activities.",
-        "Based on performance metrics, moving afternoon sessions earlier could improve focus scores by up to 30%."
-      ];
+    try {
+      const response = await fetch("/api/assistant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: `I am a tutor. ${message}`,
+          history,
+          memories: [],
+        }),
+      });
+      if (!response.ok || !response.body) throw new Error("The assistant is unavailable.");
 
-      const aiResponse = {
-        sender: 'AI',
-        message: aiResponses[Math.floor(Math.random() * aiResponses.length)],
-        timestamp: new Date().toLocaleTimeString()
-      };
-      setAiChatMessages(prev => [...prev, aiResponse]);
-    }, 1000);
-  };
-
-  // Functional AI Analysis
-  const generateAIAnalysis = () => {
-    const analyses = [
-      "Your teaching effectiveness has improved by 15% this month. Students show better retention with visual aids.",
-      "Most students respond well to the 45-minute session format. Consider sticking to this duration.",
-      "Tyler shows 40% better engagement when sessions start with a warm-up activity. Implement this for all sessions.",
-      "Parent satisfaction is highest when you provide session summaries. Add this to your routine.",
-      "Your use of positive reinforcement is working well. Keep using specific praise for student achievements."
-    ];
-    return analyses[Math.floor(Math.random() * analyses.length)];
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let answer = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          if (!line) continue;
+          const event = JSON.parse(line) as { kind: string; message: string };
+          if (event.kind === "answer" || event.kind === "error") answer = event.message;
+        }
+      }
+      setAiChatMessages((current) => [...current, {
+        sender: "AI",
+        message: answer || "I could not prepare a response. Please try again.",
+        timestamp: new Date().toLocaleTimeString(),
+      }]);
+    } catch (error) {
+      setAiChatMessages((current) => [...current, {
+        sender: "AI",
+        message: error instanceof Error ? error.message : "The assistant is unavailable right now.",
+        timestamp: new Date().toLocaleTimeString(),
+      }]);
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   // Timer functionality
@@ -416,16 +375,18 @@ export default function TeacherDashboard() {
   }
 
   function loadAnalytics() {
-    // Simulate loading analytics data
-    setTimeout(() => {
-      setEngagementMetrics({
-        avgRating: 4.9,
-        totalSessions: 156,
-        retentionRate: 96.2,
-        parentSatisfaction: 98,
-        skillImprovement: 85
-      });
-    }, 1000);
+    if (sessionReports.length === 0) {
+      setEngagementMetrics({ avgRating: 0, totalSessions: 0, retentionRate: 0, parentSatisfaction: 0, skillImprovement: 0 });
+      return;
+    }
+    const average = (key: "engagement" | "mastery" | "behavior") => sessionReports.reduce((sum, report) => sum + report[key], 0) / sessionReports.length;
+    setEngagementMetrics({
+      avgRating: Number(average("behavior").toFixed(1)),
+      totalSessions: sessionReports.length,
+      retentionRate: Math.round(average("engagement") * 20),
+      parentSatisfaction: Math.round(average("behavior") * 20),
+      skillImprovement: Math.round(average("mastery") * 20),
+    });
   }
 
   // Initialize AI recommendations and collaboration helpers for the signed-in tutor.
@@ -436,11 +397,10 @@ export default function TeacherDashboard() {
       loadAnalytics();
     }, 0);
     return () => clearTimeout(initializationTimer);
-  }, [user]);
+  }, [user, sessionReports]);
 
   const startCollaboration = (studentId: string) => {
     setIsCollaborating(true);
-    // Simulate starting collaboration session
     const session = collaborationSessions.find(s => s.studentId === studentId);
     if (session) {
       setCollaborationSessions(prev => prev.map(s =>
@@ -451,7 +411,6 @@ export default function TeacherDashboard() {
 
   const endCollaboration = (studentId: string) => {
     setIsCollaborating(false);
-    // Simulate ending collaboration session
     setCollaborationSessions(prev => prev.map(s =>
       s.studentId === studentId ? { ...s, isActive: false } : s
     ));
@@ -569,17 +528,127 @@ export default function TeacherDashboard() {
     link.click();
   };
 
-  const currentInvoiceData = INVOICES_DATA[selectedMonth];
+  const completedBookings = bookings.filter((booking) => booking.status === "Completed");
+  const currentInvoiceData = {
+    gross: completedBookings.length * hourlyRate,
+    classesTaught: completedBookings.length,
+    rate: hourlyRate,
+    hours: completedBookings.length,
+    details: completedBookings.map((booking) => ({
+      date: booking.date,
+      desc: `${booking.student} - ${booking.subject}`,
+      rate: hourlyRate,
+      duration: "1.0 hr",
+    })),
+  };
   const feeAmount = (currentInvoiceData.gross * commissionRate) / 100;
   const netAmount = currentInvoiceData.gross - feeAmount;
 
   const handleDownloadInvoice = () => {
     setIsGeneratingPDF(true);
-    setTimeout(() => {
-      setIsGeneratingPDF(false);
-      setGenerateSuccess(true);
-      setTimeout(() => setGenerateSuccess(false), 3000);
-    }, 2000);
+    const statement = [
+      `Tutor Hub payout statement - ${selectedMonth}`,
+      `Completed sessions: ${currentInvoiceData.classesTaught}`,
+      `Gross earnings: $${currentInvoiceData.gross.toFixed(2)}`,
+      `Platform commission (${commissionRate}%): -$${feeAmount.toFixed(2)}`,
+      `Net payout: $${netAmount.toFixed(2)}`,
+      "",
+      ...currentInvoiceData.details.map((row) => `${row.date} | ${row.desc} | ${row.duration} | $${row.rate}/hr`),
+    ].join("\n");
+    const url = URL.createObjectURL(new Blob([statement], { type: "text/plain" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `tutor-hub-statement-${selectedMonth.replace(" ", "-").toLowerCase()}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setIsGeneratingPDF(false);
+    setGenerateSuccess(true);
+    setTimeout(() => setGenerateSuccess(false), 3000);
+  };
+
+  const submitSessionReport = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!currentSession || !reportSummary.trim() || !reportNotes.trim()) return;
+    setSavingReport(true);
+    try {
+      const completedBooking = await db.updateBookingStatus(currentSession.id, "Completed");
+      const report = await db.createSessionReport({
+        bookingId: currentSession.id,
+        childId: currentSession.childId,
+        childName: currentSession.student,
+        tutorName: currentSession.tutorName,
+        subject: currentSession.subject,
+        date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+        summary: reportSummary.trim(),
+        progressNotes: reportNotes.trim(),
+        ...reportScores,
+      });
+      const parentName = currentSession.childId === "tyler" ? "Sarah Jenkins" : "David Miller";
+      const conversationId = `conv_parent_${currentSession.tutorName.toLowerCase().includes("alex") ? "alex" : currentSession.childId}`;
+      await Promise.all([
+        db.sendMessage({
+          conversationId,
+          senderName: currentSession.tutorName,
+          senderRole: "teacher",
+          recipientName: parentName,
+          text: `Session update for ${currentSession.student}: ${report.summary}`,
+        }),
+        db.createNotification({
+          userId: "parent",
+          userRole: "parent",
+          title: "New session report",
+          body: `${currentSession.tutorName} published a ${currentSession.subject} update for ${currentSession.student}.`,
+          type: "booking",
+        }),
+      ]);
+      setBookings((current) => current.map((booking) => booking.id === completedBooking.id ? { ...booking, status: completedBooking.status } : booking));
+      setSessionReports((current) => [report, ...current]);
+      setShowCompletionModal(false);
+      setCurrentSession(null);
+      setSessionTimer(0);
+      setReportSummary("");
+      setReportNotes("");
+      setReportScores({ engagement: 4, mastery: 3, behavior: 4 });
+    } catch (error) {
+      console.error("Failed to complete session:", error);
+      setAiAnalysis("The session report could not be saved. Please check your connection and try again.");
+    } finally {
+      setSavingReport(false);
+    }
+  };
+
+  const handleRecommendationAction = async (recommendation: AIRecommendation) => {
+    if (recommendation.action === "Open whiteboard" || recommendation.action === "Open session workspace") {
+      setWhiteboardPrompt(sessionReports[0]?.progressNotes || "Create a focused visual warm-up for the next session.");
+      setActiveTab("whiteboard");
+      return;
+    }
+    const latest = sessionReports[0];
+    if (!latest) return;
+    const parentName = latest.childId === "tyler" ? "Sarah Jenkins" : "David Miller";
+    await db.sendMessage({
+      conversationId: `conv_parent_${latest.tutorName.toLowerCase().includes("alex") ? "alex" : latest.childId}`,
+      senderName: latest.tutorName,
+      senderRole: "teacher",
+      recipientName: parentName,
+      text: `Progress update for ${latest.childName}: ${latest.summary}`,
+    });
+    setAiAnalysis(`A progress update for ${latest.childName} was added to the parent conversation.`);
+  };
+
+  const exportAiReport = () => {
+    const content = [
+      "Tutor Hub teaching insights",
+      `Generated: ${new Date().toLocaleString()}`,
+      "",
+      ...aiRecommendations.map((recommendation) => `- ${recommendation.title}: ${recommendation.description}`),
+    ].join("\n");
+    const url = URL.createObjectURL(new Blob([content], { type: "text/plain" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "tutor-hub-insights.txt";
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -898,10 +967,10 @@ export default function TeacherDashboard() {
                   Quick Start Sessions
                 </h3>
                 <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-                  {bookings.slice(0, 3).map((booking) => (
+                  {bookings.filter((booking) => booking.status === "Scheduled").slice(0, 3).map((booking) => (
                     <button
                       key={booking.id}
-                      onClick={() => startSession(booking.student, booking.subject)}
+                      onClick={() => startSession(booking)}
                       className={styles.btnPrimary}
                       style={{
                         padding: "0.75rem 1.25rem",
@@ -1924,8 +1993,9 @@ export default function TeacherDashboard() {
             </div>
 
             {/* AI Recommendations */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700 }}>Smart Recommendations</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                <h3 style={{ fontSize: "1.2rem", fontWeight: 700 }}>Smart Recommendations</h3>
+                <p style={{ marginTop: "-0.75rem", color: "var(--text-muted)", fontSize: "0.82rem" }}>{aiAnalysis}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem" }}>
                 {aiRecommendations.map((rec) => (
                   <div
@@ -1978,9 +2048,7 @@ export default function TeacherDashboard() {
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{rec.timestamp}</span>
                         <button
-                          onClick={() => {
-                            alert(`Action executed: ${rec.action}\n\n${rec.description}`)
-                          }}
+                          onClick={() => void handleRecommendationAction(rec)}
                           className={styles.btnPrimary}
                           style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
                         >
@@ -2013,39 +2081,21 @@ export default function TeacherDashboard() {
                 border: "1px solid rgba(29, 42, 68, 0.05)"
               }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                  <div style={{
-                    background: "var(--color-primary)",
-                    color: "white",
-                    padding: "1rem",
-                    borderRadius: "12px",
-                    maxWidth: "80%"
-                  }}>
-                    <p style={{ fontSize: "0.9rem" }}>
-                      I&apos;ve analyzed your recent teaching patterns and noticed that Emily shows exceptional progress with visual scheduling. Would you like me to generate personalized visual aids for her next session?
-                    </p>
-                  </div>
-                  <div style={{
-                    background: "var(--bg-cream)",
-                    padding: "1rem",
-                    borderRadius: "12px",
-                    maxWidth: "80%",
-                    marginLeft: "auto"
-                  }}>
-                    <p style={{ fontSize: "0.9rem" }}>
-                      Yes, that would be helpful. Also, can you suggest strategies for maintaining Tyler&apos;s focus during longer sessions?
-                    </p>
-                  </div>
-                  <div style={{
-                    background: "var(--color-primary)",
-                    color: "white",
-                    padding: "1rem",
-                    borderRadius: "12px",
-                    maxWidth: "80%"
-                  }}>
-                    <p style={{ fontSize: "0.9rem" }}>
-                      Excellent! I&apos;ll prepare visual aids for Emily and recommend implementing the Pomodoro Technique for Tyler with 25-minute focused sessions followed by 5-minute brain breaks. This has shown 35% better engagement for students with similar attention profiles.
-                    </p>
-                  </div>
+                  {aiChatMessages.map((message, index) => (
+                    <div key={`${message.timestamp}-${index}`} style={{
+                      background: message.sender === "AI" ? "var(--color-primary)" : "white",
+                      color: message.sender === "AI" ? "white" : "var(--text-navy)",
+                      padding: "1rem",
+                      borderRadius: "12px",
+                      maxWidth: "80%",
+                      marginLeft: message.sender === "AI" ? 0 : "auto",
+                      border: message.sender === "AI" ? "none" : "1px solid rgba(29, 42, 68, 0.1)"
+                    }}>
+                      <p style={{ fontSize: "0.9rem", whiteSpace: "pre-wrap" }}>{message.message}</p>
+                      <span style={{ display: "block", marginTop: "0.35rem", opacity: 0.7, fontSize: "0.65rem" }}>{message.timestamp}</span>
+                    </div>
+                  ))}
+                  {aiLoading && <span style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>Assistant is preparing a response…</span>}
                 </div>
               </div>
               <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -2065,6 +2115,7 @@ export default function TeacherDashboard() {
                 />
                 <button
                   onClick={sendAIMessage}
+                  disabled={aiLoading || !userMessage.trim()}
                   className={styles.btnPrimary}
                   style={{ padding: "0.75rem 1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}
                 >
@@ -2077,7 +2128,7 @@ export default function TeacherDashboard() {
             {/* Quick Actions */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
               <button
-                  onClick={() => setActiveAIMMode(!activeAIMode)}
+                  onClick={toggleAIMode}
                 className={styles.btnPrimary}
                 style={{
                   display: "flex",
@@ -2098,11 +2149,11 @@ export default function TeacherDashboard() {
                   </>
                 )}
               </button>
-              <button className={styles.btnOutline} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <button onClick={exportAiReport} className={styles.btnOutline} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <Download size={16} />
                 Export AI Report
               </button>
-              <button className={styles.btnOutline} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <button onClick={() => { generateAIRecommendations(); loadAnalytics(); setAiAnalysis("Insights refreshed from saved session reports."); }} className={styles.btnOutline} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <RefreshCw size={16} />
                 Refresh Insights
               </button>
@@ -2314,10 +2365,46 @@ export default function TeacherDashboard() {
                 gap: "0.5rem"
               }}>
                 <Sparkles size={16} />
-                <span>Statement exported successfully! Simulated PDF TH-{selectedMonth.replace(" ", "")}-042.pdf downloaded.</span>
+                <span>Statement exported successfully as a downloadable text record.</span>
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {showCompletionModal && currentSession && (
+        <div className={styles.modalBackdrop} role="presentation">
+          <form onSubmit={submitSessionReport} className={styles.modalContent} style={{ maxWidth: "620px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <h3 style={{ fontWeight: 800, fontSize: "1.25rem" }}>Complete {currentSession.subject}</h3>
+                <p style={{ color: "var(--text-muted)", fontSize: "0.82rem", marginTop: "0.25rem" }}>Publish a progress update for {currentSession.student}.</p>
+              </div>
+              <button type="button" onClick={() => { setShowCompletionModal(false); setIsTimerRunning(true); }} style={{ background: "none", border: "none", cursor: "pointer" }} aria-label="Return to active session"><X size={22} /></button>
+            </div>
+            <label style={{ display: "flex", flexDirection: "column", gap: "0.35rem", fontWeight: 700, fontSize: "0.82rem" }}>
+              Session summary
+              <textarea required value={reportSummary} onChange={(event) => setReportSummary(event.target.value)} placeholder="What did the learner practise and achieve?" rows={3} style={{ padding: "0.8rem", borderRadius: "10px", border: "1px solid rgba(29,42,68,0.15)", resize: "vertical", font: "inherit" }} />
+            </label>
+            <label style={{ display: "flex", flexDirection: "column", gap: "0.35rem", fontWeight: 700, fontSize: "0.82rem" }}>
+              Next step for home and the next session
+              <textarea required value={reportNotes} onChange={(event) => setReportNotes(event.target.value)} placeholder="Add the next activity, support, or observation." rows={3} style={{ padding: "0.8rem", borderRadius: "10px", border: "1px solid rgba(29,42,68,0.15)", resize: "vertical", font: "inherit" }} />
+            </label>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem" }}>
+              {(["engagement", "mastery", "behavior"] as const).map((score) => (
+                <label key={score} style={{ display: "flex", flexDirection: "column", gap: "0.35rem", textTransform: "capitalize", fontSize: "0.78rem", fontWeight: 700 }}>
+                  {score}
+                  <select value={reportScores[score]} onChange={(event) => setReportScores((current) => ({ ...current, [score]: Number(event.target.value) }))} style={{ padding: "0.65rem", borderRadius: "8px", border: "1px solid rgba(29,42,68,0.15)", background: "white" }}>
+                    {[1, 2, 3, 4, 5].map((value) => <option key={value} value={value}>{value} / 5</option>)}
+                  </select>
+                </label>
+              ))}
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+              <button type="button" className={styles.btnOutline} onClick={() => { setShowCompletionModal(false); setIsTimerRunning(true); }} disabled={savingReport}>Keep session open</button>
+              <button type="submit" className={styles.btnPrimary} disabled={savingReport}>{savingReport ? "Publishing…" : "Complete & publish update"}</button>
+            </div>
+          </form>
         </div>
       )}
     </div>

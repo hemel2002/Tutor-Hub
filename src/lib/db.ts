@@ -497,19 +497,63 @@ const INITIAL_SESSION_REPORTS: SessionReport[] = [
 ];
 
 // ==========================================
-// Local In-Memory Store (fallback when Supabase is not configured)
+// Browser-persisted local store (fallback when Supabase is not configured)
 // ==========================================
 
-const localStore = {
-  tutors: [...INITIAL_TUTORS],
-  children: { ...INITIAL_CHILDREN },
-  bookings: [...INITIAL_BOOKINGS],
-  disputes: [...INITIAL_DISPUTES],
-  messages: [...INITIAL_MESSAGES],
-  notifications: [...INITIAL_NOTIFICATIONS],
-  reviews: [...INITIAL_REVIEWS],
-  sessionReports: [...INITIAL_SESSION_REPORTS],
-};
+interface LocalStore {
+  tutors: Tutor[];
+  children: Record<string, Child>;
+  bookings: Booking[];
+  disputes: Dispute[];
+  messages: Message[];
+  notifications: Notification[];
+  reviews: Review[];
+  sessionReports: SessionReport[];
+}
+
+const LOCAL_STORE_KEY = "tutor_hub_store_v2";
+
+function clone<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
+}
+
+function initialLocalStore(): LocalStore {
+  return {
+    tutors: clone(INITIAL_TUTORS),
+    children: clone(INITIAL_CHILDREN),
+    bookings: clone(INITIAL_BOOKINGS),
+    disputes: clone(INITIAL_DISPUTES),
+    messages: clone(INITIAL_MESSAGES),
+    notifications: clone(INITIAL_NOTIFICATIONS),
+    reviews: clone(INITIAL_REVIEWS),
+    sessionReports: clone(INITIAL_SESSION_REPORTS),
+  };
+}
+
+function loadLocalStore(): LocalStore {
+  if (typeof window === "undefined") return initialLocalStore();
+
+  try {
+    const saved = window.localStorage.getItem(LOCAL_STORE_KEY);
+    if (!saved) return initialLocalStore();
+    const parsed = JSON.parse(saved) as Partial<LocalStore>;
+    const defaults = initialLocalStore();
+    return {
+      ...defaults,
+      ...parsed,
+      children: { ...defaults.children, ...parsed.children },
+    };
+  } catch {
+    return initialLocalStore();
+  }
+}
+
+const localStore = loadLocalStore();
+
+function persistLocalStore(): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify(localStore));
+}
 
 const genId = (prefix: string) => `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
@@ -569,6 +613,7 @@ export const db = {
     }
     if (!localStore.children[childId]) throw new Error(`Child ${childId} not found`);
     localStore.children[childId].coins = coins;
+    persistLocalStore();
     return localStore.children[childId];
   },
 
@@ -595,6 +640,7 @@ export const db = {
     if (completed && !goal.completed) child.coins += goal.reward;
     else if (!completed && goal.completed) child.coins = Math.max(0, child.coins - goal.reward);
     goal.completed = completed;
+    persistLocalStore();
     return child;
   },
 
@@ -624,6 +670,7 @@ export const db = {
       return data as Booking;
     }
     localStore.bookings.push(newBooking);
+    persistLocalStore();
     return newBooking;
   },
 
@@ -636,6 +683,7 @@ export const db = {
     const booking = localStore.bookings.find(b => b.id === bookingId);
     if (!booking) throw new Error(`Booking ${bookingId} not found`);
     booking.status = status;
+    persistLocalStore();
     return booking;
   },
 
@@ -660,6 +708,7 @@ export const db = {
     const dispute = localStore.disputes.find(d => d.id === disputeId);
     if (!dispute) throw new Error(`Dispute ${disputeId} not found`);
     dispute.status = status;
+    persistLocalStore();
     return dispute;
   },
 
@@ -675,6 +724,7 @@ export const db = {
       return data as Dispute;
     }
     localStore.disputes.push(newDispute);
+    persistLocalStore();
     return newDispute;
   },
 
@@ -732,6 +782,7 @@ export const db = {
       return data as Message;
     }
     localStore.messages.push(newMsg);
+    persistLocalStore();
     return newMsg;
   },
 
@@ -741,7 +792,10 @@ export const db = {
       return;
     }
     const msg = localStore.messages.find(m => m.id === messageId);
-    if (msg) msg.read = true;
+    if (msg) {
+      msg.read = true;
+      persistLocalStore();
+    }
   },
 
   // --- Notifications ---
@@ -769,6 +823,7 @@ export const db = {
       return data as Notification;
     }
     localStore.notifications.push(newNotif);
+    persistLocalStore();
     return newNotif;
   },
 
@@ -778,7 +833,10 @@ export const db = {
       return;
     }
     const n = localStore.notifications.find(n => n.id === notifId);
-    if (n) n.read = true;
+    if (n) {
+      n.read = true;
+      persistLocalStore();
+    }
   },
 
   // --- Reviews ---
@@ -806,6 +864,7 @@ export const db = {
       return data as Review;
     }
     localStore.reviews.push(newReview);
+    persistLocalStore();
     return newReview;
   },
 
@@ -822,14 +881,34 @@ export const db = {
     return [...localStore.sessionReports];
   },
 
+  async getTutorSessionReports(tutorName: string): Promise<SessionReport[]> {
+    const reports = await this.getSessionReports();
+    return reports.filter((report) => report.tutorName === tutorName);
+  },
+
   async createSessionReport(report: Omit<SessionReport, 'id'>): Promise<SessionReport> {
     const newReport: SessionReport = { ...report, id: genId('sr') };
     if (supabase) {
       const { data, error } = await supabase.from('session_reports').insert(newReport).select().single();
       if (error) throw error;
+      const { data: child } = await supabase.from('children').select('heatmap').eq('id', newReport.childId).single();
+      if (child) {
+        const currentHeatmap = Array.isArray(child.heatmap) ? child.heatmap : [];
+        const nextScore = Math.max(0, Math.min(4, Math.round(newReport.engagement) - 1));
+        await supabase
+          .from('children')
+          .update({ heatmap: [...currentHeatmap.slice(-11), nextScore] })
+          .eq('id', newReport.childId);
+      }
       return data as SessionReport;
     }
     localStore.sessionReports.push(newReport);
+    const child = localStore.children[newReport.childId];
+    if (child) {
+      const nextScore = Math.max(0, Math.min(4, Math.round(newReport.engagement) - 1));
+      child.heatmap = [...child.heatmap.slice(-11), nextScore];
+    }
+    persistLocalStore();
     return newReport;
   },
 };

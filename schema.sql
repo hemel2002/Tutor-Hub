@@ -58,13 +58,65 @@ CREATE TABLE IF NOT EXISTS public.disputes (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. Enable Row Level Security (RLS)
+-- 5. Collaboration and progress tables
+CREATE TABLE IF NOT EXISTS public.messages (
+  id TEXT PRIMARY KEY,
+  "conversationId" TEXT NOT NULL,
+  "senderName" TEXT NOT NULL,
+  "senderRole" TEXT NOT NULL,
+  "recipientName" TEXT NOT NULL,
+  text TEXT NOT NULL,
+  read BOOLEAN DEFAULT FALSE,
+  "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.notifications (
+  id TEXT PRIMARY KEY,
+  "userId" TEXT NOT NULL,
+  "userRole" TEXT NOT NULL,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL,
+  type TEXT NOT NULL,
+  read BOOLEAN DEFAULT FALSE,
+  "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.reviews (
+  id TEXT PRIMARY KEY,
+  "tutorName" TEXT NOT NULL,
+  "parentName" TEXT NOT NULL,
+  "childName" TEXT NOT NULL,
+  rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  text TEXT NOT NULL,
+  date TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.session_reports (
+  id TEXT PRIMARY KEY,
+  "bookingId" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "childName" TEXT NOT NULL,
+  "tutorName" TEXT NOT NULL,
+  subject TEXT NOT NULL,
+  date TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  "progressNotes" TEXT NOT NULL,
+  engagement INTEGER NOT NULL CHECK (engagement BETWEEN 1 AND 5),
+  mastery INTEGER NOT NULL CHECK (mastery BETWEEN 1 AND 5),
+  behavior INTEGER NOT NULL CHECK (behavior BETWEEN 1 AND 5)
+);
+
+-- 6. Enable Row Level Security (RLS)
 ALTER TABLE public.tutors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.children ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.disputes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.session_reports ENABLE ROW LEVEL SECURITY;
 
--- 6. Create Row Level Security Policies
+-- 7. Create Row Level Security Policies
 -- NOTE: For production, scope these policies to authenticated users.
 -- For local development/testing, these allow public access.
 
@@ -84,7 +136,23 @@ DROP POLICY IF EXISTS "Allow public access disputes" ON public.disputes;
 CREATE POLICY "Allow public access disputes" ON public.disputes 
   FOR ALL USING (true) WITH CHECK (true);
 
--- 7. Seed Initial Data
+DROP POLICY IF EXISTS "Allow public access messages" ON public.messages;
+CREATE POLICY "Allow public access messages" ON public.messages
+  FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public access notifications" ON public.notifications;
+CREATE POLICY "Allow public access notifications" ON public.notifications
+  FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public access reviews" ON public.reviews;
+CREATE POLICY "Allow public access reviews" ON public.reviews
+  FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public access session reports" ON public.session_reports;
+CREATE POLICY "Allow public access session reports" ON public.session_reports
+  FOR ALL USING (true) WITH CHECK (true);
+
+-- 8. Seed Initial Data
 INSERT INTO public.tutors (id, name, avatar, specialties, experience, rating, "videoDuration", "introText", rate)
 VALUES 
   ('tutor_1', 'Coach Alex M.', 'coach', '["ADHD-Friendly", "Autism-Informed", "Social Skills"]'::jsonb, '8 Years', '4.9/5', '0:30', 'Hey! I focus on interactive game-based social modeling. Let''s build social confidence together!', 45),

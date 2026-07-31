@@ -35,9 +35,10 @@ import {
   User,
   AlertCircle,
   CheckCircle,
-  Palette
+  Palette,
+  MessageCircle
 } from "lucide-react";
-import { db, Child, Booking, Tutor } from "@/lib/db";
+import { db, Child, Booking, Message, SessionReport, Tutor } from "@/lib/db";
 import { useAuth, ProtectedRoute } from "@/components/AuthProvider";
 import AvatarIcon from "@/components/AvatarIcon";
 
@@ -72,33 +73,39 @@ const CHILDREN_DATA = {
 };
 
 // Mock Tutors for AI Matching (baseline fallback)
-const TUTORS = [
+const TUTORS: Tutor[] = [
   {
+    id: "tutor_1",
     name: "Coach Alex M.",
     specialties: ["ADHD-Friendly", "Autism-Informed", "Social Skills"],
     experience: "8 Years",
     rating: "4.9/5",
     videoDuration: "0:30",
     introText: "Hey! I focus on interactive game-based social modeling. Let's build social confidence together!",
-    avatar: "coach"
+    avatar: "coach",
+    rate: 45,
   },
   {
+    id: "tutor_2",
     name: "Sarah Parker, M.Ed.",
     specialties: ["Dyslexia Specialist", "Visual Learning", "English"],
     experience: "12 Years",
     rating: "5.0/5",
     videoDuration: "0:45",
     introText: "Hi parents! I craft custom visual guides to make reading and structural spelling stress-free.",
-    avatar: "teacher"
+    avatar: "teacher",
+    rate: 55,
   },
   {
+    id: "tutor_3",
     name: "Dr. Jessica Chen",
     specialties: ["Anxiety Support", "Behavioral Therapy", "Self-Regulation"],
     experience: "15 Years",
     rating: "4.95/5",
     videoDuration: "0:35",
     introText: "Welcome. My sessions incorporate mindfulness-based self-regulation templates for learning ease.",
-    avatar: "therapist"
+    avatar: "therapist",
+    rate: 75,
   }
 ];
 
@@ -110,6 +117,10 @@ function ParentDashboardContent() {
   const [children, setChildren] = useState<Record<string, Child>>({});
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [tutors, setTutors] = useState<Tutor[]>([]);
+  const [sessionReports, setSessionReports] = useState<SessionReport[]>([]);
+  const [introTutor, setIntroTutor] = useState<Tutor | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState("");
   
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizStep, setQuizStep] = useState(1);
@@ -204,7 +215,7 @@ function ParentDashboardContent() {
     }
   }, [searchParams, children, selectedChild]);
 
-  // Initiate Stripe checkout or mock gateway fallback
+  // Stripe handles real payment when credentials are configured. Otherwise, save a clearly labelled unpaid booking request.
   const handleInitiateCheckout = async (bookingDetails: {
     childId: string;
     childName: string;
@@ -235,9 +246,20 @@ function ParentDashboardContent() {
       const data = await response.json();
 
       if (data.mock) {
-        // Stripe credentials missing -> Fallback to client mock modal
-        setMockBookingData(bookingDetails);
-        setShowMockModal(true);
+        const newBooking = await db.createBooking({
+          childId: bookingDetails.childId,
+          childName: bookingDetails.childName,
+          tutorName: bookingDetails.tutorName,
+          subject: bookingDetails.subject,
+          date: bookingDetails.date,
+          time: bookingDetails.time,
+        });
+        setBookings((current) => [...current, newBooking]);
+        setPaymentSuccessMessage("Booking request saved. Payments are not configured for this deployment, so no card was charged.");
+        if (bookingDetails.subject.startsWith("Emergency Substitute:")) {
+          setBookedTutor(bookingDetails.tutorName);
+          setQuickBookSuccess(true);
+        }
       } else if (data.url) {
         // Save pending booking details to localStorage for post-Stripe redirection processing
         localStorage.setItem("pending_booking", JSON.stringify(bookingDetails));
@@ -246,10 +268,8 @@ function ParentDashboardContent() {
         throw new Error("Invalid server response");
       }
     } catch (err: any) {
-      console.warn("Stripe checkout failed/unavailable, falling back to mock payment modal:", err);
-      // Connection fails / stripe keys not setup -> Fallback to client mock modal
-      setMockBookingData(bookingDetails);
-      setShowMockModal(true);
+      console.error("Stripe checkout failed:", err);
+      setCardError("We could not create a checkout session. Your booking was not saved and no payment was taken.");
     } finally {
       setPaymentLoading(false);
     }
@@ -320,10 +340,16 @@ function ParentDashboardContent() {
     async function loadData() {
       const dataChildren = await db.getChildren();
       const dataBookings = await db.getBookings();
-      const dataTutors = await db.getTutors();
+      const [dataTutors, dataReports, dataMessages] = await Promise.all([
+        db.getTutors(),
+        db.getSessionReports(),
+        db.getMessages(),
+      ]);
       setChildren(dataChildren);
       setBookings(dataBookings);
       setTutors(dataTutors);
+      setSessionReports(dataReports);
+      setMessages(dataMessages);
     }
     loadData();
   }, []);
@@ -334,16 +360,33 @@ function ParentDashboardContent() {
   };
 
   const currentChildBookings = bookings.filter(b => b.childId === selectedChild);
+  const currentChildReports = sessionReports
+    .filter((report) => report.childId === selectedChild)
+    .slice()
+    .reverse()
+    .slice(0, 3);
+  const currentTutorName = currentChildBookings.find((booking) => booking.status === "Scheduled")?.tutorName || currentChildReports[0]?.tutorName || "Coach Alex M.";
+  const currentConversationId = `conv_parent_${currentTutorName.toLowerCase().includes("alex") ? "alex" : currentChildReports[0]?.childId || selectedChild}`;
+  const currentMessages = messages
+    .filter((message) => message.conversationId === currentConversationId)
+    .slice(-4);
 
   const handleSelectOption = (key: string, value: string) => {
     setQuizAnswers(prev => ({ ...prev, [key]: value }));
     if (quizStep < 3) {
       setQuizStep(prev => prev + 1);
     } else {
-      // Find a match based on answers
-      const matchIndex = value === "ADHD Support" ? 0 : value === "Dyslexia Support" ? 1 : 2;
       const listTutors = tutors.length > 0 ? tutors : TUTORS;
-      setMatchedTutor(listTutors[matchIndex]);
+      const selectedAnswers = { ...quizAnswers, [key]: value };
+      const rankedTutors = [...listTutors].sort((first, second) => {
+        const tutorScore = (tutor: Tutor) => {
+          const specialities = tutor.specialties.join(" ").toLowerCase();
+          const answerText = Object.values(selectedAnswers).join(" ").toLowerCase();
+          return answerText.split(/\s+/).filter((term) => term.length > 3 && specialities.includes(term)).length;
+        };
+        return tutorScore(second) - tutorScore(first);
+      });
+      setMatchedTutor(rankedTutors[0]);
       setQuizStep(4);
     }
   };
@@ -359,14 +402,17 @@ function ParentDashboardContent() {
     e.preventDefault();
     if (!quickBookSubject) return;
     
-    // Auto match emergency tutor
     const listTutors = tutors.length > 0 ? tutors : TUTORS;
-    const randomTutor = listTutors[Math.floor(Math.random() * listTutors.length)];
+    const subjectTerms = quickBookSubject.toLowerCase().split(/\W+/).filter((term) => term.length > 2);
+    const emergencyTutor = [...listTutors].sort((first, second) => {
+      const score = (tutor: Tutor) => subjectTerms.filter((term) => tutor.specialties.join(" ").toLowerCase().includes(term)).length;
+      return score(second) - score(first) || first.name.localeCompare(second.name);
+    })[0];
     
     handleInitiateCheckout({
       childId: selectedChild,
       childName: currentChild.name,
-      tutorName: randomTutor.name,
+      tutorName: emergencyTutor.name,
       subject: `Emergency Substitute: ${quickBookSubject}`,
       date: "Today",
       time: quickBookTime,
@@ -407,6 +453,35 @@ function ParentDashboardContent() {
       setTimeout(() => setRewardMessage(null), 4000);
     } catch (err) {
       console.error("Failed to redeem reward:", err);
+    }
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    try {
+      const updated = await db.updateBookingStatus(bookingId, "Cancelled");
+      setBookings((current) => current.map((booking) => booking.id === updated.id ? updated : booking));
+      setPaymentSuccessMessage("Session cancelled. Your tutor has been notified through the shared booking record.");
+    } catch (error) {
+      console.error("Failed to cancel booking:", error);
+    }
+  };
+
+  const sendParentMessage = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const text = newMessage.trim();
+    if (!text) return;
+    try {
+      const message = await db.sendMessage({
+        conversationId: currentConversationId,
+        senderName: user?.name || "Parent",
+        senderRole: "parent",
+        recipientName: currentTutorName,
+        text,
+      });
+      setMessages((current) => [...current, message]);
+      setNewMessage("");
+    } catch (error) {
+      console.error("Failed to send parent message:", error);
     }
   };
 
@@ -660,19 +735,77 @@ function ParentDashboardContent() {
                         Tutor: {cls.tutorName} &bull; {cls.date} at {cls.time}
                       </span>
                     </div>
-                    <span style={{
-                      fontSize: "0.8rem",
-                      background: "#E6F7F0",
-                      color: "#2EC4B6",
-                      padding: "0.3rem 0.6rem",
-                      borderRadius: "6px",
-                      fontWeight: 700
-                    }}>{cls.status}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <span style={{
+                        fontSize: "0.8rem",
+                        background: cls.status === "Cancelled" ? "#FFEBF0" : cls.status === "Completed" ? "#E2EAFD" : "#E6F7F0",
+                        color: cls.status === "Cancelled" ? "var(--color-accent-hover)" : cls.status === "Completed" ? "var(--color-primary)" : "#2EC4B6",
+                        padding: "0.3rem 0.6rem",
+                        borderRadius: "6px",
+                        fontWeight: 700
+                      }}>{cls.status}</span>
+                      {cls.status === "Scheduled" && (
+                        <button
+                          type="button"
+                          onClick={() => handleCancelBooking(cls.id)}
+                          style={{ background: "none", border: "none", color: "var(--color-accent-hover)", fontWeight: 700, fontSize: "0.75rem", cursor: "pointer" }}
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))
               )}
             </div>
           </div>
+        </div>
+
+        <div className={styles.calendarContainer} style={{ marginBottom: "2rem" }}>
+          <h3 style={{ fontWeight: 800, marginBottom: "0.4rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <TrendingUp size={20} /> Latest learning updates
+          </h3>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginBottom: "1rem" }}>
+            These notes are published by the tutor when a session is completed.
+          </p>
+          {currentChildReports.length === 0 ? (
+            <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No completed-session updates yet.</p>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1rem" }}>
+              {currentChildReports.map((report) => (
+                <article key={report.id} style={{ padding: "1rem", background: "var(--bg-cream)", borderRadius: "12px", borderLeft: "4px solid var(--color-primary)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem", fontSize: "0.72rem", color: "var(--text-muted)" }}>
+                    <span>{report.subject}</span><span>{report.date}</span>
+                  </div>
+                  <p style={{ marginTop: "0.65rem", fontSize: "0.85rem", lineHeight: 1.5 }}>{report.summary}</p>
+                  <div style={{ marginTop: "0.7rem", display: "flex", gap: "0.4rem", fontSize: "0.7rem", fontWeight: 700, color: "var(--color-primary)" }}>
+                    <span>Engagement {report.engagement}/5</span><span>•</span><span>Mastery {report.mastery}/5</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={styles.calendarContainer} style={{ marginBottom: "2rem", background: "linear-gradient(135deg, #F5F3FF 0%, #FFFFFF 100%)" }}>
+          <h3 style={{ fontWeight: 800, marginBottom: "0.35rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <MessageCircle size={20} /> Care team inbox
+          </h3>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.82rem", marginBottom: "1rem" }}>Message {currentTutorName} about {currentChild.name}&apos;s learning plan. Replies are kept with this family&apos;s session record.</p>
+          <div style={{ maxHeight: "210px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "0.65rem", padding: "0.85rem", background: "rgba(255,255,255,0.7)", borderRadius: "12px" }}>
+            {currentMessages.length === 0 ? (
+              <span style={{ color: "var(--text-muted)", fontSize: "0.82rem" }}>Start the conversation with your tutor.</span>
+            ) : currentMessages.map((message) => (
+              <div key={message.id} style={{ alignSelf: message.senderRole === "parent" ? "flex-end" : "flex-start", maxWidth: "82%", padding: "0.65rem 0.8rem", borderRadius: "11px", background: message.senderRole === "parent" ? "var(--color-primary)" : "var(--bg-cream)", color: message.senderRole === "parent" ? "white" : "var(--text-navy)" }}>
+                <strong style={{ display: "block", fontSize: "0.68rem", marginBottom: "0.2rem" }}>{message.senderName}</strong>
+                <p style={{ fontSize: "0.8rem", lineHeight: 1.45 }}>{message.text}</p>
+              </div>
+            ))}
+          </div>
+          <form onSubmit={sendParentMessage} style={{ display: "flex", gap: "0.6rem", marginTop: "0.8rem" }}>
+            <input value={newMessage} onChange={(event) => setNewMessage(event.target.value)} placeholder="Write a message…" aria-label="Message your tutor" style={{ flex: 1, padding: "0.7rem 0.8rem", borderRadius: "9px", border: "1px solid rgba(29,42,68,0.14)", font: "inherit" }} />
+            <button type="submit" className={styles.btnPrimary} style={{ padding: "0.7rem 0.9rem" }} disabled={!newMessage.trim()}><MessageCircle size={16} /> Send</button>
+          </form>
         </div>
 
         {/* NEW FEATURES: Interactive Goal Checklist & Reward Store */}
@@ -1015,10 +1148,10 @@ function ParentDashboardContent() {
 
                   <button 
                     className={styles.btnSecondary} 
-                    onClick={() => alert("Simulating play 30-second tutor introduction video...")}
+                    onClick={() => setIntroTutor(matchedTutor)}
                     style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
                   >
-                    <Video size={18} /> Intro Video ({matchedTutor.videoDuration})
+                    <Video size={18} /> Meet this tutor
                   </button>
                 </div>
 
@@ -1273,6 +1406,27 @@ function ParentDashboardContent() {
               animation: spin 1s linear infinite;
             }
           `}} />
+        </div>
+      )}
+
+      {introTutor && (
+        <div className={styles.modalBackdrop} role="presentation" onMouseDown={() => setIntroTutor(null)}>
+          <div className={styles.modalContent} role="dialog" aria-modal="true" aria-label={`Meet ${introTutor.name}`} onMouseDown={(event) => event.stopPropagation()} style={{ maxWidth: "520px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 800 }}><Video size={21} /> Meet {introTutor.name}</h3>
+              <button type="button" onClick={() => setIntroTutor(null)} style={{ background: "none", border: "none", cursor: "pointer" }} aria-label="Close tutor introduction"><X size={22} /></button>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem", padding: "1rem", background: "var(--bg-cream)", borderRadius: "14px" }}>
+              <AvatarIcon avatar={introTutor.avatar} size={32} />
+              <div><strong>{introTutor.name}</strong><p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>{introTutor.experience} experience · {introTutor.rating}</p></div>
+            </div>
+            <p style={{ color: "var(--text-navy)", lineHeight: 1.65 }}>{introTutor.introText}</p>
+            <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", lineHeight: 1.55 }}>{introTutor.bio || "This tutor's teaching profile and verified specialisms are shown below."}</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
+              {introTutor.specialties.map((specialty) => <span key={specialty} style={{ background: "var(--sticky-blue)", color: "var(--color-primary)", padding: "0.35rem 0.55rem", borderRadius: "999px", fontSize: "0.72rem", fontWeight: 700 }}>{specialty}</span>)}
+            </div>
+            <button type="button" className={styles.btnPrimary} onClick={() => setIntroTutor(null)} style={{ alignSelf: "flex-start" }}>Continue to booking</button>
+          </div>
         </div>
       )}
     </div>
