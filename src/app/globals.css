@@ -1,6 +1,9 @@
 /* Tutor-Hub Custom Design System */
 
 :root {
+  --font-outfit: "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-caveat: "Comic Sans MS", "Bradley Hand", cursive;
+
   /* Color Palette */
   --bg-mint: #CEF1E5;
   --bg-cream: #FAF9F5;
@@ -35,6 +38,11 @@ html, body {
   max-width: 100vw;
   overflow-x: hidden;
   height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px;
 }
 
 body {
@@ -121,4 +129,10 @@ a {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

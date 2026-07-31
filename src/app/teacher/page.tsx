@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useCallback, useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import styles from "../page.module.css";
 import TiltCard from "../../components/TiltCard";
@@ -29,10 +29,33 @@ import {
   Pin,
   CheckCircle,
   Lightbulb,
-  Star
+  Star,
+  Brain,
+  BarChart3,
+  Target,
+  Trophy,
+  MessageSquare,
+  Video,
+  Volume2,
+  RotateCcw,
+  Save,
+  Share2,
+  MessageCircle,
+  Heart,
+  ThumbsUp,
+  Activity,
+  AlertCircle,
+  Info,
+  X,
+  Bot,
+  Sparkle,
+  Target as TargetIcon,
+  TrendingUp as TrendingUpIcon,
+  Award as AwardIcon,
+  RefreshCw
 } from "lucide-react";
 import { useAuth, ProtectedRoute } from "@/components/AuthProvider";
-import { db, Booking } from "@/lib/db";
+import { db, Child } from "@/lib/db";
 import AvatarIcon from "@/components/AvatarIcon";
 
 
@@ -64,17 +87,144 @@ const INVOICES_DATA = {
   }
 };
 
+// AI Recommendation Types
+interface AIRecommendation {
+  id: string;
+  type: 'session_optimization' | 'resource_suggestion' | 'skill_focus' | 'parent_communication';
+  title: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low';
+  action: string;
+  timestamp: string;
+}
+
+interface GamificationStats {
+  level: number;
+  exp: number;
+  expToNext: number;
+  coins: number;
+  streak: number;
+  achievements: string[];
+}
+
+// Real-time collaboration type
+interface CollaborationSession {
+  id: string;
+  studentId: string;
+  studentName: string;
+  isActive: boolean;
+  startTime: string;
+  tools: string[];
+}
+
+interface TeacherScheduleItem {
+  id: string;
+  student: string;
+  childId: string;
+  subject: string;
+  startTime: string;
+  endTime: string;
+  durationMin: number;
+  status: string;
+}
+
+function getBufferedTime(time: string, minutesToAdd: number) {
+  const [hoursStr, minutesStr] = time.split(":");
+  const date = new Date();
+  date.setHours(parseInt(hoursStr), parseInt(minutesStr) + minutesToAdd, 0);
+  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+
 export default function TeacherDashboard() {
   const { user, signOut } = useAuth();
-  const [activeTab, setActiveTab] = useState<"overview" | "schedule" | "whiteboard" | "invoices">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "schedule" | "whiteboard" | "invoices" | "analytics" | "ai-assistant">("overview");
   const [enableBuffer, setEnableBuffer] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<"June 2026" | "May 2026">("June 2026");
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [commissionRate, setCommissionRate] = useState(15); // Mock commission rate from database/admin settings
 
+  // AI-Powered Features
+  const [aiRecommendations, setAiRecommendations] = useState<AIRecommendation[]>([]);
+  const [activeAIMode, setActiveAIMMode] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<string>('AI Assistant ready to help');
+  const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
+  const [aiChatMessages, setAiChatMessages] = useState<Array<{sender: string, message: string, timestamp: string}>>([
+    { sender: 'AI', message: 'Hello! I am your AI teaching assistant. I can help you optimize sessions and analyze student progress.', timestamp: new Date().toLocaleTimeString() }
+  ]);
+  const [userMessage, setUserMessage] = useState('');
+
+  // Gamification States
+  const [gamificationStats, setGamificationStats] = useState<GamificationStats>({
+    level: 12,
+    exp: 8470,
+    expToNext: 10000,
+    coins: 1240,
+    streak: 7,
+    achievements: ["Master Tutor", "5-Star Specialist", "Session Champion", "Parent Favorite", "Quick Responder"]
+  });
+
+  // Real-time Collaboration
+  const [collaborationSessions, setCollaborationSessions] = useState<CollaborationSession[]>([]);
+  const [isCollaborating, setIsCollaborating] = useState(false);
+  const [collaborationTools, setCollaborationTools] = useState<string[]>([]);
+  const [selectedTool, setSelectedTool] = useState<string>('whiteboard');
+
+  // Session Timer - Functional
+  const [sessionTimer, setSessionTimer] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [currentSession, setCurrentSession] = useState<{student: string, subject: string} | null>(null);
+
+  const startSession = (student: string, subject: string) => {
+    setCurrentSession({ student, subject });
+    setSessionTimer(0);
+    setIsTimerRunning(true);
+  };
+
+  const stopSession = () => {
+    setIsTimerRunning(false);
+    setCurrentSession(null);
+    setSessionTimer(0);
+  };
+
+  // Functional collaboration tools
+  const activateCollaborationTool = (tool: string) => {
+    if (!collaborationTools.includes(tool)) {
+      setCollaborationTools(prev => [...prev, tool]);
+    }
+    setSelectedTool(tool);
+  };
+
+  const deactivateCollaborationTool = (tool: string) => {
+    setCollaborationTools(prev => prev.filter(t => t !== tool));
+  };
+
+  // Enhanced Analytics
+  const [analyticsPeriod, setAnalyticsPeriod] = useState<"week" | "month" | "quarter">("month");
+  const [engagementMetrics, setEngagementMetrics] = useState({
+    avgRating: 4.9,
+    totalSessions: 156,
+    retentionRate: 96.2,
+    parentSatisfaction: 98,
+    skillImprovement: 85
+  });
+
+  // Real-time analytics updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setEngagementMetrics(prev => ({
+        ...prev,
+        avgRating: Math.min(5.0, prev.avgRating + (Math.random() - 0.5) * 0.1),
+        totalSessions: prev.totalSessions + Math.floor(Math.random() * 3),
+        parentSatisfaction: Math.min(100, Math.max(80, prev.parentSatisfaction + (Math.random() - 0.5) * 2))
+      }));
+    }, 5000); // Update every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   // DB-driven Schedule States & Helpers
-  const [bookings, setBookings] = useState<any[]>([]);
-  const [childrenMap, setChildrenMap] = useState<Record<string, any>>({});
+  const [bookings, setBookings] = useState<TeacherScheduleItem[]>([]);
+  const [childrenMap, setChildrenMap] = useState<Record<string, Child>>({});
   const [loadingSchedule, setLoadingSchedule] = useState<boolean>(true);
   const [scheduleError, setScheduleError] = useState<string | null>(null);
 
@@ -91,13 +241,37 @@ export default function TeacherDashboard() {
     return `${String(hours).padStart(2, "0")}:${minutes}`;
   };
 
+  const updateCollaborationStatus = useCallback(() => {
+    const activeSessions: CollaborationSession[] = [
+      {
+        id: "collab_1",
+        studentId: "tyler",
+        studentName: "Tyler Jenkins",
+        isActive: true,
+        startTime: "14:00",
+        tools: ["whiteboard", "screen_share"]
+      },
+      {
+        id: "collab_2",
+        studentId: "emily",
+        studentName: "Emily Jenkins",
+        isActive: false,
+        startTime: "15:30",
+        tools: ["document_share", "polls"]
+      }
+    ];
+    setCollaborationSessions(activeSessions);
+  }, []);
+
   useEffect(() => {
+    let collaborationInterval: ReturnType<typeof setInterval> | undefined;
+
     async function loadData() {
       if (!user) return;
       try {
         setLoadingSchedule(true);
         setScheduleError(null);
-        
+
         const [childrenData, bookingsData] = await Promise.all([
           db.getChildren(),
           db.getBookings()
@@ -125,15 +299,173 @@ export default function TeacherDashboard() {
 
         mapped.sort((a, b) => a.startTime.localeCompare(b.startTime));
         setBookings(mapped);
-      } catch (err: any) {
+
+        // Simulate real-time collaboration updates
+        collaborationInterval = setInterval(updateCollaborationStatus, 30000);
+      } catch (err: unknown) {
         console.error("Failed to load schedule from Supabase:", err);
-        setScheduleError(err.message || "Failed to load schedule.");
+        setScheduleError(err instanceof Error ? err.message : "Failed to load schedule.");
       } finally {
         setLoadingSchedule(false);
       }
     }
     loadData();
+    return () => {
+      if (collaborationInterval) clearInterval(collaborationInterval);
+    };
+  }, [user, updateCollaborationStatus]);
+
+  // AI Recommendation System - Functional Demo
+  function generateAIRecommendations() {
+    const mockRecommendations: AIRecommendation[] = [
+      {
+        id: "ai_1",
+        type: "session_optimization",
+        title: "Optimize Tyler's Session Timing",
+        description: "Based on engagement patterns, moving Tyler's session to 3:30 PM could improve focus by 23%",
+        priority: "high",
+        action: "Reschedule for better engagement",
+        timestamp: "2 hours ago"
+      },
+      {
+        id: "ai_2",
+        type: "resource_suggestion",
+        title: "New Visual Learning Resource Available",
+        description: "Interactive social stories tool matches Emily's learning style perfectly",
+        priority: "medium",
+        action: "Review and integrate resource",
+        timestamp: "5 hours ago"
+      },
+      {
+        id: "ai_3",
+        type: "skill_focus",
+        title: "Focus on Executive Function Skills",
+        description: "75% of students show improvement when tasks are chunked into 5-minute segments",
+        priority: "medium",
+        action: "Implement chunking strategy",
+        timestamp: "1 day ago"
+      }
+    ];
+    setAiRecommendations(mockRecommendations);
+  }
+
+  // Functional AI Chat
+  const sendAIMessage = () => {
+    if (!userMessage.trim()) return;
+
+    // Add user message
+    const newMessage = {
+      sender: 'You',
+      message: userMessage,
+      timestamp: new Date().toLocaleTimeString()
+    };
+    setAiChatMessages(prev => [...prev, newMessage]);
+    setUserMessage('');
+
+    // Simulate AI response after 1 second
+    setTimeout(() => {
+      const aiResponses = [
+        "Great question! Based on your teaching patterns, I recommend using visual aids for this session.",
+        "I've analyzed your recent sessions and noticed that shorter, focused segments work better for most of your students.",
+        "Try implementing the chunking technique - break down tasks into 5-minute segments with short breaks in between.",
+        "Your student engagement data shows improvement when using interactive games. Consider adding more game-based activities.",
+        "Based on performance metrics, moving afternoon sessions earlier could improve focus scores by up to 30%."
+      ];
+
+      const aiResponse = {
+        sender: 'AI',
+        message: aiResponses[Math.floor(Math.random() * aiResponses.length)],
+        timestamp: new Date().toLocaleTimeString()
+      };
+      setAiChatMessages(prev => [...prev, aiResponse]);
+    }, 1000);
+  };
+
+  // Functional AI Analysis
+  const generateAIAnalysis = () => {
+    const analyses = [
+      "Your teaching effectiveness has improved by 15% this month. Students show better retention with visual aids.",
+      "Most students respond well to the 45-minute session format. Consider sticking to this duration.",
+      "Tyler shows 40% better engagement when sessions start with a warm-up activity. Implement this for all sessions.",
+      "Parent satisfaction is highest when you provide session summaries. Add this to your routine.",
+      "Your use of positive reinforcement is working well. Keep using specific praise for student achievements."
+    ];
+    return analyses[Math.floor(Math.random() * analyses.length)];
+  };
+
+  // Timer functionality
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isTimerRunning) {
+      interval = setInterval(() => {
+        setSessionTimer(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning]);
+
+  // Format time for display
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  function initializeCollaborationTools() {
+    setCollaborationTools(['whiteboard', 'screen_share', 'breakout_rooms', 'polls', 'document_share']);
+  }
+
+  function loadAnalytics() {
+    // Simulate loading analytics data
+    setTimeout(() => {
+      setEngagementMetrics({
+        avgRating: 4.9,
+        totalSessions: 156,
+        retentionRate: 96.2,
+        parentSatisfaction: 98,
+        skillImprovement: 85
+      });
+    }, 1000);
+  }
+
+  // Initialize AI recommendations and collaboration helpers for the signed-in tutor.
+  useEffect(() => {
+    const initializationTimer = setTimeout(() => {
+      generateAIRecommendations();
+      initializeCollaborationTools();
+      loadAnalytics();
+    }, 0);
+    return () => clearTimeout(initializationTimer);
   }, [user]);
+
+  const startCollaboration = (studentId: string) => {
+    setIsCollaborating(true);
+    // Simulate starting collaboration session
+    const session = collaborationSessions.find(s => s.studentId === studentId);
+    if (session) {
+      setCollaborationSessions(prev => prev.map(s =>
+        s.id === session.id ? { ...s, isActive: true } : s
+      ));
+    }
+  };
+
+  const endCollaboration = (studentId: string) => {
+    setIsCollaborating(false);
+    // Simulate ending collaboration session
+    setCollaborationSessions(prev => prev.map(s =>
+      s.studentId === studentId ? { ...s, isActive: false } : s
+    ));
+  };
+
+  const toggleAIMode = () => {
+    setActiveAIMMode(!activeAIMode);
+    if (!activeAIMode) {
+      // Generate AI insights when enabling
+      setAiAnalysis("AI Mode activated. Analyzing teaching patterns for optimization opportunities...");
+    } else {
+      setAiAnalysis("AI Mode deactivated. Resume manual teaching mode.");
+    }
+  };
 
   // Whiteboard drawing states
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -183,8 +515,9 @@ export default function TeacherDashboard() {
         ctx.lineWidth = brushSize;
       }
     }
-  }, [activeTab]);
+  }, [activeTab, brushSize, color]);
 
+  // Functional canvas drawing
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -192,7 +525,6 @@ export default function TeacherDashboard() {
     const ctx = canvas.getContext("2d");
     if (ctx) {
       ctx.beginPath();
-      // Map mouse coordinates to canvas internal coordinates
       const x = ((e.clientX - rect.left) / rect.width) * canvas.width;
       const y = ((e.clientY - rect.top) / rect.height) * canvas.height;
       ctx.moveTo(x, y);
@@ -220,20 +552,21 @@ export default function TeacherDashboard() {
   };
 
   const clearCanvas = () => {
-    if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const context = canvas?.getContext("2d");
+    if (canvas && context) {
+      context.clearRect(0, 0, canvas.width, canvas.height);
     }
   };
 
-  // Dynamic scheduler helpers
-  const getBufferedTime = (time: string, minutesToAdd: number) => {
-    const [hoursStr, minutesStr] = time.split(":");
-    const date = new Date();
-    date.setHours(parseInt(hoursStr), parseInt(minutesStr) + minutesToAdd, 0);
-    return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+  // Save drawing as image
+  const saveDrawing = () => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const link = document.createElement('a');
+    link.download = `whiteboard-${Date.now()}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
   };
 
   const currentInvoiceData = INVOICES_DATA[selectedMonth];
@@ -259,28 +592,42 @@ export default function TeacherDashboard() {
             <span>Tutor-Hub</span>
           </div>
           <ul className={styles.sidebarMenu}>
-            <li 
+            <li
               className={`${styles.menuItem} ${activeTab === "overview" ? styles.menuActive : ""}`}
               onClick={() => setActiveTab("overview")}
             >
               <Users size={20} />
               <span>Overview</span>
             </li>
-            <li 
+            <li
               className={`${styles.menuItem} ${activeTab === "schedule" ? styles.menuActive : ""}`}
               onClick={() => setActiveTab("schedule")}
             >
               <Calendar size={20} />
               <span>Smart Schedule</span>
             </li>
-            <li 
+            <li
               className={`${styles.menuItem} ${activeTab === "whiteboard" ? styles.menuActive : ""}`}
               onClick={() => setActiveTab("whiteboard")}
             >
               <Palette size={20} />
               <span>Virtual Whiteboard</span>
             </li>
-            <li 
+            <li
+              className={`${styles.menuItem} ${activeTab === "analytics" ? styles.menuActive : ""}`}
+              onClick={() => setActiveTab("analytics")}
+            >
+              <BarChart3 size={20} />
+              <span>Advanced Analytics</span>
+            </li>
+            <li
+              className={`${styles.menuItem} ${activeTab === "ai-assistant" ? styles.menuActive : ""}`}
+              onClick={() => setActiveTab("ai-assistant")}
+            >
+              <Brain size={20} />
+              <span>AI Assistant</span>
+            </li>
+            <li
               className={`${styles.menuItem} ${activeTab === "invoices" ? styles.menuActive : ""}`}
               onClick={() => setActiveTab("invoices")}
             >
@@ -290,6 +637,78 @@ export default function TeacherDashboard() {
           </ul>
 
           <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: "1rem" }}>
+            {/* Gamification Profile Card */}
+            <div style={{
+              background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)",
+              padding: "1.25rem",
+              borderRadius: "16px",
+              color: "white",
+              border: "none",
+              position: "relative",
+              overflow: "hidden"
+            }}>
+              <div style={{
+                position: "absolute",
+                top: "-20px",
+                right: "-20px",
+                width: "80px",
+                height: "80px",
+                background: "rgba(255, 255, 255, 0.1)",
+                borderRadius: "50%"
+              }} />
+              <div style={{
+                position: "absolute",
+                bottom: "-30px",
+                left: "-30px",
+                width: "100px",
+                height: "100px",
+                background: "rgba(255, 255, 255, 0.05)",
+                borderRadius: "50%"
+              }} />
+
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
+                  <Trophy size={24} style={{ color: "#FFD700" }} />
+                  <div>
+                    <div style={{ fontSize: "0.9rem", opacity: 0.9 }}>Level {gamificationStats.level}</div>
+                    <div style={{ fontSize: "1.1rem", fontWeight: 700 }}>{user?.name || "Coach Alex"}</div>
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: "0.75rem" }}>
+                  <div style={{ display: "flex", justifyItems: "space-between", marginBottom: "0.25rem" }}>
+                    <span style={{ fontSize: "0.8rem" }}>Progress</span>
+                    <span style={{ fontSize: "0.8rem" }}>{gamificationStats.exp}/{gamificationStats.expToNext} XP</span>
+                  </div>
+                  <div style={{
+                    height: "8px",
+                    background: "rgba(255, 255, 255, 0.2)",
+                    borderRadius: "4px",
+                    overflow: "hidden"
+                  }}>
+                    <div style={{
+                      height: "100%",
+                      width: `${(gamificationStats.exp / gamificationStats.expToNext) * 100}%`,
+                      background: "linear-gradient(90deg, #FFD700, #FFA500)",
+                      borderRadius: "4px",
+                      transition: "width 0.5s ease"
+                    }} />
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "2rem", fontSize: "0.9rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                    <Sparkles size={16} />
+                    <span>{gamificationStats.coins} Coins</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                    <Zap size={16} />
+                    <span>{gamificationStats.streak} day streak</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {user && (
               <div style={{
                 display: "flex",
@@ -308,6 +727,74 @@ export default function TeacherDashboard() {
                 </span>
               </div>
             )}
+
+            {/* AI Assistant Quick Access */}
+            <div style={{
+              background: "linear-gradient(135deg, rgba(72, 107, 229, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%)",
+              padding: "1rem",
+              borderRadius: "12px",
+              border: "1px solid rgba(72, 107, 229, 0.2)",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              cursor: "pointer",
+              transition: "all 0.2s ease"
+            }}
+            onClick={() => setActiveTab("ai-assistant")}
+            >
+              <div style={{
+                width: "40px",
+                height: "40px",
+                background: "linear-gradient(135deg, #486BE5, #9333EA)",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}>
+                <Brain size={20} style={{ color: "white" }} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-navy)" }}>
+                  AI Assistant Ready
+                </div>
+                <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                  {aiRecommendations.length} recommendations available
+                </div>
+              </div>
+              <div style={{
+                width: "8px",
+                height: "8px",
+                background: "#10B981",
+                borderRadius: "50%",
+                animation: "pulse 2s infinite"
+              }} />
+            </div>
+
+            {/* Active Collaboration Indicator */}
+            {collaborationSessions.length > 0 && (
+              <div style={{
+                background: "rgba(16, 185, 129, 0.1)",
+                padding: "0.75rem",
+                borderRadius: "12px",
+                border: "1px solid rgba(16, 185, 129, 0.2)",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                fontSize: "0.8rem"
+              }}>
+                <div style={{
+                  width: "8px",
+                  height: "8px",
+                  background: "#10B981",
+                  borderRadius: "50%",
+                  animation: "pulse 1s infinite"
+                }} />
+                <span style={{ color: "#059669", fontWeight: 600 }}>
+                  {collaborationSessions.length} active collaboration session{collaborationSessions.length > 1 ? 's' : ''}
+                </span>
+              </div>
+            )}
+
             <div style={{
               background: "var(--sticky-green)",
               padding: "1rem",
@@ -321,14 +808,15 @@ export default function TeacherDashboard() {
               <Lightbulb size={16} style={{ color: "var(--color-secondary)" }} />
               <span><strong>Dynamic Buffer:</strong> Toggle standard class padding slots inside the Scheduler tool page.</span>
             </div>
-            <button 
-              onClick={signOut} 
-              className={styles.btnOutline} 
-              style={{ 
-                width: "100%", 
-                display: "flex", 
-                alignItems: "center", 
-                justifyContent: "center", 
+
+            <button
+              onClick={signOut}
+              className={styles.btnOutline}
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 gap: "0.5rem",
                 borderColor: "rgba(214, 40, 40, 0.4)",
                 color: "#d62828"
@@ -358,6 +846,174 @@ export default function TeacherDashboard() {
         {/* OVERVIEW PANEL */}
         {activeTab === "overview" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
+            {/* Session Timer */}
+            {currentSession && (
+              <div style={{
+                background: "linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(251, 146, 60, 0.1) 100%)",
+                padding: "1.5rem",
+                borderRadius: "16px",
+                border: "1px solid rgba(239, 68, 68, 0.2)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "1.5rem"
+              }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                    <Clock size={20} style={{ color: "#EF4444" }} />
+                    <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-navy)" }}>
+                      Active Session
+                    </span>
+                  </div>
+                  <p style={{ fontSize: "0.9rem", color: "var(--text-muted)" }}>
+                    {currentSession.student} - {currentSession.subject}
+                  </p>
+                  <p style={{ fontSize: "2rem", fontWeight: 700, color: "#EF4444", margin: "0.5rem 0" }}>
+                    {formatTime(sessionTimer)}
+                  </p>
+                </div>
+                <button
+                  onClick={stopSession}
+                  className={styles.btnPrimary}
+                  style={{
+                    background: "#EF4444",
+                    padding: "0.75rem 1.5rem"
+                  }}
+                >
+                  End Session
+                </button>
+              </div>
+            )}
+
+            {/* Quick Session Start Buttons */}
+            {!currentSession && (
+              <div style={{
+                background: "white",
+                padding: "1.5rem",
+                borderRadius: "16px",
+                border: "1px solid rgba(29, 42, 68, 0.05)",
+                marginBottom: "1.5rem"
+              }}>
+                <h3 style={{ marginBottom: "1rem", fontSize: "1.1rem", fontWeight: 700 }}>
+                  Quick Start Sessions
+                </h3>
+                <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+                  {bookings.slice(0, 3).map((booking) => (
+                    <button
+                      key={booking.id}
+                      onClick={() => startSession(booking.student, booking.subject)}
+                      className={styles.btnPrimary}
+                      style={{
+                        padding: "0.75rem 1.25rem",
+                        fontSize: "0.9rem"
+                      }}
+                    >
+                      Start with {booking.student}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Real-time Status Banner */}
+            <div style={{
+              background: "linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)",
+              padding: "1.5rem",
+              borderRadius: "16px",
+              border: "1px solid rgba(16, 185, 129, 0.2)",
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+              position: "relative",
+              overflow: "hidden"
+            }}>
+              <div style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "4px",
+                height: "100%",
+                background: "linear-gradient(180deg, #10B981, #3B82F6)"
+              }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                  <div style={{
+                    width: "12px",
+                    height: "12px",
+                    background: "#10B981",
+                    borderRadius: "50%",
+                    animation: "pulse 2s infinite"
+                  }} />
+                  <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-navy)" }}>
+                    Live Session Status
+                  </h3>
+                </div>
+                <p style={{ fontSize: "0.9rem", color: "var(--text-muted)" }}>
+                  You have {collaborationSessions.filter(s => s.isActive).length} active session{collaborationSessions.filter(s => s.isActive).length > 1 ? 's' : ''}
+                  with {collaborationSessions.reduce((acc, s) => acc + (s.isActive ? 1 : 0), 0)} student{collaborationSessions.reduce((acc, s) => acc + (s.isActive ? 1 : 0), 0) > 1 ? 's' : ''}
+                </p>
+              </div>
+              <button
+                onClick={() => setIsCollaborating(!isCollaborating)}
+                className={styles.btnPrimary}
+                style={{
+                  background: isCollaborating ? "var(--color-accent)" : "var(--color-primary)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  fontSize: "0.9rem"
+                }}
+              >
+                <Video size={16} />
+                {isCollaborating ? "End Collaboration" : "Start Collaboration"}
+              </button>
+            </div>
+
+            {/* Functional Collaboration Tools */}
+            {isCollaborating && (
+              <div style={{
+                background: "var(--bg-cream)",
+                padding: "1.5rem",
+                borderRadius: "16px",
+                border: "1px solid rgba(29, 42, 68, 0.05)"
+              }}>
+                <h3 style={{ marginBottom: "1rem", fontSize: "1.1rem", fontWeight: 700 }}>
+                  Collaboration Tools
+                </h3>
+                <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+                  {['whiteboard', 'screen_share', 'document_share', 'polls', 'breakout_rooms'].map((tool) => (
+                    <button
+                      key={tool}
+                      onClick={() => collaborationTools.includes(tool) ? deactivateCollaborationTool(tool) : activateCollaborationTool(tool)}
+                      className={styles.btnOutline}
+                      style={{
+                        padding: "0.5rem 1rem",
+                        borderRadius: "8px",
+                        background: collaborationTools.includes(tool) ? "var(--color-primary)" : "white",
+                        color: collaborationTools.includes(tool) ? "white" : "var(--text-navy)"
+                      }}
+                    >
+                      {tool === 'whiteboard' && <Palette size={16} />}
+                      {tool === 'screen_share' && <Video size={16} />}
+                      {tool === 'document_share' && <BookOpen size={16} />}
+                      {tool === 'polls' && <Target size={16} />}
+                      {tool === 'breakout_rooms' && <Users size={16} />}
+                      <span style={{ marginLeft: "0.5rem" }}>
+                        {tool.replace('_', ' ')}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                {collaborationTools.length > 0 && (
+                  <div style={{ marginTop: "1rem", padding: "0.75rem", background: "rgba(72, 107, 229, 0.1)", borderRadius: "8px" }}>
+                    <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>
+                      Active Tools: {collaborationTools.join(', ')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Key Metrics Row with Tilt Effects */}
             <div className={styles.dashGrid}>
               <TiltCard className={styles.dashCard}>
@@ -373,12 +1029,12 @@ export default function TeacherDashboard() {
 
               <TiltCard className={styles.dashCard}>
                 <div className={styles.dashCardHeader}>
-                  <span>Retention Conversion Rate</span>
-                  <Users size={20} style={{ color: "var(--color-accent)" }} />
+                  <span>AI Performance Score</span>
+                  <Brain size={20} style={{ color: "var(--color-accent)" }} />
                 </div>
-                <div className={styles.dashCardValue}>96.2%</div>
+                <div className={styles.dashCardValue}>94.7%</div>
                 <span className={styles.dashCardSubtext} style={{ color: "var(--color-primary)", display: "flex", alignItems: "center", gap: "0.25rem" }}>
-                  <Star size={12} fill="var(--color-primary)" style={{ color: "var(--color-primary)" }} /> Elite Level Instructor
+                  <Star size={12} fill="var(--color-primary)" style={{ color: "var(--color-primary)" }} /> Top 5% AI-Optimized
                 </span>
               </TiltCard>
 
@@ -389,18 +1045,18 @@ export default function TeacherDashboard() {
                 </div>
                 <div className={styles.dashCardValue}>{currentInvoiceData.hours} hrs</div>
                 <span className={styles.dashCardSubtext}>
-                  32 unique training sessions
+                  {currentInvoiceData.classesTaught} unique training sessions
                 </span>
               </TiltCard>
 
               <TiltCard className={styles.dashCard}>
                 <div className={styles.dashCardHeader}>
-                  <span>Distributed Knowledge Coins</span>
-                  <Sparkles size={20} style={{ color: "var(--color-secondary)" }} />
+                  <span>Gamification Level</span>
+                  <Trophy size={20} style={{ color: "var(--color-secondary)" }} />
                 </div>
-                <div className={styles.dashCardValue}>1,240</div>
+                <div className={styles.dashCardValue}>Level {gamificationStats.level}</div>
                 <span className={styles.dashCardSubtext} style={{ color: "orange" }}>
-                  Active Gamification Tier 4
+                  {gamificationStats.exp}/{gamificationStats.expToNext} XP
                 </span>
               </TiltCard>
             </div>
@@ -650,7 +1306,7 @@ export default function TeacherDashboard() {
                           }}
                         >
                           <Zap size={16} />
-                          15-minute Auto-Buffer Active: Guarding {item.student}'s wrap-up session and prep time. (Next session pushed to safe window)
+                          15-minute Auto-Buffer Active: Guarding {item.student}&apos;s wrap-up session and prep time. (Next session pushed to safe window)
                         </div>
                       )}
                     </React.Fragment>
@@ -668,27 +1324,83 @@ export default function TeacherDashboard() {
               <div>
                 <h2 style={{ fontWeight: 800, fontSize: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                   <Palette size={24} style={{ color: "var(--color-accent)" }} />
-                  <span>Interactive Whiteboard Workspace</span>
+                  <span>AI-Powered Whiteboard Studio</span>
                 </h2>
                 <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
-                  Demonstrate concepts dynamically. Share drawings directly with the client student session.
+                  Collaborate in real-time with AI suggestions and smart drawing tools.
                 </p>
               </div>
-              <div style={{
-                background: "var(--sticky-yellow)",
-                padding: "0.5rem 1rem",
-                borderRadius: "12px",
-                border: "1px solid rgba(0,0,0,0.05)",
-                fontSize: "0.85rem",
-                fontWeight: 700,
-                display: "flex",
-                alignItems: "center",
-                gap: "0.25rem"
-              }}>
-                <Edit3 size={14} />
-                <span>Prompt: {whiteboardPrompt}</span>
+              <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                <div style={{
+                  background: "var(--sticky-yellow)",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(0,0,0,0.05)",
+                  fontSize: "0.85rem",
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.25rem"
+                }}>
+                  <Edit3 size={14} />
+                  <span>Prompt: {whiteboardPrompt}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    // AI Suggestion generation
+                    const suggestions = [
+                      "Try drawing a step-by-step process breakdown",
+                      "Consider using color-coding for different concepts",
+                      "Add simple icons to represent key ideas",
+                      "Create a mind map structure for better organization"
+                    ];
+                    setAiSuggestions(suggestions);
+                  }}
+                  className={styles.btnSecondary}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    fontSize: "0.9rem"
+                  }}
+                >
+                  <Brain size={16} />
+                  AI Suggestions
+                </button>
               </div>
             </div>
+
+            {/* AI Suggestions Panel */}
+            {aiSuggestions.length > 0 && (
+              <div style={{
+                background: "linear-gradient(135deg, rgba(72, 107, 229, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%)",
+                padding: "1rem",
+                borderRadius: "12px",
+                border: "1px solid rgba(72, 107, 229, 0.2)",
+                marginBottom: "1.5rem"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                  <Sparkle size={16} style={{ color: "var(--color-accent)" }} />
+                  <span style={{ fontWeight: 700, fontSize: "0.9rem" }}>AI Drawing Suggestions</span>
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                  {aiSuggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setWhiteboardPrompt(suggestion)}
+                      className={styles.btnOutline}
+                      style={{
+                        fontSize: "0.85rem",
+                        padding: "0.5rem 1rem",
+                        borderRadius: "50px"
+                      }}
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* 2-Column Grid */}
             <div className={styles.grid2col}>
@@ -737,9 +1449,19 @@ export default function TeacherDashboard() {
                     />
                   </div>
 
-                  <button className={styles.btnOutline} style={{ borderRadius: "8px", padding: "0.5rem 1.25rem" }} onClick={clearCanvas}>
-                    Clear Screen
-                  </button>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <button className={styles.btnOutline} style={{ borderRadius: "8px", padding: "0.5rem 1.25rem" }} onClick={clearCanvas}>
+                      Clear Screen
+                    </button>
+                    <button
+                      onClick={saveDrawing}
+                      className={styles.btnPrimary}
+                      style={{ borderRadius: "8px", padding: "0.5rem 1.25rem", fontSize: "0.9rem" }}
+                    >
+                      <Save size={16} />
+                      Save Drawing
+                    </button>
+                  </div>
                 </div>
 
                 {/* Preset Prompt Dropdown & Custom Override Input */}
@@ -911,6 +1633,483 @@ export default function TeacherDashboard() {
           </div>
         )}
 
+         {/* ADVANCED ANALYTICS PANEL */}
+        {activeTab === "analytics" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
+            {/* Analytics Period Selector */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <h2 style={{ fontWeight: 800, fontSize: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <BarChart3 size={24} style={{ color: "var(--color-primary)" }} />
+                  <span>Advanced Analytics Dashboard</span>
+                </h2>
+                <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
+                  AI-powered insights and performance metrics for optimized teaching strategies.
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                {["week", "month", "quarter"].map((period) => (
+                  <button
+                    key={period}
+                    onClick={() => setAnalyticsPeriod(period as "week" | "month" | "quarter")}
+                    className={styles.btnOutline}
+                    style={{
+                      padding: "0.5rem 1.25rem",
+                      borderRadius: "8px",
+                      background: analyticsPeriod === period ? "var(--color-primary)" : "white",
+                      color: analyticsPeriod === period ? "white" : "var(--text-navy)"
+                    }}
+                  >
+                    {period.charAt(0).toUpperCase() + period.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Performance Overview */}
+            <div className={styles.dashGrid}>
+              <TiltCard className={styles.dashCard}>
+                <div className={styles.dashCardHeader}>
+                  <span>Average Rating</span>
+                  <Star size={20} style={{ color: "#FFD700" }} />
+                </div>
+                <div className={styles.dashCardValue}>{engagementMetrics.avgRating}/5.0</div>
+                <span className={styles.dashCardSubtext} style={{ color: "green" }}>
+                  ↑ 0.3 from last period
+                </span>
+              </TiltCard>
+
+              <TiltCard className={styles.dashCard}>
+                <div className={styles.dashCardHeader}>
+                  <span>Student Retention</span>
+                  <Target size={20} style={{ color: "var(--color-accent)" }} />
+                </div>
+                <div className={styles.dashCardValue}>{engagementMetrics.retentionRate}%</div>
+                <span className={styles.dashCardSubtext} style={{ color: "var(--color-primary)" }}>
+                  Industry benchmark: 78%
+                </span>
+              </TiltCard>
+
+              <TiltCard className={styles.dashCard}>
+                <div className={styles.dashCardHeader}>
+                  <span>Parent Satisfaction</span>
+                  <Heart size={20} style={{ color: "#EF4444" }} />
+                </div>
+                <div className={styles.dashCardValue}>{engagementMetrics.parentSatisfaction}%</div>
+                <span className={styles.dashCardSubtext} style={{ color: "var(--color-secondary)" }}>
+                  Excellent feedback score
+                </span>
+              </TiltCard>
+
+              <TiltCard className={styles.dashCard}>
+                <div className={styles.dashCardHeader}>
+                  <span>Skill Improvement</span>
+                  <TrendingUpIcon size={20} style={{ color: "var(--color-secondary)" }} />
+                </div>
+                <div className={styles.dashCardValue}>{engagementMetrics.skillImprovement}%</div>
+                <span className={styles.dashCardSubtext} style={{ color: "orange" }}>
+                  +12% from baseline
+                </span>
+              </TiltCard>
+            </div>
+
+            {/* Detailed Analytics Sections */}
+            <div className={styles.grid2col}>
+              {/* Student Progress Heatmap */}
+              <div style={{ background: "white", padding: "2rem", borderRadius: "24px", border: "1px solid rgba(29, 42, 68, 0.05)" }}>
+                <h3 style={{ marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 800 }}>
+                  <Activity size={20} style={{ color: "var(--color-primary)" }} />
+                  Student Engagement Heatmap
+                </h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  {Object.entries(childrenMap).map(([childId, child]) => (
+                    <div key={childId}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                        <span style={{ fontWeight: 600 }}>{child.name}</span>
+                        <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                          Level {(childId.length % 5) + 1}
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", gap: "4px" }}>
+                        {(child.heatmap as number[]).map((value: number, index: number) => (
+                          <div
+                            key={index}
+                            style={{
+                              width: "24px",
+                              height: "24px",
+                              borderRadius: "4px",
+                              background: value === 4 ? "var(--color-primary)" :
+                                        value === 3 ? "var(--color-secondary)" :
+                                        value === 2 ? "#EAB308" :
+                                        value === 1 ? "#F59E0B" : "#FDE047",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "0.75rem",
+                              fontWeight: "700",
+                              color: value >= 3 ? "white" : "var(--text-navy)"
+                            }}
+                          >
+                            {value}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* AI Insights Panel */}
+              <div style={{ background: "white", padding: "2rem", borderRadius: "24px", border: "1px solid rgba(29, 42, 68, 0.05)" }}>
+                <h3 style={{ marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 800 }}>
+                  <Brain size={20} style={{ color: "var(--color-accent)" }} />
+                  AI-Powered Insights
+                </h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                  <div style={{
+                    padding: "1rem",
+                    background: "linear-gradient(135deg, rgba(72, 107, 229, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%)",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(72, 107, 229, 0.2)"
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                      <TargetIcon size={16} style={{ color: "var(--color-primary)" }} />
+                      <span style={{ fontWeight: 700 }}>Optimization Opportunity</span>
+                    </div>
+                    <p style={{ fontSize: "0.9rem", color: "var(--text-navy)" }}>
+                      Moving sessions to earlier times could improve focus scores by 23% based on biometric patterns.
+                    </p>
+                  </div>
+
+                  <div style={{
+                    padding: "1rem",
+                    background: "rgba(34, 197, 94, 0.1)",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(34, 197, 94, 0.2)"
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                      <AwardIcon size={16} style={{ color: "#22C55E" }} />
+                      <span style={{ fontWeight: 700 }}>Success Pattern Detected</span>
+                    </div>
+                    <p style={{ fontSize: "0.9rem", color: "var(--text-navy)" }}>
+                      Sessions with visual aids show 45% better retention rates across all student demographics.
+                    </p>
+                  </div>
+
+                  <div style={{
+                    padding: "1rem",
+                    background: "rgba(251, 146, 60, 0.1)",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(251, 146, 60, 0.2)"
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                      <AlertCircle size={16} style={{ color: "#FB923C" }} />
+                      <span style={{ fontWeight: 700 }}>Attention Required</span>
+                    </div>
+                    <p style={{ fontSize: "0.9rem", color: "var(--text-navy)" }}>
+                      Tyler shows decreased engagement after 45 minutes. Consider shortening sessions or adding breaks.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Performance Trends */}
+            <div style={{ background: "white", padding: "2rem", borderRadius: "24px", border: "1px solid rgba(29, 42, 68, 0.05)" }}>
+              <h3 style={{ marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 800 }}>
+                <TrendingUpIcon size={20} style={{ color: "var(--color-primary)" }} />
+                Performance Trends
+              </h3>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "2rem" }}>
+                <div>
+                  <h4 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: "1rem" }}>Session Duration Impact</h4>
+                  <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                    <div style={{ flex: 1 }}>
+                      {[60, 45, 30].map((duration) => (
+                        <div key={duration} style={{ marginBottom: "0.5rem" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.25rem" }}>
+                            <span style={{ fontSize: "0.85rem" }}>{duration} min</span>
+                            <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                              {85 - (duration - 30) * 2}%
+                            </span>
+                          </div>
+                          <div style={{
+                            height: "8px",
+                            background: "rgba(29, 42, 68, 0.1)",
+                            borderRadius: "4px",
+                            overflow: "hidden"
+                          }}>
+                            <div style={{
+                              height: "100%",
+                              width: `${85 - (duration - 30) * 2}%`,
+                              background: duration === 45 ? "var(--color-primary)" : "var(--color-secondary)",
+                              borderRadius: "4px"
+                            }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: "1rem" }}>Preferred Teaching Methods</h4>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                    {[
+                      { method: "Visual Aids", percentage: 92 },
+                      { method: "Interactive Games", percentage: 88 },
+                      { method: "Direct Instruction", percentage: 75 },
+                      { method: "Group Activities", percentage: 68 }
+                    ].map((item) => (
+                      <div key={item.method}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.25rem" }}>
+                          <span style={{ fontSize: "0.85rem" }}>{item.method}</span>
+                          <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>{item.percentage}%</span>
+                        </div>
+                        <div style={{
+                          height: "8px",
+                          background: "rgba(29, 42, 68, 0.1)",
+                          borderRadius: "4px",
+                          overflow: "hidden"
+                        }}>
+                          <div style={{
+                            height: "100%",
+                            width: `${item.percentage}%`,
+                            background: "var(--color-primary)",
+                            borderRadius: "4px"
+                          }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* AI ASSISTANT PANEL */}
+        {activeTab === "ai-assistant" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <h2 style={{ fontWeight: 800, fontSize: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <Brain size={24} style={{ color: "var(--color-accent)" }} />
+                  <span>AI Teaching Assistant</span>
+                </h2>
+                <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
+                  Real-time AI recommendations and insights to enhance your teaching effectiveness.
+                </p>
+              </div>
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.5rem 1rem",
+                borderRadius: "50px",
+                background: activeAIMode ? "var(--color-primary)" : "var(--bg-cream)",
+                color: activeAIMode ? "white" : "var(--text-navy)",
+                fontWeight: 700,
+                fontSize: "0.9rem"
+              }}>
+                <div style={{
+                  width: "8px",
+                  height: "8px",
+                  background: activeAIMode ? "#10B981" : "#EF4444",
+                  borderRadius: "50%",
+                  marginRight: "0.5rem"
+                }} />
+                AI Mode: {activeAIMode ? "Active" : "Standby"}
+              </div>
+            </div>
+
+            {/* AI Recommendations */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 700 }}>Smart Recommendations</h3>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem" }}>
+                {aiRecommendations.map((rec) => (
+                  <div
+                    key={rec.id}
+                    style={{
+                      flex: 1,
+                      minWidth: "300px",
+                      background: "white",
+                      padding: "1.5rem",
+                      borderRadius: "16px",
+                      border: "1px solid rgba(29, 42, 68, 0.05)",
+                      position: "relative",
+                      overflow: "hidden"
+                    }}
+                  >
+                    <div style={{
+                      position: "absolute",
+                      top: 0,
+                      right: 0,
+                      width: "4px",
+                      height: "100%",
+                      background: rec.priority === "high" ? "#EF4444" :
+                                  rec.priority === "medium" ? "#F59E0B" : "#10B981"
+                    }} />
+                    <div style={{ marginBottom: "1rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                        {rec.type === "session_optimization" && <Target size={16} style={{ color: "var(--color-primary)" }} />}
+                        {rec.type === "resource_suggestion" && <BookOpen size={16} style={{ color: "var(--color-secondary)" }} />}
+                        {rec.type === "skill_focus" && <Brain size={16} style={{ color: "var(--color-accent)" }} />}
+                        {rec.type === "parent_communication" && <MessageSquare size={16} style={{ color: "#10B981" }} />}
+                        <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-muted)" }}>
+                          {rec.type.replace(/_/g, ' ')}
+                        </span>
+                        <span style={{
+                          fontSize: "0.8rem",
+                          padding: "0.25rem 0.5rem",
+                          borderRadius: "50px",
+                          background: rec.priority === "high" ? "rgba(239, 68, 68, 0.1)" :
+                                    rec.priority === "medium" ? "rgba(245, 158, 11, 0.1)" : "rgba(16, 185, 129, 0.1)",
+                          color: rec.priority === "high" ? "#EF4444" :
+                                 rec.priority === "medium" ? "#F59E0B" : "#10B981"
+                        }}>
+                          {rec.priority}
+                        </span>
+                      </div>
+                      <h4 style={{ fontWeight: 700, marginBottom: "0.5rem" }}>{rec.title}</h4>
+                      <p style={{ fontSize: "0.9rem", color: "var(--text-navy)", marginBottom: "1rem" }}>
+                        {rec.description}
+                      </p>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{rec.timestamp}</span>
+                        <button
+                          onClick={() => {
+                            alert(`Action executed: ${rec.action}\n\n${rec.description}`)
+                          }}
+                          className={styles.btnPrimary}
+                          style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
+                        >
+                          {rec.action}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* AI Chat Interface */}
+            <div style={{
+              background: "white",
+              padding: "2rem",
+              borderRadius: "24px",
+              border: "1px solid rgba(29, 42, 68, 0.05)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem"
+            }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 700 }}>AI Consultation</h3>
+              <div style={{
+                height: "300px",
+                overflowY: "auto",
+                padding: "1rem",
+                background: "var(--bg-cream)",
+                borderRadius: "12px",
+                border: "1px solid rgba(29, 42, 68, 0.05)"
+              }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  <div style={{
+                    background: "var(--color-primary)",
+                    color: "white",
+                    padding: "1rem",
+                    borderRadius: "12px",
+                    maxWidth: "80%"
+                  }}>
+                    <p style={{ fontSize: "0.9rem" }}>
+                      I&apos;ve analyzed your recent teaching patterns and noticed that Emily shows exceptional progress with visual scheduling. Would you like me to generate personalized visual aids for her next session?
+                    </p>
+                  </div>
+                  <div style={{
+                    background: "var(--bg-cream)",
+                    padding: "1rem",
+                    borderRadius: "12px",
+                    maxWidth: "80%",
+                    marginLeft: "auto"
+                  }}>
+                    <p style={{ fontSize: "0.9rem" }}>
+                      Yes, that would be helpful. Also, can you suggest strategies for maintaining Tyler&apos;s focus during longer sessions?
+                    </p>
+                  </div>
+                  <div style={{
+                    background: "var(--color-primary)",
+                    color: "white",
+                    padding: "1rem",
+                    borderRadius: "12px",
+                    maxWidth: "80%"
+                  }}>
+                    <p style={{ fontSize: "0.9rem" }}>
+                      Excellent! I&apos;ll prepare visual aids for Emily and recommend implementing the Pomodoro Technique for Tyler with 25-minute focused sessions followed by 5-minute brain breaks. This has shown 35% better engagement for students with similar attention profiles.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <input
+                  type="text"
+                  value={userMessage}
+                  onChange={(e) => setUserMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendAIMessage()}
+                  placeholder="Ask your AI teaching assistant..."
+                  style={{
+                    flex: 1,
+                    padding: "0.75rem",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(29, 42, 68, 0.1)",
+                    outline: "none"
+                  }}
+                />
+                <button
+                  onClick={sendAIMessage}
+                  className={styles.btnPrimary}
+                  style={{ padding: "0.75rem 1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}
+                >
+                  <MessageCircle size={16} />
+                  Send
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+              <button
+                  onClick={() => setActiveAIMMode(!activeAIMode)}
+                className={styles.btnPrimary}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  background: activeAIMode ? "var(--color-accent)" : "var(--color-primary)"
+                }}
+              >
+                {activeAIMode ? (
+                  <>
+                    <X size={16} />
+                    Disable AI Mode
+                  </>
+                ) : (
+                  <>
+                    <Brain size={16} />
+                    Enable AI Mode
+                  </>
+                )}
+              </button>
+              <button className={styles.btnOutline} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Download size={16} />
+                Export AI Report
+              </button>
+              <button className={styles.btnOutline} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <RefreshCw size={16} />
+                Refresh Insights
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* INVOICES & EARNINGS PANEL */}
         {activeTab === "invoices" && (
           <div style={{ background: "white", padding: "2.5rem", borderRadius: "24px", border: "1px solid rgba(29, 42, 68, 0.05)" }}>
@@ -1018,13 +2217,13 @@ export default function TeacherDashboard() {
             <div style={{ border: "2px solid rgba(29,42,68,0.05)", padding: "2rem", borderRadius: "16px", backgroundColor: "var(--bg-cream)", fontSize: "0.9rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1.5rem" }}>
                 <div>
-                  <strong>James Stanfield Company</strong><br />
+                  <strong>Tutor Hub Company</strong><br />
                   123 Learning Path Circle<br />
                   Education City, CA 90210<br />
-                  tutor-safety@stanfield.com
+                  tutor-safety@tutorhub.com
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <strong>STATEMENT NO:</strong> JSS-{selectedMonth.replace(" ", "")}-042<br />
+                  <strong>STATEMENT NO:</strong> TH-{selectedMonth.replace(" ", "")}-042<br />
                   <strong>DATE:</strong> June 24, 2026<br />
                   <strong>TUTOR ID:</strong> T-ALEX-9042
                 </div>
@@ -1115,7 +2314,7 @@ export default function TeacherDashboard() {
                 gap: "0.5rem"
               }}>
                 <Sparkles size={16} />
-                <span>Statement exported successfully! Simulated PDF JSS-{selectedMonth.replace(" ", "")}-042.pdf downloaded.</span>
+                <span>Statement exported successfully! Simulated PDF TH-{selectedMonth.replace(" ", "")}-042.pdf downloaded.</span>
               </div>
             )}
           </div>
